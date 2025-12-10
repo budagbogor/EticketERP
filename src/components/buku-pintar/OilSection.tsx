@@ -1,0 +1,72 @@
+import { EngineOilSpec, FluidSpec } from "@/types/buku-pintar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Droplet } from "lucide-react";
+
+interface OilSectionProps {
+    engineOil: EngineOilSpec;
+    transmissionOil: FluidSpec;
+}
+
+export function OilSection({ engineOil, transmissionOil }: OilSectionProps) {
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                    <Droplet className="w-5 h-5 text-amber-500" />
+                    <CardTitle className="text-lg">Oli Mesin</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                        <span className="text-muted-foreground">Viskositas:</span>
+                        <span className="font-medium">{engineOil.viscosity_options.join(" / ")}</span>
+
+                        <span className="text-muted-foreground">Kapasitas (Tanpa Filter):</span>
+                        <span className="font-medium">{engineOil.capacity_liter} Liter</span>
+
+                        <span className="text-muted-foreground">Kapasitas (Ganti Filter):</span>
+                        <span className="font-medium">{engineOil.capacity_with_filter_liter} Liter</span>
+
+                        <span className="text-muted-foreground">Standar Kualitas:</span>
+                        <span className="font-medium">{engineOil.quality_standard}</span>
+                    </div>
+
+                    {engineOil.recommended_brands && (
+                        <div className="pt-2 border-t">
+                            <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
+                            <div className="flex flex-wrap gap-2">
+                                {engineOil.recommended_brands.map((brand, idx) => (
+                                    <span key={idx} className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full dark:bg-amber-900 dark:text-amber-100">
+                                        {brand}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                    <Droplet className="w-5 h-5 text-blue-500" />
+                    <CardTitle className="text-lg">Oli Transmisi</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                        <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
+                        <span className="font-medium">{transmissionOil.type}</span>
+
+                        <span className="text-muted-foreground">Kapasitas:</span>
+                        <span className="font-medium">{transmissionOil.capacity_liter} Liter</span>
+
+                        {transmissionOil.replacement_interval_km && (
+                            <>
+                                <span className="text-muted-foreground">Interval Ganti:</span>
+                                <span className="font-medium">{transmissionOil.replacement_interval_km.toLocaleString()} KM</span>
+                            </>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
