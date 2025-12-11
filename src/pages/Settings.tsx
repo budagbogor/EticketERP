@@ -126,6 +126,19 @@ export default function Settings() {
         return;
       }
 
+      // Helper function to properly escape CSV values
+      const escapeCsvValue = (value: string | null | undefined): string => {
+        if (!value) return '""';
+        // Replace newlines with spaces and escape quotes
+        const cleaned = String(value)
+          .replace(/\r\n/g, ' ')
+          .replace(/\n/g, ' ')
+          .replace(/\r/g, ' ')
+          .replace(/"/g, '""')
+          .trim();
+        return `"${cleaned}"`;
+      };
+
       const headers = [
         "No Tiket",
         "Tanggal Input",
@@ -141,23 +154,23 @@ export default function Settings() {
         "Status",
         "Tanggal Service Sebelumnya",
         "Item Service Sebelumnya",
-      ];
+      ].map(h => `"${h}"`);
 
       const csvRows = tickets.map(ticket => [
-        ticket.ticket_number,
-        format(new Date(ticket.created_at), "dd/MM/yyyy HH:mm"),
-        ticket.customer_name,
-        ticket.customer_phone,
-        `"${(ticket.customer_address || '').replace(/"/g, '""')}"`,
-        `${ticket.vehicle_brand} ${ticket.vehicle_model} (${ticket.vehicle_year})`,
-        ticket.vehicle_plate_number || "-",
-        ticket.branch,
-        ticket.category,
-        ticket.sub_category || "-",
-        `"${ticket.description.replace(/"/g, '""')}"`,
-        STATUS_LABELS[ticket.status] || ticket.status,
-        ticket.last_service_date ? format(new Date(ticket.last_service_date), "dd/MM/yyyy") : "-",
-        `"${(ticket.last_service_items || '-').replace(/"/g, '""')}"`,
+        `"${ticket.ticket_number}"`,
+        `"${format(new Date(ticket.created_at), "dd/MM/yyyy HH:mm")}"`,
+        `"${ticket.customer_name}"`,
+        `"${ticket.customer_phone}"`,
+        escapeCsvValue(ticket.customer_address),
+        `"${ticket.vehicle_brand} ${ticket.vehicle_model} ${ticket.vehicle_year || ''}"`.trim(),
+        `"${ticket.vehicle_plate_number || "-"}"`,
+        `"${ticket.branch}"`,
+        `"${ticket.category}"`,
+        `"${ticket.sub_category || "-"}"`,
+        escapeCsvValue(ticket.description),
+        `"${STATUS_LABELS[ticket.status] || ticket.status}"`,
+        `"${ticket.last_service_date ? format(new Date(ticket.last_service_date), "dd/MM/yyyy") : "-"}"`,
+        escapeCsvValue(ticket.last_service_items),
       ]);
 
       const csvContent = [headers.join(","), ...csvRows.map(row => row.join(","))].join("\n");

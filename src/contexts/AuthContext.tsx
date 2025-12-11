@@ -133,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setRoles([]);
     // Redirect to login page after logout
-    window.location.href = '/login';
+    window.location.replace('/login');
   };
 
   const isAdmin = roles.includes("admin");
