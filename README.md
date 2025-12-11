@@ -49,22 +49,26 @@
 - **AI Chatbot**: Tanya jawab tentang spesifikasi kendaraan dengan Google Gemini
 
 ### 👥 Manajemen Pengguna (User Management)
-- **Role-Based Access**: Admin, Mekanik, Customer Service
+- **Role-Based Access**: Admin, Staff, Tech Support, PSD, Viewer
 - **CRUD Users**: Tambah, edit, hapus pengguna
+- **Generate Password**: Admin dapat generate password baru untuk user
 - **Reset Password**: Kirim email reset password
 - **NIK Optional**: NIK tidak wajib untuk fleksibilitas
 - **Search & Filter**: Cari pengguna berdasarkan nama, email, NIK, role
+- **Access Control**: Viewer role hanya dapat melihat, tidak dapat create/edit
 
 ### 📊 Dashboard & Laporan
 - **Dashboard**: Statistik real-time tiket, grafik, quick actions
 - **Laporan**: Filter berdasarkan tanggal, status, kategori, prioritas
-- **Export**: Export laporan ke Excel/PDF
+- **Export CSV**: Export tiket dengan 21 kolom data lengkap (termasuk laporan teknik)
 - **Visualisasi**: Grafik dan chart untuk analisis data
 
 ### ⚙️ Pengaturan (Settings)
 - **Profil Perusahaan**: Nama, alamat, telepon, email, logo
 - **Master Data**: Kelola kategori, prioritas, status tiket
 - **Data Kendaraan**: Kelola merek, model, tipe kendaraan
+- **Backup & Export**: Export/import data lengkap dalam format JSON
+- **Backup Otomatis**: Dikelola oleh Supabase dengan retensi 7 hari
 
 ## 🛠 Teknologi
 
