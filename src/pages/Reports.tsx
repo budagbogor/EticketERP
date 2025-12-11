@@ -70,12 +70,12 @@ const calculateDuration = (startDate: Date, endDate: Date): string => {
   const days = differenceInDays(endDate, startDate);
   const hours = differenceInHours(endDate, startDate) % 24;
   const minutes = differenceInMinutes(endDate, startDate) % 60;
-  
+
   const parts = [];
   if (days > 0) parts.push(`${days} hari`);
   if (hours > 0) parts.push(`${hours} jam`);
   if (minutes > 0) parts.push(`${minutes} menit`);
-  
+
   return parts.length > 0 ? parts.join(" ") : "< 1 menit";
 };
 
@@ -164,7 +164,7 @@ export default function Reports() {
   const { data: reports = [], isLoading } = useClosedComplaints();
 
   const filteredReports = reports.filter((report) => {
-    const matchesSearch = 
+    const matchesSearch =
       report.ticket_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
       report.customer_name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesBranch = branchFilter === "all" || report.branch === branchFilter;
@@ -192,7 +192,7 @@ export default function Reports() {
     const ticketCreatedAt = new Date(report.created_at);
     const ticketClosedAt = getClosedDate(report);
     const resolutionDuration = calculateDuration(ticketCreatedAt, ticketClosedAt);
-    
+
     const activityHistoryHtml = report.activityHistory
       .map(h => `<tr><td style="padding: 6px; border: 1px solid #e5e7eb;">${format(new Date(h.performed_at), "dd/MM/yyyy HH:mm", { locale: localeId })}</td><td style="padding: 6px; border: 1px solid #e5e7eb;">${h.description || h.action}</td><td style="padding: 6px; border: 1px solid #e5e7eb;">${h.performer_name}</td></tr>`)
       .join("");
@@ -388,7 +388,11 @@ export default function Reports() {
                     const closedDate = getClosedDate(report);
                     const duration = calculateDuration(new Date(report.created_at), closedDate);
                     return (
-                      <TableRow key={report.id} className="hover:bg-muted/30">
+                      <TableRow
+                        key={report.id}
+                        className="hover:bg-muted/30 cursor-pointer"
+                        onClick={() => handleView(report)}
+                      >
                         <TableCell className="font-medium text-primary">{report.ticket_number}</TableCell>
                         <TableCell>{report.customer_name}</TableCell>
                         <TableCell>{getVehicleDisplay(report)}</TableCell>
@@ -397,18 +401,18 @@ export default function Reports() {
                           {format(closedDate, "dd/MM/yyyy", { locale: localeId })}
                         </TableCell>
                         <TableCell className="text-sm">{duration}</TableCell>
-                        <TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center gap-1">
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="icon"
                               onClick={() => handleView(report)}
                               title="Lihat Detail"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="icon"
                               onClick={() => handleDownloadPDF(report)}
                               title="Download PDF"
@@ -433,8 +437,8 @@ export default function Reports() {
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Laporan Teknik - {selectedReport?.ticket_number}</span>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => selectedReport && handleDownloadPDF(selectedReport)}
               >
@@ -443,11 +447,11 @@ export default function Reports() {
               </Button>
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedReport && (() => {
             const ticketCreatedAt = new Date(selectedReport.created_at);
             const ticketClosedAt = getClosedDate(selectedReport);
-            
+
             return (
               <div className="space-y-6">
                 {/* Customer Info */}
@@ -495,7 +499,7 @@ export default function Reports() {
                       <div><span className="text-muted-foreground">Nama PIC:</span> {selectedReport.technicalReport.pic_name}</div>
                       <div><span className="text-muted-foreground">Tanggal Laporan:</span> {format(new Date(selectedReport.technicalReport.created_at), "dd MMMM yyyy, HH:mm", { locale: localeId })}</div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm text-muted-foreground mb-1">Analisa Kerusakan</p>
@@ -590,8 +594,8 @@ export default function Reports() {
 
                 <div className="flex justify-end gap-2">
                   {selectedReport.technicalReport && (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => {
                         setIsViewDialogOpen(false);
                         navigate(`/tickets/${selectedReport.id}/technical-report/edit`);

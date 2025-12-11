@@ -208,7 +208,6 @@ export default function CreateTicket() {
           description: formData.get("description") as string,
           status: "new",
           created_by: user.id,
-          creator_name: formData.get("creatorName") as string || profile?.name || null,
           attachments: attachmentUrls.length > 0 ? attachmentUrls : null,
         })
         .select()
@@ -315,19 +314,6 @@ export default function CreateTicket() {
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="customerAddress">Alamat</Label>
               <Textarea id="customerAddress" name="customerAddress" placeholder="Masukkan alamat lengkap" rows={2} />
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="creatorName">Nama Pembuat Tiket *</Label>
-              <Input
-                id="creatorName"
-                name="creatorName"
-                placeholder="Nama pembuat tiket"
-                defaultValue={profile?.name || ''}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                Nama Anda sebagai pembuat tiket ini
-              </p>
             </div>
           </CardContent>
         </Card>

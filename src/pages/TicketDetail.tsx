@@ -329,12 +329,6 @@ export default function TicketDetail() {
                     <span>{ticket.customer_address}</span>
                   </div>
                 )}
-                {ticket.creator_name && (
-                  <div className="pt-2 border-t">
-                    <p className="text-muted-foreground">Dibuat oleh</p>
-                    <p className="font-medium">{ticket.creator_name}</p>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
