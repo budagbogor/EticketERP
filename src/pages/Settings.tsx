@@ -106,10 +106,21 @@ export default function Settings() {
     setIsExportingCsv(true);
 
     try {
-      // Fetch real tickets from Supabase
+      // Fetch real tickets from Supabase with technical reports
       const { data: tickets, error } = await supabase
         .from("complaints")
-        .select("*")
+        .select(`
+          *,
+          technical_reports (
+            pic_name,
+            damage_analysis,
+            problem_parts,
+            repair_method,
+            estimated_cost,
+            recommendation,
+            conclusion
+          )
+        `)
         .gte("created_at", startOfDay(startDate).toISOString())
         .lte("created_at", endOfDay(endDate).toISOString())
         .order("created_at", { ascending: false });
@@ -140,6 +151,7 @@ export default function Settings() {
       };
 
       const headers = [
+        // Basic ticket information
         "No Tiket",
         "Tanggal Input",
         "Nama Pelanggan",
@@ -154,24 +166,48 @@ export default function Settings() {
         "Status",
         "Tanggal Service Sebelumnya",
         "Item Service Sebelumnya",
+        // Technical Report Analysis
+        "Nama PIC",
+        "Analisa Kerusakan",
+        "Part Bermasalah",
+        "Metode Perbaikan",
+        "Estimasi Biaya (Rp)",
+        "Rekomendasi",
+        "Kesimpulan",
       ].map(h => `"${h}"`);
 
-      const csvRows = tickets.map(ticket => [
-        `"${ticket.ticket_number}"`,
-        `"${format(new Date(ticket.created_at), "dd/MM/yyyy HH:mm")}"`,
-        `"${ticket.customer_name}"`,
-        `"${ticket.customer_phone}"`,
-        escapeCsvValue(ticket.customer_address),
-        `"${ticket.vehicle_brand} ${ticket.vehicle_model} ${ticket.vehicle_year || ''}"`.trim(),
-        `"${ticket.vehicle_plate_number || "-"}"`,
-        `"${ticket.branch}"`,
-        `"${ticket.category}"`,
-        `"${ticket.sub_category || "-"}"`,
-        escapeCsvValue(ticket.description),
-        `"${STATUS_LABELS[ticket.status] || ticket.status}"`,
-        `"${ticket.last_service_date ? format(new Date(ticket.last_service_date), "dd/MM/yyyy") : "-"}"`,
-        escapeCsvValue(ticket.last_service_items),
-      ]);
+      const csvRows = tickets.map(ticket => {
+        // Get technical report data (array with single item or null)
+        const report = Array.isArray(ticket.technical_reports) && ticket.technical_reports.length > 0
+          ? ticket.technical_reports[0]
+          : null;
+
+        return [
+          // Basic ticket information
+          `"${ticket.ticket_number}"`,
+          `"${format(new Date(ticket.created_at), "dd/MM/yyyy HH:mm")}"`,
+          `"${ticket.customer_name}"`,
+          `"${ticket.customer_phone}"`,
+          escapeCsvValue(ticket.customer_address),
+          `"${ticket.vehicle_brand} ${ticket.vehicle_model} ${ticket.vehicle_year || ''}".trim()`,
+          `"${ticket.vehicle_plate_number || "-"}"`,
+          `"${ticket.branch}"`,
+          `"${ticket.category}"`,
+          `"${ticket.sub_category || "-"}"`,
+          escapeCsvValue(ticket.description),
+          `"${STATUS_LABELS[ticket.status] || ticket.status}"`,
+          `"${ticket.last_service_date ? format(new Date(ticket.last_service_date), "dd/MM/yyyy") : "-"}"`,
+          escapeCsvValue(ticket.last_service_items),
+          // Technical Report Analysis
+          `"${report?.pic_name || "-"}"`,
+          escapeCsvValue(report?.damage_analysis),
+          escapeCsvValue(report?.problem_parts),
+          escapeCsvValue(report?.repair_method),
+          `"${report?.estimated_cost ? report.estimated_cost.toLocaleString('id-ID') : "-"}"`,
+          escapeCsvValue(report?.recommendation),
+          escapeCsvValue(report?.conclusion),
+        ];
+      });
 
       const csvContent = [headers.join(","), ...csvRows.map(row => row.join(","))].join("\n");
       const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
@@ -187,7 +223,7 @@ export default function Settings() {
       setIsExportingCsv(false);
       toast({
         title: "Export CSV Berhasil",
-        description: `${tickets.length} tiket berhasil di-export`,
+        description: `${tickets.length} tiket berhasil di-export dengan data laporan teknik`,
       });
     } catch (error: any) {
       setIsExportingCsv(false);
