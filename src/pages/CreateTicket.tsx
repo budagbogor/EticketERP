@@ -316,21 +316,19 @@ export default function CreateTicket() {
               <Label htmlFor="customerAddress">Alamat</Label>
               <Textarea id="customerAddress" name="customerAddress" placeholder="Masukkan alamat lengkap" rows={2} />
             </div>
-            {/* Creator Name - Only for Admin */}
-            {profile?.role === 'admin' && (
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="creatorName">Nama Pembuat Tiket</Label>
-                <Input
-                  id="creatorName"
-                  name="creatorName"
-                  placeholder="Nama pembuat tiket (opsional)"
-                  defaultValue={profile?.name || ''}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Kosongkan jika Anda yang membuat tiket ini
-                </p>
-              </div>
-            )}
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="creatorName">Nama Pembuat Tiket *</Label>
+              <Input
+                id="creatorName"
+                name="creatorName"
+                placeholder="Nama pembuat tiket"
+                defaultValue={profile?.name || ''}
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Nama Anda sebagai pembuat tiket ini
+              </p>
+            </div>
           </CardContent>
         </Card>
 
