@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { STATUS_LABELS } from "@/lib/constants";
-import { Search, Plus, Eye, Pencil, Trash2, Timer } from "lucide-react";
-import { differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
+import { Search, Plus, Eye, Pencil, Trash2, Timer, Calendar } from "lucide-react";
+import { differenceInDays, differenceInHours, differenceInMinutes, format } from "date-fns";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useBranches, useComplaintCategories } from "@/hooks/useMasterData";
 import { supabase } from "@/integrations/supabase/client";
@@ -187,6 +187,7 @@ export default function TicketList() {
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead className="font-semibold">No. Tiket</TableHead>
+                  <TableHead className="font-semibold">Tanggal</TableHead>
                   <TableHead className="font-semibold">Pelanggan</TableHead>
                   <TableHead className="font-semibold">Kendaraan</TableHead>
                   <TableHead className="font-semibold">Cabang</TableHead>
@@ -200,7 +201,7 @@ export default function TicketList() {
                 {isLoading ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
-                      {Array.from({ length: 8 }).map((_, j) => (
+                      {Array.from({ length: 9 }).map((_, j) => (
                         <TableCell key={j}>
                           <Skeleton className="h-6 w-full" />
                         </TableCell>
@@ -209,7 +210,7 @@ export default function TicketList() {
                   ))
                 ) : filteredTickets.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                       Tidak ada tiket yang ditemukan
                     </TableCell>
                   </TableRow>
@@ -227,6 +228,12 @@ export default function TicketList() {
                         onClick={() => navigate(`/tickets/${ticket.id}`)}
                       >
                         <TableCell className="font-medium text-primary">{ticket.ticket_number}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1 text-sm">
+                            <Calendar className="w-3 h-3 text-muted-foreground" />
+                            <span>{format(new Date(ticket.created_at), "dd/MM/yyyy")}</span>
+                          </div>
+                        </TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium">{ticket.customer_name}</p>
