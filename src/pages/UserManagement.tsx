@@ -530,28 +530,57 @@ export default function UserManagement() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => {
+                  onClick={async () => {
                     if (selectedUser) {
-                      // Generate new temporary password (8 karakter: huruf + angka)
+                      // Generate new temporary password (8 characters: letters + numbers)
                       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
                       let tempPassword = '';
                       for (let i = 0; i < 8; i++) {
                         tempPassword += chars.charAt(Math.floor(Math.random() * chars.length));
                       }
 
-                      setGeneratedPassword(tempPassword);
-                      setNewUserName(selectedUser.name);
-                      setPasswordCopied(false);
-                      setIsPasswordDialogOpen(true);
+                      setIsSaving(true);
 
-                      toast({
-                        title: "Password Baru Dibuat",
-                        description: "Password sementara telah dibuat. Silakan catat dan berikan ke pengguna.",
-                      });
+                      try {
+                        // Call edge function to update password
+                        const response = await supabase.functions.invoke("admin-reset-password", {
+                          body: {
+                            userId: selectedUser.id,
+                            newPassword: tempPassword,
+                          },
+                        });
+
+                        if (response.error) {
+                          throw new Error(response.error.message);
+                        }
+
+                        if (response.data?.error) {
+                          throw new Error(response.data.error);
+                        }
+
+                        setGeneratedPassword(tempPassword);
+                        setNewUserName(selectedUser.name);
+                        setPasswordCopied(false);
+                        setIsPasswordDialogOpen(true);
+
+                        toast({
+                          title: "Password Baru Dibuat",
+                          description: "Password sementara telah dibuat dan disimpan. Silakan catat dan berikan ke pengguna.",
+                        });
+                      } catch (error: any) {
+                        toast({
+                          title: "Error",
+                          description: error.message || "Gagal membuat password baru",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setIsSaving(false);
+                      }
                     }
                   }}
                   disabled={isSaving || !selectedUser}
                 >
+                  {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Generate Password Baru
                 </Button>
               </div>
