@@ -67,30 +67,70 @@ export default function Settings() {
 
   const handleExportData = async () => {
     setIsExporting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const exportData = {
-      company: companyData,
-      exportDate: new Date().toISOString(),
-      totalTickets: 150,
-      totalUsers: 25,
-    };
+    try {
+      // Fetch all data from Supabase
+      const [tickets, reports, profiles, branches, categories, subCategories] = await Promise.all([
+        supabase.from("complaints").select("*"),
+        supabase.from("technical_reports").select("*"),
+        supabase.from("profiles").select("*"),
+        supabase.from("branches").select("*"),
+        supabase.from("complaint_categories").select("*"),
+        supabase.from("sub_categories").select("*"),
+      ]);
 
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `mobeng-export-${new Date().toISOString().split("T")[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      // Check for errors
+      if (tickets.error) throw tickets.error;
+      if (reports.error) throw reports.error;
+      if (profiles.error) throw profiles.error;
+      if (branches.error) throw branches.error;
+      if (categories.error) throw categories.error;
+      if (subCategories.error) throw subCategories.error;
 
-    setIsExporting(false);
-    toast({
-      title: "Export Berhasil",
-      description: "Data telah berhasil di-export",
-    });
+      const exportData = {
+        version: "1.0",
+        exportDate: new Date().toISOString(),
+        data: {
+          tickets: tickets.data || [],
+          technicalReports: reports.data || [],
+          profiles: profiles.data || [],
+          branches: branches.data || [],
+          categories: categories.data || [],
+          subCategories: subCategories.data || [],
+        },
+        metadata: {
+          totalTickets: tickets.data?.length || 0,
+          totalReports: reports.data?.length || 0,
+          totalUsers: profiles.data?.length || 0,
+          totalBranches: branches.data?.length || 0,
+          totalCategories: categories.data?.length || 0,
+        },
+        company: companyData,
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mobeng-backup-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setIsExporting(false);
+      toast({
+        title: "Export Berhasil",
+        description: `${exportData.metadata.totalTickets} tiket, ${exportData.metadata.totalReports} laporan teknik, dan data lainnya berhasil di-export`,
+      });
+    } catch (error: any) {
+      setIsExporting(false);
+      toast({
+        title: "Export Gagal",
+        description: error.message || "Terjadi kesalahan saat export data",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleExportCsv = async () => {
@@ -241,21 +281,84 @@ export default function Settings() {
     input.accept = ".json";
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        try {
-          const text = await file.text();
-          JSON.parse(text);
-          toast({
-            title: "Import Berhasil",
-            description: `Data dari ${file.name} berhasil diimport`,
-          });
-        } catch {
-          toast({
-            title: "Import Gagal",
-            description: "Format file tidak valid",
-            variant: "destructive",
-          });
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const importData = JSON.parse(text);
+
+        // Validate data structure
+        if (!importData.version || !importData.data) {
+          throw new Error("Format file tidak valid. File harus berisi 'version' dan 'data'.");
         }
+
+        // Show confirmation dialog
+        const confirmed = window.confirm(
+          `Import akan menambahkan data berikut:\n\n` +
+          `• ${importData.data.tickets?.length || 0} tiket\n` +
+          `• ${importData.data.technicalReports?.length || 0} laporan teknik\n` +
+          `• ${importData.data.branches?.length || 0} cabang\n` +
+          `• ${importData.data.categories?.length || 0} kategori\n\n` +
+          `Data yang sudah ada akan di-update jika ID sama.\n` +
+          `Lanjutkan import?`
+        );
+
+        if (!confirmed) return;
+
+        setIsSaving(true);
+
+        // Import tickets
+        if (importData.data.tickets?.length > 0) {
+          const { error } = await supabase
+            .from("complaints")
+            .upsert(importData.data.tickets, { onConflict: "id" });
+          if (error) throw new Error(`Gagal import tiket: ${error.message}`);
+        }
+
+        // Import technical reports
+        if (importData.data.technicalReports?.length > 0) {
+          const { error } = await supabase
+            .from("technical_reports")
+            .upsert(importData.data.technicalReports, { onConflict: "id" });
+          if (error) throw new Error(`Gagal import laporan teknik: ${error.message}`);
+        }
+
+        // Import branches
+        if (importData.data.branches?.length > 0) {
+          const { error } = await supabase
+            .from("branches")
+            .upsert(importData.data.branches, { onConflict: "id" });
+          if (error) throw new Error(`Gagal import cabang: ${error.message}`);
+        }
+
+        // Import categories
+        if (importData.data.categories?.length > 0) {
+          const { error } = await supabase
+            .from("complaint_categories")
+            .upsert(importData.data.categories, { onConflict: "id" });
+          if (error) throw new Error(`Gagal import kategori: ${error.message}`);
+        }
+
+        // Import sub categories
+        if (importData.data.subCategories?.length > 0) {
+          const { error } = await supabase
+            .from("sub_categories")
+            .upsert(importData.data.subCategories, { onConflict: "id" });
+          if (error) throw new Error(`Gagal import sub kategori: ${error.message}`);
+        }
+
+        setIsSaving(false);
+        toast({
+          title: "Import Berhasil",
+          description: `Data dari ${file.name} berhasil diimport ke database`,
+        });
+      } catch (error: any) {
+        setIsSaving(false);
+        toast({
+          title: "Import Gagal",
+          description: error.message || "Format file tidak valid",
+          variant: "destructive",
+        });
       }
     };
     input.click();
