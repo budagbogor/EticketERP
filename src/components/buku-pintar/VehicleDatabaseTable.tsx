@@ -11,13 +11,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { DeleteVariantDialog } from "@/components/buku-pintar/DeleteVariantDialog";
+import { bukuPintarData } from "@/lib/buku-pintar-data";
 
 interface VehicleDatabaseTableProps {
     vehicles: Vehicle[];
     onSelect: (vehicle: Vehicle, variant: VehicleVariant) => void;
+    onDelete: (brandName: string, modelName: string, variantId: string) => void;
 }
 
-export function VehicleDatabaseTable({ vehicles, onSelect }: VehicleDatabaseTableProps) {
+export function VehicleDatabaseTable({ vehicles, onSelect, onDelete }: VehicleDatabaseTableProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -25,19 +28,30 @@ export function VehicleDatabaseTable({ vehicles, onSelect }: VehicleDatabaseTabl
     // Flatten data for table view
     const flatData = useMemo(() => {
         return vehicles.flatMap(vehicle => {
-            return vehicle.variants.map(variant => ({
-                id: variant.id,
-                brand: vehicle.brand,
-                model: vehicle.model,
-                yearStart: variant.year_start || vehicle.year_start,
-                yearEnd: variant.year_end || vehicle.year_end,
-                variant: variant.name,
-                transmission: variant.transmission,
-                engineCode: variant.engine_code,
-                // Include full objects for selection
-                originalVehicle: vehicle,
-                originalVariant: variant
-            }));
+            return vehicle.variants.map(variant => {
+                // Check if this variant is from mock data (not deletable)
+                const isMockData = bukuPintarData.some(
+                    mockVehicle =>
+                        mockVehicle.brand.toLowerCase() === vehicle.brand.toLowerCase() &&
+                        mockVehicle.model.toLowerCase() === vehicle.model.toLowerCase() &&
+                        mockVehicle.variants.some(mockVariant => mockVariant.id === variant.id)
+                );
+
+                return {
+                    id: variant.id,
+                    brand: vehicle.brand,
+                    model: vehicle.model,
+                    yearStart: variant.year_start || vehicle.year_start,
+                    yearEnd: variant.year_end || vehicle.year_end,
+                    variant: variant.name,
+                    transmission: variant.transmission,
+                    engineCode: variant.engine_code,
+                    isCustom: !isMockData,
+                    // Include full objects for selection
+                    originalVehicle: vehicle,
+                    originalVariant: variant
+                };
+            });
         });
     }, [vehicles]);
 
@@ -95,6 +109,7 @@ export function VehicleDatabaseTable({ vehicles, onSelect }: VehicleDatabaseTabl
                             <TableHead>Varian</TableHead>
                             <TableHead>Transmisi</TableHead>
                             <TableHead>Kode Mesin</TableHead>
+                            <TableHead className="w-[80px]">Aksi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -113,11 +128,22 @@ export function VehicleDatabaseTable({ vehicles, onSelect }: VehicleDatabaseTabl
                                     <TableCell>{item.variant}</TableCell>
                                     <TableCell>{item.transmission}</TableCell>
                                     <TableCell>{item.engineCode}</TableCell>
+                                    <TableCell>
+                                        {item.isCustom ? (
+                                            <DeleteVariantDialog
+                                                vehicle={item.originalVehicle}
+                                                variant={item.originalVariant}
+                                                onDelete={onDelete}
+                                            />
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">-</span>
+                                        )}
+                                    </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
+                                <TableCell colSpan={7} className="h-24 text-center">
                                     Tidak ada data ditemukan.
                                 </TableCell>
                             </TableRow>

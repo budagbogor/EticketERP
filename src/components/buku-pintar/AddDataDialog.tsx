@@ -67,6 +67,14 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
     const [lowerArm, setLowerArm] = useState("");
     const [upperArm, setUpperArm] = useState("");
 
+    // Tire Specs
+    const [tireLocation, setTireLocation] = useState("Depan & Belakang");
+    const [tireSize, setTireSize] = useState("");
+    const [tirePressureFront, setTirePressureFront] = useState("");
+    const [tirePressureRear, setTirePressureRear] = useState("");
+    const [tireLoadSpeed, setTireLoadSpeed] = useState("");
+    const [tireBrands, setTireBrands] = useState("");
+
     const { toast } = useToast();
 
     const handleAdd = () => {
@@ -101,7 +109,14 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                     ...(partCabinFilter ? [{ category: "Filter Kabin" as const, name: "Cabin Filter", part_number: partCabinFilter }] : []),
                     ...(partSparkPlug ? [{ category: "Busi" as const, name: "Spark Plug", part_number: partSparkPlug }] : []),
                 ],
-                tires: [],
+                tires: tireSize ? [{
+                    location: tireLocation as any,
+                    size: tireSize,
+                    pressure_psi_front: Number(tirePressureFront) || 32,
+                    pressure_psi_rear: Number(tirePressureRear) || 32,
+                    load_speed_index: tireLoadSpeed || undefined,
+                    recommended_brands: tireBrands ? tireBrands.split(",").map(b => b.trim()) : undefined
+                }] : [],
                 battery: batteryType ? {
                     type: batteryType,
                     model: batteryModel,
@@ -172,6 +187,12 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setLinkStabilizer("");
         setLowerArm("");
         setUpperArm("");
+        setTireLocation("Depan & Belakang");
+        setTireSize("");
+        setTirePressureFront("");
+        setTirePressureRear("");
+        setTireLoadSpeed("");
+        setTireBrands("");
     };
 
     const currentModels = brands.find(b => b.name === selectedBrand)?.models || [];
@@ -330,9 +351,10 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                     </div>
 
                     <Tabs defaultValue="oil" className="w-full">
-                        <TabsList className="grid w-full grid-cols-5">
+                        <TabsList className="grid w-full grid-cols-6">
                             <TabsTrigger value="oil">Oli</TabsTrigger>
                             <TabsTrigger value="parts">Part</TabsTrigger>
+                            <TabsTrigger value="tires">Ban</TabsTrigger>
                             <TabsTrigger value="battery">Aki</TabsTrigger>
                             <TabsTrigger value="brakes">Rem</TabsTrigger>
                             <TabsTrigger value="suspension">Kaki-kaki</TabsTrigger>
@@ -388,6 +410,44 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 <div className="space-y-2">
                                     <Label>Busi</Label>
                                     <Input placeholder="Part Number" value={partSparkPlug} onChange={e => setPartSparkPlug(e.target.value)} />
+                                </div>
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="tires" className="space-y-4 pt-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Lokasi Ban</Label>
+                                    <Select value={tireLocation} onValueChange={setTireLocation}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih Lokasi" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Depan & Belakang">Depan & Belakang</SelectItem>
+                                            <SelectItem value="Depan">Depan</SelectItem>
+                                            <SelectItem value="Belakang">Belakang</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Ukuran Ban</Label>
+                                    <Input placeholder="Contoh: 185/65 R15" value={tireSize} onChange={e => setTireSize(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Tekanan Depan (PSI)</Label>
+                                    <Input type="number" placeholder="32" value={tirePressureFront} onChange={e => setTirePressureFront(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Tekanan Belakang (PSI)</Label>
+                                    <Input type="number" placeholder="32" value={tirePressureRear} onChange={e => setTirePressureRear(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Load & Speed Index (Opsional)</Label>
+                                    <Input placeholder="Contoh: 88H" value={tireLoadSpeed} onChange={e => setTireLoadSpeed(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Merek Rekomendasi</Label>
+                                    <Input placeholder="Pisahkan dengan koma" value={tireBrands} onChange={e => setTireBrands(e.target.value)} />
                                 </div>
                             </div>
                         </TabsContent>

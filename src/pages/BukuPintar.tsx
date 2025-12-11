@@ -21,7 +21,7 @@ export default function BukuPintar() {
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [selectedVariant, setSelectedVariant] = useState<VehicleVariant | null>(null);
     const [viewMode, setViewMode] = useState<"search" | "table">("search");
-    const { vehicles, supabaseBrands, addVariantData, updateVariantData } = useBukuPintar();
+    const { vehicles, supabaseBrands, addVariantData, updateVariantData, deleteVariantData } = useBukuPintar();
 
     const handleSelectVehicle = (vehicle: Vehicle, variant: VehicleVariant) => {
         setSelectedVehicle(vehicle);
@@ -168,6 +168,7 @@ export default function BukuPintar() {
                         handleSelectVehicle(v, var_data);
                         setViewMode("search");
                     }}
+                    onDelete={deleteVariantData}
                 />
             )}
         </div>

@@ -145,12 +145,40 @@ export function useBukuPintar() {
         localStorage.setItem(BUKU_PINTAR_STORAGE_KEY, JSON.stringify(newCustomData));
     };
 
+    const deleteVariantData = (
+        brandName: string,
+        modelName: string,
+        variantId: string
+    ) => {
+        const newCustomData = [...customData];
+        const vehicleIndex = newCustomData.findIndex(
+            v => v.brand.toLowerCase() === brandName.toLowerCase() &&
+                v.model.toLowerCase() === modelName.toLowerCase()
+        );
+
+        if (vehicleIndex !== -1) {
+            // Remove the variant from the vehicle
+            newCustomData[vehicleIndex].variants = newCustomData[vehicleIndex].variants.filter(
+                v => v.id !== variantId
+            );
+
+            // If no variants left, remove the entire vehicle entry
+            if (newCustomData[vehicleIndex].variants.length === 0) {
+                newCustomData.splice(vehicleIndex, 1);
+            }
+        }
+
+        setCustomData(newCustomData);
+        localStorage.setItem(BUKU_PINTAR_STORAGE_KEY, JSON.stringify(newCustomData));
+    };
+
     return {
         vehicles: completeData,
         supabaseBrands,
         isSupabaseLoading,
         refreshVehicles,
         addVariantData,
-        updateVariantData
+        updateVariantData,
+        deleteVariantData
     };
 }
