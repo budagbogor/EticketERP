@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { AdminRoute, ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminRoute, ProtectedRoute, WriterRoute } from "@/components/auth/ProtectedRoute";
 
 // Pages
 import Login from "./pages/Login";
@@ -72,11 +72,11 @@ const App = () => (
             <Route
               path="/tickets/create"
               element={
-                <ProtectedRoute>
+                <WriterRoute>
                   <AppLayout>
                     <CreateTicket />
                   </AppLayout>
-                </ProtectedRoute>
+                </WriterRoute>
               }
             />
             <Route
@@ -92,31 +92,31 @@ const App = () => (
             <Route
               path="/tickets/:ticketId/edit"
               element={
-                <ProtectedRoute>
+                <WriterRoute>
                   <AppLayout>
                     <EditTicket />
                   </AppLayout>
-                </ProtectedRoute>
+                </WriterRoute>
               }
             />
             <Route
               path="/tickets/:ticketId/technical-report"
               element={
-                <ProtectedRoute>
+                <WriterRoute>
                   <AppLayout>
                     <CreateTechnicalReport />
                   </AppLayout>
-                </ProtectedRoute>
+                </WriterRoute>
               }
             />
             <Route
               path="/tickets/:ticketId/technical-report/edit"
               element={
-                <ProtectedRoute>
+                <WriterRoute>
                   <AppLayout>
                     <EditTechnicalReport />
                   </AppLayout>
-                </ProtectedRoute>
+                </WriterRoute>
               }
             />
             <Route

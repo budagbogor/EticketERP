@@ -18,6 +18,9 @@ interface AuthContextType {
   profile: Profile | null;
   roles: AppRole[];
   isAdmin: boolean;
+  canCreateTickets: boolean;
+  canCreateReports: boolean;
+  isViewer: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, name: string, branch?: string) => Promise<{ error: Error | null }>;
@@ -134,6 +137,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isAdmin = roles.includes("admin");
+  const isViewer = roles.includes("viewer");
+  const canCreateTickets = !isViewer && roles.length > 0;
+  const canCreateReports = !isViewer && roles.length > 0;
 
   return (
     <AuthContext.Provider
@@ -143,6 +149,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         roles,
         isAdmin,
+        canCreateTickets,
+        canCreateReports,
+        isViewer,
         isLoading,
         signIn,
         signUp,

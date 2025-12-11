@@ -11,13 +11,13 @@ import { STATUS_LABELS, ROLE_LABELS } from "@/lib/constants";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { 
-  ArrowLeft, 
-  User, 
-  Car, 
-  MapPin, 
-  Phone, 
-  Calendar, 
+import {
+  ArrowLeft,
+  User,
+  Car,
+  MapPin,
+  Phone,
+  Calendar,
   FileText,
   Send,
   CheckCircle,
@@ -37,19 +37,19 @@ const calculateDuration = (startDate: Date, endDate: Date): string => {
   const days = differenceInDays(endDate, startDate);
   const hours = differenceInHours(endDate, startDate) % 24;
   const minutes = differenceInMinutes(endDate, startDate) % 60;
-  
+
   const parts = [];
   if (days > 0) parts.push(`${days} hari`);
   if (hours > 0) parts.push(`${hours} jam`);
   if (minutes > 0) parts.push(`${minutes} menit`);
-  
+
   return parts.length > 0 ? parts.join(" ") : "< 1 menit";
 };
 
 export default function TicketDetail() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, canCreateReports } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -66,7 +66,7 @@ export default function TicketDetail() {
         .select("*")
         .eq("id", ticketId)
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -82,7 +82,7 @@ export default function TicketDetail() {
         .select("*")
         .eq("complaint_id", ticketId)
         .order("performed_at", { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -98,7 +98,7 @@ export default function TicketDetail() {
         .select("*")
         .eq("complaint_id", ticketId)
         .maybeSingle();
-      
+
       if (error) throw error;
       return data;
     },
@@ -159,16 +159,16 @@ export default function TicketDetail() {
 
     try {
       const newStatus = selectedDepartment === "tech_support" ? "escalated_tech" : "escalated_psd";
-      
+
       const { error } = await supabase
         .from("complaints")
-        .update({ 
-          status: newStatus, 
+        .update({
+          status: newStatus,
           assigned_department: selectedDepartment,
           updated_at: new Date().toISOString()
         })
         .eq("id", ticketId);
-      
+
       if (error) throw error;
 
       // Add history record
@@ -183,7 +183,7 @@ export default function TicketDetail() {
 
       queryClient.invalidateQueries({ queryKey: ["complaint", ticketId] });
       queryClient.invalidateQueries({ queryKey: ["complaint_history", ticketId] });
-      
+
       toast({
         title: "Tiket Diteruskan",
         description: `Tiket berhasil diteruskan ke ${selectedDepartment === "tech_support" ? "Teknikal Support" : "Produk & Service Development"}`,
@@ -201,12 +201,12 @@ export default function TicketDetail() {
     try {
       const { error } = await supabase
         .from("complaints")
-        .update({ 
+        .update({
           status: newStatus,
           updated_at: new Date().toISOString()
         })
         .eq("id", ticketId);
-      
+
       if (error) throw error;
 
       // Add history record
@@ -221,7 +221,7 @@ export default function TicketDetail() {
 
       queryClient.invalidateQueries({ queryKey: ["complaint", ticketId] });
       queryClient.invalidateQueries({ queryKey: ["complaint_history", ticketId] });
-      
+
       toast({
         title: "Status Diperbarui",
         description: `Status tiket berubah menjadi "${STATUS_LABELS[newStatus] || newStatus}"`,
@@ -268,7 +268,7 @@ export default function TicketDetail() {
 
       queryClient.invalidateQueries({ queryKey: ["complaint_history", ticketId] });
       setComment("");
-      
+
       toast({
         title: "Komentar Terkirim",
         description: "Komentar berhasil ditambahkan",
@@ -520,8 +520,8 @@ export default function TicketDetail() {
                       <span className="bg-card px-2 text-muted-foreground">atau</span>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => handleStatusChange("repair_completed")}
                   >
@@ -533,15 +533,15 @@ export default function TicketDetail() {
 
               {["escalated_tech", "in_progress"].includes(ticket.status) && (
                 <div className="space-y-2">
-                  <Button 
+                  <Button
                     className="w-full"
                     onClick={() => handleStatusChange("repair_completed")}
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Perbaikan Selesai
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => handleStatusChange("escalated_psd")}
                   >
@@ -553,15 +553,15 @@ export default function TicketDetail() {
 
               {ticket.status === "escalated_psd" && (
                 <div className="space-y-2">
-                  <Button 
+                  <Button
                     className="w-full"
                     onClick={() => handleStatusChange("repair_completed")}
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Perbaikan Selesai
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => handleStatusChange("escalated_tech")}
                   >
@@ -572,7 +572,7 @@ export default function TicketDetail() {
               )}
 
               {ticket.status === "repair_completed" && !technicalReport && (
-                <Button 
+                <Button
                   className="w-full"
                   onClick={() => navigate(`/tickets/${ticketId}/technical-report`)}
                 >
@@ -582,7 +582,7 @@ export default function TicketDetail() {
               )}
 
               {ticket.status === "awaiting_report" && !technicalReport && (
-                <Button 
+                <Button
                   className="w-full"
                   onClick={() => navigate(`/tickets/${ticketId}/technical-report`)}
                 >
@@ -592,7 +592,7 @@ export default function TicketDetail() {
               )}
 
               {technicalReport && (
-                <Button 
+                <Button
                   variant="outline"
                   className="w-full"
                   onClick={() => setShowReportDialog(true)}
@@ -603,8 +603,8 @@ export default function TicketDetail() {
               )}
 
               {!["closed", "cancelled"].includes(ticket.status) && (
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   className="w-full"
                   onClick={() => handleStatusChange("cancelled")}
                 >
@@ -621,14 +621,14 @@ export default function TicketDetail() {
               <CardTitle className="text-base">Update Progress / Komentar</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Textarea 
-                placeholder="Tulis Progress/catatan/komentar.." 
+              <Textarea
+                placeholder="Tulis Progress/catatan/komentar.."
                 rows={3}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
               />
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
                 onClick={handleSendComment}
                 disabled={isSendingComment || !comment.trim()}
@@ -719,7 +719,7 @@ export default function TicketDetail() {
                   <div><span className="text-muted-foreground">Nama PIC:</span> {technicalReport.pic_name}</div>
                   <div><span className="text-muted-foreground">Tanggal Laporan:</span> {format(new Date(technicalReport.created_at), "dd MMMM yyyy, HH:mm", { locale: id })}</div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Analisa Kerusakan</p>
@@ -801,8 +801,8 @@ export default function TicketDetail() {
               </div>
 
               <div className="flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setShowReportDialog(false);
                     navigate(`/tickets/${ticketId}/technical-report/edit`);

@@ -25,6 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 const calculateDuration = (startDate: Date, endDate: Date): string => {
   const days = differenceInDays(endDate, startDate);
@@ -54,6 +55,7 @@ export default function TicketList() {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { canCreateTickets } = useAuth();
 
   // Read search query from URL parameters
   useEffect(() => {
@@ -118,12 +120,14 @@ export default function TicketList() {
           <h1 className="text-2xl font-bold">Daftar Tiket</h1>
           <p className="text-muted-foreground">Kelola semua tiket komplain</p>
         </div>
-        <Link to="/tickets/create">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Buat Tiket Baru
-          </Button>
-        </Link>
+        {canCreateTickets && (
+          <Link to="/tickets/create">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Buat Tiket Baru
+            </Button>
+          </Link>
+        )}
       </div>
 
       <Card>
@@ -260,23 +264,27 @@ export default function TicketList() {
                                 <Eye className="w-4 h-4" />
                               </Button>
                             </Link>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="Edit"
-                              onClick={() => handleEdit(ticket.id)}
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="Hapus"
-                              className="text-destructive hover:text-destructive"
-                              onClick={() => handleDeleteClick(ticket.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            {canCreateTickets && (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Edit"
+                                  onClick={() => handleEdit(ticket.id)}
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title="Hapus"
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() => handleDeleteClick(ticket.id)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

@@ -39,3 +39,31 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
 export function AdminRoute({ children }: { children: React.ReactNode }) {
   return <ProtectedRoute requiredRole="admin">{children}</ProtectedRoute>;
 }
+
+export function WriterRoute({ children }: { children: React.ReactNode }) {
+  const { roles, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="space-y-4 w-full max-w-md p-8">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+      </div>
+    );
+  }
+
+  // Viewer tidak boleh akses create/edit routes
+  if (roles.includes("viewer")) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // User tanpa role juga tidak boleh
+  if (roles.length === 0) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
