@@ -24,6 +24,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
     const [yearEnd, setYearEnd] = useState("");
     const [engineCode, setEngineCode] = useState("");
     const [transmission, setTransmission] = useState("");
+    const [engineType, setEngineType] = useState("");
     const [isNewBrand, setIsNewBrand] = useState(false);
     const [isNewModel, setIsNewModel] = useState(false);
 
@@ -78,6 +79,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
             id: crypto.randomUUID(),
             name: variantName,
             transmission: (transmission as "AT" | "MT" | "CVT" | "DCT" | "Manual" | "Automatic") || "AT",
+            engine_type: engineType as any,
             year_start: yearStart ? Number(yearStart) : undefined,
             year_end: yearEnd ? Number(yearEnd) : undefined,
             engine_code: engineCode || "N/A",
@@ -142,6 +144,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setYearEnd("");
         setEngineCode("");
         setTransmission("");
+        setEngineType("");
         setOilViscosity("");
         setOilCapacity("");
         setOilQuality("");
@@ -304,6 +307,24 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 <SelectItem value="MT">Manual (MT)</SelectItem>
                                 <SelectItem value="CVT">CVT</SelectItem>
                                 <SelectItem value="DCT">DCT</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Type Mesin</Label>
+                        <Select value={engineType} onValueChange={setEngineType}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Pilih Type Mesin" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Bensin">Bensin</SelectItem>
+                                <SelectItem value="Diesel">Diesel</SelectItem>
+                                <SelectItem value="Hybrid">Hybrid</SelectItem>
+                                <SelectItem value="Listrik">Listrik</SelectItem>
+                                <SelectItem value="Gas">Gas</SelectItem>
+                                <SelectItem value="Bensin Turbo">Bensin Turbo</SelectItem>
+                                <SelectItem value="Diesel Turbo">Diesel Turbo</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

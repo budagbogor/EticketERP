@@ -84,7 +84,9 @@ export default function BukuPintar() {
                                             {selectedVehicle.brand} {selectedVehicle.model} - {selectedVariant.name}
                                         </h2>
                                         <p className="text-sm text-muted-foreground">
-                                            Tahun: {selectedVehicle.year_start} - {selectedVehicle.year_end || "Sekarang"} • Kode Mesin: {selectedVariant.engine_code}
+                                            Tahun: {selectedVehicle.year_start} - {selectedVehicle.year_end || "Sekarang"} •
+                                            Kode Mesin: {selectedVariant.engine_code} •
+                                            Type Mesin: {selectedVariant.engine_type || "-"}
                                         </p>
                                     </div>
                                 </div>

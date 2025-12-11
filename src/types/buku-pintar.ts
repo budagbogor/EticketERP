@@ -11,6 +11,7 @@ export interface VehicleVariant {
     id: string;
     name: string; // Restoring name field
     transmission: "AT" | "MT" | "CVT" | "DCT" | "Manual" | "Automatic";
+    engine_type?: "Bensin" | "Diesel" | "Hybrid" | "Listrik" | "Gas" | "Bensin Turbo" | "Diesel Turbo";
     year_start?: number; // Added specific year range for variant
     year_end?: number;
     engine_code: string;
