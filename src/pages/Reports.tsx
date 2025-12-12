@@ -7,11 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useBranches } from "@/hooks/useMasterData";
-import { Search, Download, FileText, Eye, Printer, Clock, History, Loader2, Pencil, Video } from "lucide-react";
+import { Search, Download, FileText, Eye, Printer, Clock, History, Loader2, Pencil, Video, Trash2 } from "lucide-react";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ComplaintHistory {
@@ -162,10 +162,12 @@ const formatCurrency = (value: number | null): string => {
 
 export default function Reports() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [branchFilter, setBranchFilter] = useState("all");
   const [selectedReport, setSelectedReport] = useState<ReportData | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { data: branches = [] } = useBranches();
   const { data: reports = [], isLoading } = useClosedComplaints();
 
@@ -344,6 +346,62 @@ export default function Reports() {
       toast.success("PDF siap untuk didownload/print");
     } else {
       toast.error("Gagal membuka jendela print. Mohon izinkan popup.");
+    }
+  };
+
+  const handleDeleteReport = async (report: ReportData) => {
+    if (!report.technicalReport) {
+      toast.error("Laporan teknik tidak ditemukan");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Apakah Anda yakin ingin menghapus laporan teknik untuk tiket ${report.ticket_number}?\n\nTindakan ini akan:\n- Menghapus laporan teknik\n- Mengubah status tiket menjadi 'in_progress'\n\nTindakan ini tidak dapat dibatalkan!`
+    );
+
+    if (!confirmed) return;
+
+    setIsDeleting(true);
+    try {
+      // Delete technical report
+      const { error: deleteError } = await supabase
+        .from("technical_reports")
+        .delete()
+        .eq("id", report.technicalReport.id);
+
+      if (deleteError) throw deleteError;
+
+      // Update complaint status back to in_progress
+      const { error: statusError } = await supabase
+        .from("complaints")
+        .update({
+          status: "in_progress",
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", report.id);
+
+      if (statusError) throw statusError;
+
+      // Add history record
+      await supabase.from("complaint_history").insert({
+        complaint_id: report.id,
+        action: "report_deleted",
+        description: `Laporan teknik dihapus`,
+        performed_by: (await supabase.auth.getUser()).data.user?.id || "",
+        old_status: "closed",
+        new_status: "in_progress",
+      });
+
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["closed-complaints-with-history"] });
+
+      toast.success("Laporan teknik berhasil dihapus");
+      setIsViewDialogOpen(false);
+      setSelectedReport(null);
+    } catch (error: any) {
+      toast.error(`Gagal menghapus laporan: ${error.message}`);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -653,18 +711,29 @@ export default function Reports() {
 
                 <div className="flex justify-end gap-2">
                   {selectedReport.technicalReport && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setIsViewDialogOpen(false);
-                        navigate(`/tickets/${selectedReport.id}/technical-report/edit`);
-                      }}
-                    >
-                      <Pencil className="w-4 h-4 mr-2" />
-                      Edit Laporan
-                    </Button>
+                    <>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDeleteReport(selectedReport)}
+                        disabled={isDeleting}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        {isDeleting ? "Menghapus..." : "Hapus Laporan"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setIsViewDialogOpen(false);
+                          navigate(`/tickets/${selectedReport.id}/technical-report/edit`);
+                        }}
+                        disabled={isDeleting}
+                      >
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Edit Laporan
+                      </Button>
+                    </>
                   )}
-                  <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+                  <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} disabled={isDeleting}>
                     Tutup
                   </Button>
                 </div>
