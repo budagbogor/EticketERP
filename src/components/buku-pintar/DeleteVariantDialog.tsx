@@ -11,6 +11,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Vehicle, VehicleVariant } from "@/types/buku-pintar";
+import { useToast } from "@/hooks/use-toast";
 
 interface DeleteVariantDialogProps {
     vehicle: Vehicle;
@@ -20,10 +21,15 @@ interface DeleteVariantDialogProps {
 
 export function DeleteVariantDialog({ vehicle, variant, onDelete }: DeleteVariantDialogProps) {
     const [open, setOpen] = useState(false);
+    const { toast } = useToast();
 
     const handleDelete = () => {
         onDelete(vehicle.brand, vehicle.model, variant.id);
         setOpen(false);
+        toast({
+            title: "Data Berhasil Dihapus",
+            description: `${vehicle.brand} ${vehicle.model} - ${variant.name} telah dihapus dari database.`,
+        });
     };
 
     return (

@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState } from "react";
 import { z } from "zod";
+import { MediaUpload, MediaFile } from "@/components/MediaUpload";
 
 const technicalReportSchema = z.object({
   damageAnalysis: z.string().min(1, "Analisa kerusakan wajib diisi").max(5000),
@@ -40,6 +42,7 @@ export default function CreateTechnicalReport() {
     recommendation: "",
     picName: "",
   });
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -91,12 +94,12 @@ export default function CreateTechnicalReport() {
 
   const handleChange = (field: string, value: string) => {
     let processedValue = value;
-    
+
     // Format currency for estimatedCost field
     if (field === "estimatedCost") {
       processedValue = formatCurrency(value);
     }
-    
+
     setFormData(prev => ({ ...prev, [field]: processedValue }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
@@ -130,6 +133,7 @@ export default function CreateTechnicalReport() {
         recommendation: formData.recommendation || null,
         pic_name: formData.picName,
         created_by: user?.id,
+        media_attachments: mediaFiles.length > 0 ? (mediaFiles as unknown as Json) : null,
       });
 
       if (reportError) throw reportError;
@@ -274,7 +278,7 @@ export default function CreateTechnicalReport() {
                 <span>{ticket.vehicle_transmission}</span>
               </div>
             )}
-          {ticket.vehicle_odometer && (
+            {ticket.vehicle_odometer && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Odometer</span>
                 <span>{ticket.vehicle_odometer.toLocaleString()} KM</span>
@@ -447,6 +451,16 @@ export default function CreateTechnicalReport() {
             {errors.picName && (
               <p className="text-sm text-destructive">{errors.picName}</p>
             )}
+          </div>
+
+          {/* Media Upload */}
+          <div className="space-y-2">
+            <MediaUpload
+              files={mediaFiles}
+              onChange={setMediaFiles}
+              maxFiles={3}
+              maxSizeMB={5}
+            />
           </div>
 
           {/* Submit Buttons */}

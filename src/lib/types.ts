@@ -55,6 +55,13 @@ export interface TicketHistory {
   newStatus?: string;
 }
 
+export interface MediaAttachment {
+  name: string;
+  type: string;
+  data: string; // base64 encoded
+  size: number;
+}
+
 export interface TechnicalReport {
   id: string;
   ticketId: string;
@@ -65,4 +72,5 @@ export interface TechnicalReport {
   technician: string;
   createdBy: string;
   createdAt: Date;
+  mediaAttachments?: MediaAttachment[];
 }

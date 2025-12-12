@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
 import { z } from "zod";
+import { MediaUpload, MediaFile } from "@/components/MediaUpload";
 
 const technicalReportSchema = z.object({
   damageAnalysis: z.string().min(1, "Analisa kerusakan wajib diisi").max(5000),
@@ -41,6 +43,7 @@ export default function EditTechnicalReport() {
     recommendation: "",
     picName: "",
   });
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,13 +86,18 @@ export default function EditTechnicalReport() {
         damageAnalysis: existingReport.damage_analysis || "",
         repairMethod: existingReport.repair_method || "",
         problemParts: existingReport.problem_parts || "",
-        estimatedCost: existingReport.estimated_cost 
-          ? formatCurrencyValue(existingReport.estimated_cost) 
+        estimatedCost: existingReport.estimated_cost
+          ? formatCurrencyValue(existingReport.estimated_cost)
           : "",
         conclusion: existingReport.conclusion || "",
         recommendation: existingReport.recommendation || "",
         picName: existingReport.pic_name || "",
       });
+
+      // Load existing media attachments
+      if (existingReport.media_attachments && Array.isArray(existingReport.media_attachments)) {
+        setMediaFiles(existingReport.media_attachments as unknown as MediaFile[]);
+      }
     }
   }, [existingReport]);
 
@@ -104,11 +112,11 @@ export default function EditTechnicalReport() {
 
   const handleChange = (field: string, value: string) => {
     let processedValue = value;
-    
+
     if (field === "estimatedCost") {
       processedValue = formatCurrency(value);
     }
-    
+
     setFormData(prev => ({ ...prev, [field]: processedValue }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: "" }));
@@ -149,6 +157,7 @@ export default function EditTechnicalReport() {
           conclusion: formData.conclusion,
           recommendation: formData.recommendation || null,
           pic_name: formData.picName,
+          media_attachments: mediaFiles.length > 0 ? (mediaFiles as unknown as Json) : null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", existingReport.id);
@@ -461,6 +470,16 @@ export default function EditTechnicalReport() {
             {errors.picName && (
               <p className="text-sm text-destructive">{errors.picName}</p>
             )}
+          </div>
+
+          {/* Media Upload */}
+          <div className="space-y-2">
+            <MediaUpload
+              files={mediaFiles}
+              onChange={setMediaFiles}
+              maxFiles={3}
+              maxSizeMB={5}
+            />
           </div>
 
           {/* Submit Buttons */}

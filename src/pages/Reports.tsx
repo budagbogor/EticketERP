@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useBranches } from "@/hooks/useMasterData";
-import { Search, Download, FileText, Eye, Printer, Clock, History, Loader2, Pencil } from "lucide-react";
+import { Search, Download, FileText, Eye, Printer, Clock, History, Loader2, Pencil, Video } from "lucide-react";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { toast } from "sonner";
@@ -38,6 +38,12 @@ interface TechnicalReport {
   recommendation: string | null;
   created_at: string;
   created_by: string;
+  media_attachments?: Array<{
+    name: string;
+    type: string;
+    data: string;
+    size: number;
+  }> | null;
 }
 
 interface ReportData {
@@ -139,7 +145,7 @@ function useClosedComplaints() {
         ...c,
         activityHistory: historyByComplaint[c.id] || [],
         technicalReport: technicalReportMap.get(c.id) || null
-      })) as ReportData[];
+      })) as unknown as ReportData[];
     },
   });
 }
@@ -280,6 +286,27 @@ export default function Reports() {
           <div class="row" style="margin-top: 10px;"><span class="label">Rekomendasi Pencegahan</span></div>
           <div class="description">${report.technicalReport.recommendation}</div>
           ` : ''}
+        </div>
+        ` : ''}
+
+        ${report.technicalReport?.media_attachments && report.technicalReport.media_attachments.length > 0 ? `
+        <div class="section">
+          <div class="section-title">FOTO/VIDEO DOKUMENTASI</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+            ${report.technicalReport.media_attachments.map((media: any) => {
+      if (media.type.startsWith('image/')) {
+        return `<div style="border: 1px solid #e5e7eb; border-radius: 4px; overflow: hidden;">
+                  <img src="${media.data}" alt="${media.name}" style="width: 100%; height: auto; display: block;" />
+                  <p style="padding: 4px; font-size: 10px; text-align: center; background: #f9fafb;">${media.name}</p>
+                </div>`;
+      } else {
+        return `<div style="border: 1px solid #e5e7eb; border-radius: 4px; padding: 12px; text-align: center; background: #f9fafb;">
+                  <p style="font-size: 12px; margin: 0;">📹 Video: ${media.name}</p>
+                  <p style="font-size: 10px; color: #6b7280; margin: 4px 0 0 0;">(Video tidak dapat ditampilkan di PDF)</p>
+                </div>`;
+      }
+    }).join('')}
+          </div>
         </div>
         ` : ''}
 
@@ -534,6 +561,38 @@ export default function Reports() {
                         <div>
                           <p className="text-sm text-muted-foreground mb-1">Rekomendasi Pencegahan</p>
                           <p className="bg-muted/50 p-3 rounded-lg text-sm">{selectedReport.technicalReport.recommendation}</p>
+                        </div>
+                      )}
+
+                      {/* Media Attachments */}
+                      {selectedReport.technicalReport.media_attachments && selectedReport.technicalReport.media_attachments.length > 0 && (
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-2">Foto/Video Dokumentasi</p>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {selectedReport.technicalReport.media_attachments.map((media, index) => (
+                              <div key={index} className="border rounded-lg overflow-hidden bg-muted/30">
+                                {media.type.startsWith('image/') ? (
+                                  <img
+                                    src={media.data}
+                                    alt={media.name}
+                                    className="w-full aspect-video object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                    onClick={() => window.open(media.data, '_blank')}
+                                  />
+                                ) : (
+                                  <div className="aspect-video bg-muted flex items-center justify-center">
+                                    <div className="text-center p-4">
+                                      <Video className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                                      <p className="text-xs text-muted-foreground">Video</p>
+                                    </div>
+                                  </div>
+                                )}
+                                <div className="p-2 bg-background">
+                                  <p className="text-xs truncate" title={media.name}>{media.name}</p>
+                                  <p className="text-xs text-muted-foreground">{(media.size / 1024).toFixed(1)} KB</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
