@@ -15,6 +15,7 @@ export function SuspensionSection({ suspension }: SuspensionSectionProps) {
         { label: "Link Stabilizer", value: suspension.link_stabilizer },
         { label: "Lower Arm", value: suspension.lower_arm },
         { label: "Upper Arm", value: suspension.upper_arm },
+        { label: "Upper Support", value: suspension.upper_support },
         { label: "Shock Absorber Depan", value: suspension.shock_absorber_front },
         { label: "Shock Absorber Belakang", value: suspension.shock_absorber_rear },
     ];

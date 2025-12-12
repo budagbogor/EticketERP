@@ -64,6 +64,7 @@ export interface SuspensionSpec {
     link_stabilizer?: string;
     lower_arm?: string;
     upper_arm?: string;
+    upper_support?: string;
     shock_absorber_front?: string;
     shock_absorber_rear?: string;
 }

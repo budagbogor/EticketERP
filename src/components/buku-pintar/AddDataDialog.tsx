@@ -66,6 +66,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
     const [linkStabilizer, setLinkStabilizer] = useState("");
     const [lowerArm, setLowerArm] = useState("");
     const [upperArm, setUpperArm] = useState("");
+    const [upperSupport, setUpperSupport] = useState("");
 
     // Tire Specs
     const [tireLocation, setTireLocation] = useState("Depan & Belakang");
@@ -138,7 +139,8 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                     tie_rod_end: tieRod,
                     link_stabilizer: linkStabilizer,
                     lower_arm: lowerArm,
-                    upper_arm: upperArm
+                    upper_arm: upperArm,
+                    upper_support: upperSupport
                 } : undefined
             }
         };
@@ -187,6 +189,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setLinkStabilizer("");
         setLowerArm("");
         setUpperArm("");
+        setUpperSupport("");
         setTireLocation("Depan & Belakang");
         setTireSize("");
         setTirePressureFront("");
@@ -528,9 +531,13 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                     <Label>Lower Arm</Label>
                                     <Input placeholder="Kode Part" value={lowerArm} onChange={e => setLowerArm(e.target.value)} />
                                 </div>
-                                <div className="space-y-2 col-span-2">
+                                <div className="space-y-2">
                                     <Label>Upper Arm (Optional)</Label>
                                     <Input placeholder="Kode Part" value={upperArm} onChange={e => setUpperArm(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Upper Support (Optional)</Label>
+                                    <Input placeholder="Kode Part" value={upperSupport} onChange={e => setUpperSupport(e.target.value)} />
                                 </div>
                             </div>
                         </TabsContent>

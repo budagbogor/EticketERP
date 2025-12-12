@@ -61,6 +61,7 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
     const [linkStabilizer, setLinkStabilizer] = useState("");
     const [lowerArm, setLowerArm] = useState("");
     const [upperArm, setUpperArm] = useState("");
+    const [upperSupport, setUpperSupport] = useState("");
 
     const { toast } = useToast();
 
@@ -126,6 +127,7 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
             setLinkStabilizer(variant.specifications.suspension.link_stabilizer || "");
             setLowerArm(variant.specifications.suspension.lower_arm || "");
             setUpperArm(variant.specifications.suspension.upper_arm || "");
+            setUpperSupport(variant.specifications.suspension.upper_support || "");
         }
     };
 
@@ -182,7 +184,8 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                     tie_rod_end: tieRod,
                     link_stabilizer: linkStabilizer,
                     lower_arm: lowerArm,
-                    upper_arm: upperArm
+                    upper_arm: upperArm,
+                    upper_support: upperSupport
                 } : undefined
             }
         };
@@ -385,9 +388,13 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                                     <Label>Lower Arm</Label>
                                     <Input placeholder="Kode Part" value={lowerArm} onChange={e => setLowerArm(e.target.value)} />
                                 </div>
-                                <div className="space-y-2 col-span-2">
+                                <div className="space-y-2">
                                     <Label>Upper Arm (Optional)</Label>
                                     <Input placeholder="Kode Part" value={upperArm} onChange={e => setUpperArm(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Upper Support (Optional)</Label>
+                                    <Input placeholder="Kode Part" value={upperSupport} onChange={e => setUpperSupport(e.target.value)} />
                                 </div>
                             </div>
                         </TabsContent>

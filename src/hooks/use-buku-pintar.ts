@@ -82,7 +82,10 @@ export function useBukuPintar() {
         variant: VehicleVariant
     ) => {
         const newCustomData = [...customData];
-        let vehicleIndex = newCustomData.findIndex(v => v.brand.toLowerCase() === brandName.toLowerCase());
+        let vehicleIndex = newCustomData.findIndex(
+            v => v.brand.toLowerCase() === brandName.toLowerCase() &&
+                v.model.toLowerCase() === modelName.toLowerCase()
+        );
 
         if (vehicleIndex === -1) {
             // Create new vehicle entry
@@ -90,8 +93,8 @@ export function useBukuPintar() {
                 id: crypto.randomUUID(),
                 brand: brandName,
                 model: modelName,
-                year_start: new Date().getFullYear(),
-                year_end: null,
+                year_start: variant.year_start || new Date().getFullYear(),
+                year_end: variant.year_end || null,
                 variants: [variant]
             });
         } else {
