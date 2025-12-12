@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,24 @@ export default function BukuPintar() {
     const [selectedVariant, setSelectedVariant] = useState<VehicleVariant | null>(null);
     const [viewMode, setViewMode] = useState<"search" | "table">("search");
     const { vehicles, supabaseBrands, addVariantData, updateVariantData, deleteVariantData } = useBukuPintar();
+
+    // Update selectedVariant when vehicles data changes (e.g., after edit)
+    useEffect(() => {
+        if (selectedVehicle && selectedVariant) {
+            const updatedVehicle = vehicles.find(
+                v => v.brand === selectedVehicle.brand && v.model === selectedVehicle.model
+            );
+            if (updatedVehicle) {
+                const updatedVariant = updatedVehicle.variants.find(
+                    v => v.id === selectedVariant.id
+                );
+                if (updatedVariant) {
+                    setSelectedVariant(updatedVariant);
+                    setSelectedVehicle(updatedVehicle);
+                }
+            }
+        }
+    }, [vehicles]);
 
     const handleSelectVehicle = (vehicle: Vehicle, variant: VehicleVariant) => {
         setSelectedVehicle(vehicle);
