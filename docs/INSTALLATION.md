@@ -7,7 +7,7 @@ Panduan lengkap untuk menginstall dan menjalankan aplikasi MBTracker di environm
 Sebelum memulai, pastikan Anda sudah menginstall:
 
 - **Node.js** versi 18 atau lebih baru ([Download](https://nodejs.org/))
-- **npm** (terinstall otomatis dengan Node.js) atau **bun**
+- **npm** (terinstall otomatis dengan Node.js)
 - **Git** ([Download](https://git-scm.com/))
 - **Akun Supabase** (gratis) - [Daftar di sini](https://supabase.com)
 
@@ -23,16 +23,8 @@ cd psd
 
 ## Langkah 2: Install Dependencies
 
-Pilih salah satu package manager:
-
-### Menggunakan npm
 ```bash
 npm install
-```
-
-### Menggunakan bun (lebih cepat)
-```bash
-bun install
 ```
 
 Proses ini akan menginstall semua dependencies yang diperlukan (~200MB).
@@ -120,11 +112,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ## Langkah 5: Jalankan Development Server
 
 ```bash
-# Menggunakan npm
 npm run dev
-
-# Menggunakan bun
-bun dev
 ```
 
 Jika berhasil, Anda akan melihat output seperti ini:

@@ -106,7 +106,7 @@
 ## 📦 Instalasi
 
 ### Prasyarat
-- Node.js 18+ dan npm/bun
+- Node.js 18+ dan npm
 - Akun Supabase (gratis)
 - Git
 
@@ -121,8 +121,6 @@ cd psd
 2. **Install Dependencies**
 ```bash
 npm install
-# atau
-bun install
 ```
 
 3. **Konfigurasi Environment Variables**
@@ -147,8 +145,6 @@ Jalankan migration SQL di Supabase SQL Editor:
 5. **Jalankan Development Server**
 ```bash
 npm run dev
-# atau
-bun dev
 ```
 
 Aplikasi akan berjalan di `http://localhost:8080`
