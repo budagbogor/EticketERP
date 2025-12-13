@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    
+
     if (!resendApiKey) {
       console.error("RESEND_API_KEY is not configured");
       return new Response(JSON.stringify({ error: "Email service tidak dikonfigurasi" }), {
@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     });
 
     const resend = new Resend(resendApiKey);
-    
+
     const { email } = await req.json();
 
     if (!email) {
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
 
     // Find user by email
     const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    
+
     if (listError) {
       console.error("Error listing users:", listError);
       return new Response(JSON.stringify({ error: "Terjadi kesalahan sistem" }), {
@@ -131,17 +131,17 @@ Deno.serve(async (req) => {
       const numbers = '23456789';
       const symbols = '!@#$%&*';
       const allChars = lowercase + uppercase + numbers + symbols;
-      
+
       let password = '';
       password += lowercase[Math.floor(Math.random() * lowercase.length)];
       password += uppercase[Math.floor(Math.random() * uppercase.length)];
       password += numbers[Math.floor(Math.random() * numbers.length)];
       password += symbols[Math.floor(Math.random() * symbols.length)];
-      
+
       for (let i = 4; i < 12; i++) {
         password += allChars[Math.floor(Math.random() * allChars.length)];
       }
-      
+
       return password.split('').sort(() => Math.random() - 0.5).join('');
     };
 
@@ -214,8 +214,8 @@ Deno.serve(async (req) => {
     if (emailError) {
       console.error("Error sending email:", emailError);
       // Password already changed, so return success with warning
-      return new Response(JSON.stringify({ 
-        success: true, 
+      return new Response(JSON.stringify({
+        success: true,
         warning: "Password berhasil direset tetapi email gagal dikirim. Hubungi administrator untuk password baru."
       }), {
         status: 200,

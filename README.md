@@ -178,6 +178,9 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 # Optional: Google Gemini API (untuk AI Chatbot)
 VITE_GEMINI_API_KEY=your-gemini-api-key
+
+# Required for Password Reset (Supabase Edge Functions)
+RESEND_API_KEY=re_123456789
 ```
 
 ## 🚀 Penggunaan

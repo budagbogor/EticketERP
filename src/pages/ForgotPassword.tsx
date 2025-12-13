@@ -46,6 +46,8 @@ export default function ForgotPassword() {
 
       if (data?.error) {
         setError(data.error);
+      } else if (data?.warning) {
+        setError(data.warning);
       } else {
         setSuccess(true);
         toast({
@@ -72,7 +74,7 @@ export default function ForgotPassword() {
               </div>
               <h2 className="text-xl font-semibold">Email Terkirim!</h2>
               <p className="text-muted-foreground">
-                Password baru telah dikirim ke email <strong>{email}</strong>. 
+                Password baru telah dikirim ke email <strong>{email}</strong>.
                 Silakan cek inbox Anda dan gunakan password baru untuk login.
               </p>
               <Link to="/login">
