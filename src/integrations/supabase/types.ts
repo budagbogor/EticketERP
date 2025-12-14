@@ -461,6 +461,54 @@ export type Database = {
         }
         Relationships: []
       }
+      social_complaints: {
+        Row: {
+          id: string
+          channel: string
+          username: string
+          link: string | null
+          datetime: string
+          complain_category: string
+          complain_summary: string
+          original_complain_text: string
+          contact_status: 'Sulit Dihubungi' | 'Berhasil Dihubungi' | 'Belum Dicoba'
+          viral_risk: 'Normal' | 'Potensi Viral'
+          follow_up_note: string | null
+          status: 'Open' | 'Monitoring' | 'Closed'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          channel: string
+          username: string
+          link?: string | null
+          datetime?: string
+          complain_category: string
+          complain_summary: string
+          original_complain_text: string
+          contact_status?: 'Sulit Dihubungi' | 'Berhasil Dihubungi' | 'Belum Dicoba'
+          viral_risk?: 'Normal' | 'Potensi Viral'
+          follow_up_note?: string | null
+          status?: 'Open' | 'Monitoring' | 'Closed'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          channel?: string
+          username?: string
+          link?: string | null
+          datetime?: string
+          complain_category?: string
+          complain_summary?: string
+          original_complain_text?: string
+          contact_status?: 'Sulit Dihubungi' | 'Berhasil Dihubungi' | 'Belum Dicoba'
+          viral_risk?: 'Normal' | 'Potensi Viral'
+          follow_up_note?: string | null
+          status?: 'Open' | 'Monitoring' | 'Closed'
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

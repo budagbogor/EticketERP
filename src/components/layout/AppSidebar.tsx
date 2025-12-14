@@ -9,7 +9,8 @@ import {
   Database,
   LogOut,
   Lock,
-  BookOpen
+  BookOpen,
+  MessageSquareWarning
 } from "lucide-react";
 import logoMobeng from "@/assets/logo-mobeng.jpg";
 import { NavLink } from "@/components/NavLink";
@@ -34,6 +35,7 @@ const mainMenuItems = [
   { title: "Daftar Tiket", url: "/tickets", icon: ListTodo, end: true },
   { title: "Laporan Teknik", url: "/reports", icon: FileText, end: true },
   { title: "Buku Pintar", url: "/buku-pintar", icon: BookOpen, end: true },
+  { title: "Complain Compass", url: "/complain-compass", icon: MessageSquareWarning, end: true },
 ];
 
 const adminMenuItems = [

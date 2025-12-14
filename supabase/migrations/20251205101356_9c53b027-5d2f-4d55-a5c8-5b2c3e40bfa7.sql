@@ -1,5 +1,6 @@
 -- Fix 1: Customer PII Exposure - Restrict complaints SELECT to relevant users
 DROP POLICY IF EXISTS "Authenticated users can view complaints" ON complaints;
+DROP POLICY IF EXISTS "Users can view relevant complaints" ON complaints;
 CREATE POLICY "Users can view relevant complaints" ON complaints FOR SELECT
 USING (
   created_by = auth.uid() OR 
@@ -10,6 +11,7 @@ USING (
 
 -- Fix 2: Audit Trail Manipulation - Restrict complaint_history INSERT
 DROP POLICY IF EXISTS "Authenticated users can create history" ON complaint_history;
+DROP POLICY IF EXISTS "Users create own history entries" ON complaint_history;
 CREATE POLICY "Users create own history entries" ON complaint_history FOR INSERT
 WITH CHECK (
   performed_by = auth.uid() AND
@@ -29,6 +31,7 @@ UPDATE storage.buckets SET public = false WHERE id = 'ticket-attachments';
 
 -- Update storage SELECT policy to require authentication
 DROP POLICY IF EXISTS "Anyone can view ticket attachments" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated users view ticket attachments" ON storage.objects;
 CREATE POLICY "Authenticated users view ticket attachments" ON storage.objects
 FOR SELECT USING (
   bucket_id = 'ticket-attachments' AND

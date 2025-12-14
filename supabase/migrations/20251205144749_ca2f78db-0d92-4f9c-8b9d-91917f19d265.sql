@@ -2,6 +2,7 @@
 DROP POLICY IF EXISTS "Authenticated users can view complaint history" ON complaint_history;
 
 -- Create a restricted policy that only allows users to view history for complaints they can access
+DROP POLICY IF EXISTS "Users can view relevant complaint history" ON complaint_history;
 CREATE POLICY "Users can view relevant complaint history" ON complaint_history FOR SELECT
 USING (
   EXISTS (

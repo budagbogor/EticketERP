@@ -1,5 +1,5 @@
 -- Create technical_reports table
-CREATE TABLE public.technical_reports (
+CREATE TABLE IF NOT EXISTS public.technical_reports (
     id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
     complaint_id UUID NOT NULL REFERENCES public.complaints(id) ON DELETE CASCADE,
     damage_analysis TEXT NOT NULL,
@@ -19,6 +19,7 @@ CREATE TABLE public.technical_reports (
 ALTER TABLE public.technical_reports ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Users can view relevant technical reports" ON public.technical_reports;
 CREATE POLICY "Users can view relevant technical reports"
 ON public.technical_reports
 FOR SELECT
@@ -37,6 +38,7 @@ USING (
     )
 );
 
+DROP POLICY IF EXISTS "Non-viewers can create technical reports" ON public.technical_reports;
 CREATE POLICY "Non-viewers can create technical reports"
 ON public.technical_reports
 FOR INSERT
@@ -45,6 +47,7 @@ WITH CHECK (
     AND NOT has_role(auth.uid(), 'viewer'::app_role)
 );
 
+DROP POLICY IF EXISTS "Non-viewers can update own technical reports" ON public.technical_reports;
 CREATE POLICY "Non-viewers can update own technical reports"
 ON public.technical_reports
 FOR UPDATE
@@ -53,12 +56,14 @@ USING (
     AND NOT has_role(auth.uid(), 'viewer'::app_role)
 );
 
+DROP POLICY IF EXISTS "Admins can delete technical reports" ON public.technical_reports;
 CREATE POLICY "Admins can delete technical reports"
 ON public.technical_reports
 FOR DELETE
 USING (has_role(auth.uid(), 'admin'::app_role));
 
 -- Create trigger for updated_at
+DROP TRIGGER IF EXISTS update_technical_reports_updated_at ON public.technical_reports;
 CREATE TRIGGER update_technical_reports_updated_at
 BEFORE UPDATE ON public.technical_reports
 FOR EACH ROW

@@ -12,7 +12,7 @@ ALTER TABLE public.password_reset_attempts ENABLE ROW LEVEL SECURITY;
 -- No RLS policies needed - only accessed via edge function with service role
 
 -- Create index for efficient lookups
-CREATE INDEX idx_password_reset_attempts_email_created ON public.password_reset_attempts(email, created_at);
+CREATE INDEX IF NOT EXISTS idx_password_reset_attempts_email_created ON public.password_reset_attempts(email, created_at);
 
 -- Auto-cleanup old entries (older than 24 hours)
 CREATE OR REPLACE FUNCTION public.cleanup_old_reset_attempts()
@@ -28,6 +28,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS cleanup_reset_attempts_trigger ON public.password_reset_attempts;
 CREATE TRIGGER cleanup_reset_attempts_trigger
 AFTER INSERT ON public.password_reset_attempts
 FOR EACH STATEMENT
@@ -36,6 +37,7 @@ EXECUTE FUNCTION public.cleanup_old_reset_attempts();
 -- Fix storage policy: restrict attachment access to complaint owners
 DROP POLICY IF EXISTS "Authenticated users view ticket attachments" ON storage.objects;
 
+DROP POLICY IF EXISTS "Users can view relevant ticket attachments" ON storage.objects;
 CREATE POLICY "Users can view relevant ticket attachments" ON storage.objects
   FOR SELECT
   USING (

@@ -26,6 +26,7 @@ import MasterData from "./pages/MasterData";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import BukuPintar from "./pages/BukuPintar";
+import ComplainCompass from "./pages/ComplainCompass";
 
 const queryClient = new QueryClient();
 
@@ -135,6 +136,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <BukuPintar />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/complain-compass"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ComplainCompass />
                   </AppLayout>
                 </ProtectedRoute>
               }

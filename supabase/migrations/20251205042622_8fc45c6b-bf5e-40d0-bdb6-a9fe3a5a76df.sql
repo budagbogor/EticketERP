@@ -6,9 +6,10 @@ VALUES (
   true,
   10485760, -- 10MB limit
   ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/quicktime', 'video/webm']
-);
+) ON CONFLICT (id) DO NOTHING;
 
 -- Allow authenticated users to upload files
+DROP POLICY IF EXISTS "Authenticated users can upload ticket attachments" ON storage.objects;
 CREATE POLICY "Authenticated users can upload ticket attachments"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -17,11 +18,13 @@ WITH CHECK (
 );
 
 -- Allow anyone to view ticket attachments (public bucket)
+DROP POLICY IF EXISTS "Anyone can view ticket attachments" ON storage.objects;
 CREATE POLICY "Anyone can view ticket attachments"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'ticket-attachments');
 
 -- Allow users to delete their own uploads
+DROP POLICY IF EXISTS "Users can delete own ticket attachments" ON storage.objects;
 CREATE POLICY "Users can delete own ticket attachments"
 ON storage.objects FOR DELETE
 USING (
