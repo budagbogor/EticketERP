@@ -15,10 +15,10 @@ Sebelum memulai, pastikan Anda sudah menginstall:
 
 ```bash
 # Clone repository dari GitHub
-git clone https://github.com/budagbogor/psd.git
+git clone https://github.com/budagbogor/complain-medsos.git
 
 # Masuk ke folder project
-cd psd
+cd complain-medsos
 ```
 
 ## Langkah 2: Install Dependencies
@@ -53,24 +53,10 @@ Proses ini akan menginstall semua dependencies yang diperlukan (~200MB).
 
 ### 3.3 Setup Database Schema
 
-1. Di Supabase Dashboard, klik **SQL Editor**
-2. Klik "New query"
-3. Copy-paste isi file `supabase/migrations/*.sql` satu per satu
-4. Klik "Run" untuk setiap query
-
-Atau gunakan Supabase CLI:
+Jalankan perintah push untuk sinkronisasi schema dan edge functions:
 ```bash
-# Install Supabase CLI
-npm install -g supabase
-
-# Login
-supabase login
-
-# Link project
-supabase link --project-ref your-project-ref
-
-# Run migrations
-supabase db push
+npx supabase db push
+npx supabase functions deploy
 ```
 
 ### 3.4 Setup Storage
@@ -79,6 +65,7 @@ supabase db push
 2. Buat bucket baru:
    - **Name**: `ticket-attachments`
    - **Public**: Yes
+   - **Policies**: Allow authenticated uploads, allow public read
 3. Buat bucket lagi:
    - **Name**: `company-logos`
    - **Public**: Yes
@@ -195,12 +182,12 @@ cmd /c npm run dev
 
 ## Langkah Selanjutnya
 
-- 📖 Baca [User Guide](./docs/USER_GUIDE.md) untuk panduan penggunaan
-- 🚀 Lihat [Deployment Guide](./docs/DEPLOYMENT.md) untuk deploy ke production
-- 🔧 Lihat [API Documentation](./docs/API.md) untuk integrasi
+- 📖 Baca [User Guide](./USER_GUIDE.md) untuk panduan penggunaan
+- 🚀 Lihat [Deployment Guide](./DEPLOYMENT.md) untuk deploy ke production
+- 🔧 Lihat [API Documentation](./API.md) untuk integrasi
 
 ## Butuh Bantuan?
 
 - 📧 Email: support@mbtracker.com
-- 💬 GitHub Issues: [https://github.com/budagbogor/psd/issues](https://github.com/budagbogor/psd/issues)
-- 📚 Documentation: [https://github.com/budagbogor/psd](https://github.com/budagbogor/psd)
+- 💬 GitHub Issues: [https://github.com/budagbogor/complain-medsos/issues](https://github.com/budagbogor/complain-medsos/issues)
+- 📚 Documentation: [https://github.com/budagbogor/complain-medsos](https://github.com/budagbogor/complain-medsos)

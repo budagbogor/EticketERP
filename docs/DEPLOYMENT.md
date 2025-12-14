@@ -33,7 +33,7 @@ git push origin main
 1. Buka [Vercel](https://vercel.com)
 2. Login dengan GitHub
 3. Klik "Add New" → "Project"
-4. Pilih repository `budagbogor/psd`
+4. Pilih repository `budagbogor/complain-medsos`
 5. Klik "Import"
 
 #### 1.3 Konfigurasi Project
@@ -110,7 +110,7 @@ netlify deploy --prod
 
 1. Buka [Netlify](https://netlify.com)
 2. Klik "Add new site" → "Import an existing project"
-3. Pilih GitHub dan repository `budagbogor/psd`
+3. Pilih GitHub dan repository `budagbogor/complain-medsos`
 4. **Build command**: `npm run build`
 5. **Publish directory**: `dist`
 6. Tambahkan Environment Variables
@@ -166,7 +166,7 @@ sudo apt install -y certbot python3-certbot-nginx
 ```bash
 # Clone repository
 cd /var/www
-sudo git clone https://github.com/budagbogor/psd.git mbtracker
+sudo git clone https://github.com/budagbogor/complain-medsos.git mbtracker
 cd mbtracker
 
 # Install dependencies
@@ -381,4 +381,4 @@ sudo systemctl reload nginx
 
 Jika mengalami masalah saat deployment:
 - 📧 Email: support@mbtracker.com
-- 💬 GitHub Issues: [https://github.com/budagbogor/psd/issues](https://github.com/budagbogor/psd/issues)
+- 💬 GitHub Issues: [https://github.com/budagbogor/complain-medsos/issues](https://github.com/budagbogor/complain-medsos/issues)

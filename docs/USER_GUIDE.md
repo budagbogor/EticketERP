@@ -398,7 +398,52 @@ Buku Pintar adalah database spesifikasi kendaraan.
 
 - **Search**: Cari berdasarkan nama, email, atau NIK
 - **Filter Role**: Tampilkan hanya role tertentu
-- **Filter Status**: Tampilkan hanya active/inactive
+### Filter Status: Tampilkan hanya active/inactive
+
+## Complain Compass
+
+Fitur untuk mendata dan memonitoring komplain pelanggan dari media sosial (Instagram, TikTok, Google Maps, dll).
+
+### Membuat Complain Baru
+
+1. Navigasi ke **Complain Compass** di sidebar
+2. Isi form input:
+   - **Channel**: Sumber komplain (Instagram, TikTok, dll)
+   - **Username**: Nama akun pelapor
+   - **Link Post**: URL postingan/komentar (opsional)
+   - **Tanggal**: Waktu kejadian
+   - **Kategori**: Jenis keluhan (Produk, Service, dll)
+   - **Cabang**: Lokasi bengkel terkait
+3. **Analisis Risiko**:
+   - Tentukan **Status Pelanggan**: Dapat dihubungi / Tidak
+   - Tentukan **Viral Risk**: Normal / Potensi Viral
+4. Isi ringkasan dan detail masalah
+5. Klik **"Simpan Complain"**
+
+### Monitoring Dashboard
+
+Dashboard Complain Compass menampilkan:
+- **Total Complain**: Jumlah keseluruhan
+- **Open**: Komplain baru yang belum ditangani
+- **Monitoring**: Komplain dalam pemantauan khusus
+- **Potensi Viral**: Komplain yang perlu perhatian segera
+- **Status Warna**:
+  - Merah: Open (Perlu respon)
+  - Kuning: Monitoring (Sedang dipantau)
+  - Hijau: Closed (Selesai)
+
+### Update Status & Hapus
+
+1. Di daftar complain, klik dropdown status
+2. Ubah status (Open → Monitoring → Closed)
+3. Untuk melihat detail, klik icon **Mata**
+4. Untuk menghapus, klik icon **Sampah**
+
+### Export Data
+
+1. Klik tombol **"Export Complain Compass to CSV"** di pojok kanan atas
+2. File CSV berisi semua data detail akan terdownload otomatis
+3. Data mencakup: ID, Channel, Username, Kategori, Risiko, Status, dll.
 
 ## Pengaturan (Admin)
 
@@ -509,4 +554,4 @@ Jika mengalami masalah atau butuh bantuan:
 
 - 📧 Email: support@mbtracker.com
 - 💬 WhatsApp: +62 xxx xxxx xxxx
-- 📚 Documentation: [https://github.com/budagbogor/psd](https://github.com/budagbogor/psd)
+- 📚 Documentation: [https://github.com/budagbogor/complain-medsos](https://github.com/budagbogor/complain-medsos)

@@ -21,6 +21,13 @@
 
 ## ✨ Fitur Utama
 
+### 🧭 Complain Compass (NEW)
+- **Monitoring Medsos**: Pendataan komplain dari Instagram, TikTok, Google Maps, dll
+- **Viral Risk Detection**: Deteksi dini komplain berpotensi viral
+- **Real-time Updates**: Status komplain terupdate otomatis tanpa refresh
+- **Export Data**: Download data komplain ke format CSV
+- **Status Tracking**: Monitor status Open, Monitoring, Closed
+
 ### 🎫 Sistem Tiket (Ticket Management)
 - **Buat Tiket Baru**: Catat komplain kendaraan dengan detail lengkap
 - **Tracking Status**: Monitor status tiket dari Open → In Progress → Resolved → Closed
@@ -89,10 +96,10 @@
 ### Backend & Database
 - **Supabase** - Backend as a Service
   - PostgreSQL Database
-  - Authentication
-  - Storage
-  - Edge Functions
-  - Real-time subscriptions
+  - Authentication (Email & Role Based)
+  - Storage (Buckets for media)
+  - Edge Functions (Deno runtime for backend logic)
+  - Real-time subscriptions (WebSocket)
 
 ### Form & Validation
 - **React Hook Form 7.61.1** - Form management
@@ -114,8 +121,8 @@
 
 1. **Clone Repository**
 ```bash
-git clone https://github.com/budagbogor/psd.git
-cd psd
+git clone https://github.com/budagbogor/complain-medsos.git
+cd complain-medsos
 ```
 
 2. **Install Dependencies**
@@ -137,9 +144,10 @@ Dapatkan kredensial dari [Supabase Dashboard](https://app.supabase.com):
 
 4. **Setup Database**
 
-Jalankan migration SQL di Supabase SQL Editor:
+Jalankan perintah push untuk sinkronisasi schema dan edge functions:
 ```bash
-# File migration ada di folder supabase/migrations/
+npx supabase db push
+npx supabase functions deploy
 ```
 
 5. **Jalankan Development Server**
@@ -166,7 +174,7 @@ Aplikasi akan berjalan di `http://localhost:8080`
    - Set policies untuk akses public/private
 
 4. **Setup Edge Functions**
-   - Deploy edge functions untuk reset password
+   - Deploy edge functions untuk reset password dan user management
    - Konfigurasi SMTP untuk email
 
 ### Environment Variables
@@ -221,6 +229,13 @@ RESEND_API_KEY=re_123456789
 3. Isi data pengguna dan pilih role
 4. Klik "Simpan"
 
+### Menggunakan Complain Compass
+
+1. Navigasi ke **Complain Compass**
+2. Klik "Buat Complain"
+3. Isi data komplain dari media sosial
+4. Lihat status di dashboard monitoring
+
 ## 📁 Struktur Proyek
 
 ```
@@ -230,6 +245,7 @@ mbtracker-main/
 │   ├── components/        # React components
 │   │   ├── auth/         # Authentication components
 │   │   ├── buku-pintar/  # Vehicle database components
+│   │   ├── complain-compass/ # Complain Compass components
 │   │   ├── layout/       # Layout components
 │   │   ├── tickets/      # Ticket components
 │   │   └── ui/           # shadcn/ui components
@@ -238,6 +254,7 @@ mbtracker-main/
 │   ├── hooks/            # Custom React hooks
 │   │   ├── use-vehicles.ts
 │   │   ├── use-buku-pintar.ts
+│   │   ├── useSocialComplaints.ts
 │   │   └── use-toast.ts
 │   ├── integrations/     # External integrations
 │   │   └── supabase/
@@ -250,6 +267,7 @@ mbtracker-main/
 │   │   ├── CreateTicket.tsx
 │   │   ├── TicketDetail.tsx
 │   │   ├── BukuPintar.tsx
+│   │   ├── ComplainCompass.tsx
 │   │   ├── UserManagement.tsx
 │   │   ├── Reports.tsx
 │   │   └── Settings.tsx
@@ -326,7 +344,7 @@ Developed with ❤️ by **budagbogor**
 ## 📞 Kontak & Support
 
 - GitHub: [@budagbogor](https://github.com/budagbogor)
-- Repository: [https://github.com/budagbogor/psd](https://github.com/budagbogor/psd)
+- Repository: [https://github.com/budagbogor/complain-medsos](https://github.com/budagbogor/complain-medsos)
 
 ## 🙏 Acknowledgments
 
