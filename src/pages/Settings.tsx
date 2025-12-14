@@ -218,9 +218,11 @@ export default function Settings() {
 
       const csvRows = tickets.map(ticket => {
         // Get technical report data (array with single item or null)
-        const report = Array.isArray(ticket.technical_reports) && ticket.technical_reports.length > 0
-          ? ticket.technical_reports[0]
-          : null;
+        // Get technical report data (handle both array and single object)
+        const reportData = ticket.technical_reports;
+        const report = Array.isArray(reportData)
+          ? (reportData.length > 0 ? reportData[0] : null)
+          : reportData;
 
         return [
           // Basic ticket information
