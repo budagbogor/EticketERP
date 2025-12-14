@@ -13,12 +13,14 @@ const ComplainCompass = () => {
         categories,
         subCategories,
         branches,
+        channels,
         addComplaint,
         updateComplaint,
         deleteComplaint,
         exportToCSV,
         addCategory,
         addSubCategory,
+        addChannel,
     } = useSocialComplaints();
 
     const handleAddComplaint = async (data: Omit<SocialComplaint, 'id' | 'created_at'>) => {
@@ -86,8 +88,10 @@ const ComplainCompass = () => {
                             categories={categories}
                             subCategories={subCategories}
                             branches={branches}
+                            channels={channels}
                             onAddCategory={addCategory}
                             onAddSubCategory={addSubCategory}
+                            onAddChannel={addChannel}
                         />
                     </div>
                     <div className="lg:col-span-2">

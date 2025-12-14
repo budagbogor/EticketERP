@@ -26,7 +26,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CHANNELS, SocialComplaint } from '@/types/social-complaint';
+import { SocialComplaint } from '@/types/social-complaint';
 import { Send, AlertTriangle, Plus, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -36,11 +36,22 @@ interface ComplaintFormProps {
     categories: string[];
     subCategories: string[];
     branches: string[];
+    channels: string[];
     onAddCategory: (name: string) => Promise<boolean>;
     onAddSubCategory: (name: string) => Promise<boolean>;
+    onAddChannel: (name: string) => Promise<boolean>;
 }
 
-export function ComplaintForm({ onSubmit, categories, subCategories, branches, onAddCategory, onAddSubCategory }: ComplaintFormProps) {
+export function ComplaintForm({
+    onSubmit,
+    categories,
+    subCategories,
+    branches,
+    channels,
+    onAddCategory,
+    onAddSubCategory,
+    onAddChannel,
+}: ComplaintFormProps) {
     const [formData, setFormData] = useState({
         channel: '',
         username: '',
@@ -72,6 +83,9 @@ export function ComplaintForm({ onSubmit, categories, subCategories, branches, o
 
     const [isAddSubCategoryOpen, setIsAddSubCategoryOpen] = useState(false);
     const [newSubCategoryName, setNewSubCategoryName] = useState('');
+
+    const [isAddChannelOpen, setIsAddChannelOpen] = useState(false);
+    const [newChannelName, setNewChannelName] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -130,6 +144,16 @@ export function ComplaintForm({ onSubmit, categories, subCategories, branches, o
         }
     };
 
+    const handleAddChannel = async () => {
+        if (!newChannelName.trim()) return;
+        const success = await onAddChannel(newChannelName);
+        if (success) {
+            setFormData({ ...formData, channel: newChannelName });
+            setNewChannelName('');
+            setIsAddChannelOpen(false);
+        }
+    };
+
     return (
         <Card className="glass-card animate-fade-in">
             <CardHeader className="pb-4">
@@ -142,23 +166,51 @@ export function ComplaintForm({ onSubmit, categories, subCategories, branches, o
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="channel">Channel Media Sosial</Label>
-                        <Select
-                            value={formData.channel}
-                            onValueChange={(value) =>
-                                setFormData({ ...formData, channel: value })
-                            }
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Pilih channel" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {CHANNELS.map((ch) => (
-                                    <SelectItem key={ch} value={ch}>
-                                        {ch}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <div className="flex gap-2">
+                            <Select
+                                value={formData.channel}
+                                onValueChange={(value) =>
+                                    setFormData({ ...formData, channel: value })
+                                }
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Pilih channel" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {channels.map((ch) => (
+                                        <SelectItem key={ch} value={ch}>
+                                            {ch}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Dialog open={isAddChannelOpen} onOpenChange={setIsAddChannelOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="icon" title="Tambah Channel">
+                                        <Plus className="h-4 w-4" />
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Tambah Channel Baru</DialogTitle>
+                                        <DialogDescription>
+                                            Masukkan nama channel baru yang ingin ditambahkan.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="py-4">
+                                        <Input
+                                            value={newChannelName}
+                                            onChange={(e) => setNewChannelName(e.target.value)}
+                                            placeholder="Nama Channel"
+                                        />
+                                    </div>
+                                    <DialogFooter>
+                                        <Button variant="outline" onClick={() => setIsAddChannelOpen(false)}>Batal</Button>
+                                        <Button onClick={handleAddChannel}>Simpan</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
                     </div>
 
                     <div className="space-y-2">

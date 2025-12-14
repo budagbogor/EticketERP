@@ -27,6 +27,7 @@ export function useSocialComplaints() {
     const [categories, setCategories] = useState<string[]>([]);
     const [subCategories, setSubCategories] = useState<string[]>([]);
     const [branches, setBranches] = useState<string[]>([]);
+    const [channels, setChannels] = useState<string[]>([]);
 
     const fetchCategories = async () => {
         try {
@@ -70,6 +71,20 @@ export function useSocialComplaints() {
         }
     };
 
+    const fetchChannels = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('channels')
+                .select('name')
+                .order('name');
+
+            if (error) throw error;
+            setChannels(data.map(c => c.name));
+        } catch (error) {
+            console.error('Error fetching channels:', error);
+        }
+    };
+
     const addCategory = async (name: string) => {
         try {
             const { error } = await supabase
@@ -104,12 +119,29 @@ export function useSocialComplaints() {
         }
     };
 
+    const addChannel = async (name: string) => {
+        try {
+            const { error } = await supabase
+                .from('channels')
+                .insert([{ name }]);
+
+            if (error) throw error;
+            await fetchChannels();
+            toast.success('Channel berhasil ditambahkan');
+            return true;
+        } catch (error) {
+            console.error('Error adding channel:', error);
+            toast.error('Gagal menambahkan channel');
+            return false;
+        }
+    };
+
     useEffect(() => {
         fetchComplaints();
         fetchCategories();
-        fetchCategories();
         fetchSubCategories();
         fetchBranches();
+        fetchChannels();
 
         // Subscribe to realtime changes
         const channel = supabase
@@ -251,6 +283,7 @@ export function useSocialComplaints() {
         categories,
         subCategories,
         branches,
+        channels,
         loading,
         addComplaint,
         updateComplaint,
@@ -258,5 +291,6 @@ export function useSocialComplaints() {
         exportToCSV,
         addCategory,
         addSubCategory,
+        addChannel,
     };
 }
