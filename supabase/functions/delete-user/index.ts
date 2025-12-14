@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    
+
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: {
         autoRefreshToken: false,
@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
     const { data: { user: requestingUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
-    
+
     if (authError || !requestingUser) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -41,14 +41,30 @@ Deno.serve(async (req) => {
     }
 
     // Check if requesting user is admin
-    const { data: roleData } = await supabaseAdmin
-      .from("user_roles")
+    // We check app_users first as it's the primary table for UI
+    const { data: appUserData } = await supabaseAdmin
+      .from("app_users")
       .select("role")
-      .eq("user_id", requestingUser.id)
+      .eq("id", requestingUser.id)
       .eq("role", "admin")
       .maybeSingle();
 
-    if (!roleData) {
+    // Fallback to user_roles if not found in app_users
+    let isAdmin = !!appUserData;
+
+    if (!isAdmin) {
+      const { data: roleData } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", requestingUser.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (roleData) isAdmin = true;
+    }
+
+    if (!isAdmin) {
+      console.error(`User ${requestingUser.id} attempted to delete user but is not admin`);
       return new Response(JSON.stringify({ error: "Admin access required" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
