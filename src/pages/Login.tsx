@@ -15,7 +15,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  
+
   const { signIn, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -45,7 +45,7 @@ export default function Login() {
 
     try {
       const { error: signInError } = await signIn(email, password);
-      
+
       if (signInError) {
         if (signInError.message.includes("Invalid login credentials")) {
           setError("Email atau password salah. Silakan coba lagi.");
@@ -150,14 +150,7 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t text-center">
-              <p className="text-sm text-muted-foreground">
-                Belum punya akun?{" "}
-                <Link to="/register" className="text-primary hover:underline font-medium">
-                  Daftar sekarang
-                </Link>
-              </p>
-            </div>
+
           </CardContent>
         </Card>
       </div>
