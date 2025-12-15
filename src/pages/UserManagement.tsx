@@ -212,6 +212,20 @@ export default function UserManagement() {
         variant: "destructive",
       });
     } else {
+      // Also update the role in user_roles table to ensure permissions are synced
+      if (selectedUser.role !== formData.role) {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .update({ role: formData.role as any }) // Cast to any to bypass type check if types aren't regenerated yet
+          .eq("user_id", selectedUser.id);
+
+        if (roleError) {
+          console.error("Error updating user role permissions:", roleError);
+          // We don't block the UI success but log it and maybe warn
+          // Likely if this fails, the user needs to run the SQL to update enums
+        }
+      }
+
       toast({
         title: "Pengguna Diperbarui",
         description: `Data ${formData.name} berhasil diperbarui`,

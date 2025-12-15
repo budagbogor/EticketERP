@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBranches, useComplaintCategories, useSubCategories, useFuelTypes, useTransmissionTypes, useCarBrands } from "@/hooks/useMasterData";
+import { CategoryDialog } from "@/components/master-data/CategoryDialog";
+import { SubCategoryDialog } from "@/components/master-data/SubCategoryDialog";
 import { ticketFormSchema } from "@/lib/validations";
 
 interface CarModel {
@@ -493,7 +495,20 @@ export default function CreateTicket() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Kategori Komplain *</Label>
+              <div className="flex items-center justify-between">
+                <Label>Kategori Komplain *</Label>
+                <CategoryDialog
+                  trigger={
+                    <Button variant="link" size="sm" className="h-auto p-0 text-xs">
+                      <Plus className="w-3 h-3 mr-1" />
+                      Tambah Kategori
+                    </Button>
+                  }
+                  onSuccess={() => {
+                    queryClient.invalidateQueries({ queryKey: ["complaint-categories"] });
+                  }}
+                />
+              </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih kategori" />
@@ -506,7 +521,20 @@ export default function CreateTicket() {
               </Select>
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label>Sub-Kategori *</Label>
+              <div className="flex items-center justify-between">
+                <Label>Sub-Kategori *</Label>
+                <SubCategoryDialog
+                  trigger={
+                    <Button variant="link" size="sm" className="h-auto p-0 text-xs">
+                      <Plus className="w-3 h-3 mr-1" />
+                      Tambah Sub-Kategori
+                    </Button>
+                  }
+                  onSuccess={() => {
+                    queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
+                  }}
+                />
+              </div>
               <Select value={selectedSubCategory} onValueChange={setSelectedSubCategory} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih sub-kategori" />

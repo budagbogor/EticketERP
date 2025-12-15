@@ -30,6 +30,8 @@ import { SocialComplaint } from '@/types/social-complaint';
 import { Send, AlertTriangle, Plus, Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { CategoryDialog } from '@/components/master-data/CategoryDialog';
+import { SubCategoryDialog } from '@/components/master-data/SubCategoryDialog';
 
 interface ComplaintFormProps {
     onSubmit: (complaint: Omit<SocialComplaint, 'id' | 'created_at'>) => void;
@@ -37,8 +39,6 @@ interface ComplaintFormProps {
     subCategories: string[];
     branches: string[];
     channels: string[];
-    onAddCategory: (name: string) => Promise<boolean>;
-    onAddSubCategory: (name: string) => Promise<boolean>;
     onAddChannel: (name: string) => Promise<boolean>;
 }
 
@@ -48,8 +48,6 @@ export function ComplaintForm({
     subCategories,
     branches,
     channels,
-    onAddCategory,
-    onAddSubCategory,
     onAddChannel,
 }: ComplaintFormProps) {
     const [formData, setFormData] = useState({
@@ -77,12 +75,6 @@ export function ComplaintForm({
         const dateStr = format(selectedDate, "yyyy-MM-dd");
         return `${dateStr}T${selectedTime}`; // ISO format for local time
     };
-
-    const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState('');
-
-    const [isAddSubCategoryOpen, setIsAddSubCategoryOpen] = useState(false);
-    const [newSubCategoryName, setNewSubCategoryName] = useState('');
 
     const [isAddChannelOpen, setIsAddChannelOpen] = useState(false);
     const [newChannelName, setNewChannelName] = useState('');
@@ -122,26 +114,6 @@ export function ComplaintForm({
         });
         setDate(new Date());
         setTime(format(new Date(), "HH:mm"));
-    };
-
-    const handleAddCategory = async () => {
-        if (!newCategoryName.trim()) return;
-        const success = await onAddCategory(newCategoryName);
-        if (success) {
-            setFormData({ ...formData, complain_category: newCategoryName });
-            setNewCategoryName('');
-            setIsAddCategoryOpen(false);
-        }
-    };
-
-    const handleAddSubCategory = async () => {
-        if (!newSubCategoryName.trim()) return;
-        const success = await onAddSubCategory(newSubCategoryName);
-        if (success) {
-            setFormData({ ...formData, sub_category: newSubCategoryName });
-            setNewSubCategoryName('');
-            setIsAddSubCategoryOpen(false);
-        }
     };
 
     const handleAddChannel = async () => {
@@ -350,32 +322,13 @@ export function ComplaintForm({
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-                                <DialogTrigger asChild>
+                            <CategoryDialog
+                                trigger={
                                     <Button variant="outline" size="icon" title="Tambah Kategori">
                                         <Plus className="h-4 w-4" />
                                     </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>Tambah Kategori Baru</DialogTitle>
-                                        <DialogDescription>
-                                            Masukkan nama kategori baru yang ingin ditambahkan.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="py-4">
-                                        <Input
-                                            value={newCategoryName}
-                                            onChange={(e) => setNewCategoryName(e.target.value)}
-                                            placeholder="Nama Kategori"
-                                        />
-                                    </div>
-                                    <DialogFooter>
-                                        <Button variant="outline" onClick={() => setIsAddCategoryOpen(false)}>Batal</Button>
-                                        <Button onClick={handleAddCategory}>Simpan</Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
+                                }
+                            />
                         </div>
                     </div>
 
@@ -399,32 +352,13 @@ export function ComplaintForm({
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <Dialog open={isAddSubCategoryOpen} onOpenChange={setIsAddSubCategoryOpen}>
-                                <DialogTrigger asChild>
+                            <SubCategoryDialog
+                                trigger={
                                     <Button variant="outline" size="icon" title="Tambah Sub Kategori">
                                         <Plus className="h-4 w-4" />
                                     </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>Tambah Sub Kategori Baru</DialogTitle>
-                                        <DialogDescription>
-                                            Masukkan nama sub kategori baru yang ingin ditambahkan.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="py-4">
-                                        <Input
-                                            value={newSubCategoryName}
-                                            onChange={(e) => setNewSubCategoryName(e.target.value)}
-                                            placeholder="Nama Sub Kategori"
-                                        />
-                                    </div>
-                                    <DialogFooter>
-                                        <Button variant="outline" onClick={() => setIsAddSubCategoryOpen(false)}>Batal</Button>
-                                        <Button onClick={handleAddSubCategory}>Simpan</Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
+                                }
+                            />
                         </div>
                     </div>
 

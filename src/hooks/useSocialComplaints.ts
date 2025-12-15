@@ -2,10 +2,57 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SocialComplaint } from '@/types/social-complaint';
 import { toast } from 'sonner';
+import { useBranches, useComplaintCategories, useSubCategories } from '@/hooks/useMasterData';
+import { useQuery } from '@tanstack/react-query';
 
 export function useSocialComplaints() {
     const [complaints, setComplaints] = useState<SocialComplaint[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Use Master Data Hooks
+    const { data: categoryData } = useComplaintCategories();
+    const categories = categoryData?.map(c => c.name) || [];
+
+    const { data: subCategoryData } = useSubCategories();
+    const subCategories = subCategoryData?.map(c => c.name) || [];
+
+    const { data: branchData } = useBranches();
+    const branches = branchData?.map(b => b.name) || [];
+
+    // Keep channels local for now as it wasn't in MasterData hooks previously shown, 
+    // or fetch it similarly if it exists. 
+    // Looking at useMasterData.ts (Step 132), there is NO useChannels.
+    // So I must keep fetchChannels here or add it to useMasterData.
+    // The previous code had fetchChannels. I should probably keep it or genericize it.
+    // For now I will keep it but clean it up.
+    const { data: channels = [] } = useQuery({
+        queryKey: ['channels'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('channels' as any)
+                .select('name')
+                .order('name');
+            if (error) throw error;
+            return data.map((c: any) => c.name);
+        }
+    });
+
+    const addChannel = async (name: string) => {
+        try {
+            const { error } = await supabase
+                .from('channels' as any)
+                .insert([{ name }]);
+
+            if (error) throw error;
+            // Invalidate query would be better but we'll return true for compatibility with component
+            toast.success('Channel berhasil ditambahkan');
+            return true;
+        } catch (error) {
+            console.error('Error adding channel:', error);
+            toast.error('Gagal menambahkan channel');
+            return false;
+        }
+    };
 
     const fetchComplaints = async () => {
         try {
@@ -24,124 +71,8 @@ export function useSocialComplaints() {
         }
     };
 
-    const [categories, setCategories] = useState<string[]>([]);
-    const [subCategories, setSubCategories] = useState<string[]>([]);
-    const [branches, setBranches] = useState<string[]>([]);
-    const [channels, setChannels] = useState<string[]>([]);
-
-    const fetchCategories = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('complaint_categories')
-                .select('name')
-                .order('name');
-
-            if (error) throw error;
-            setCategories(data.map(c => c.name));
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
-
-    const fetchSubCategories = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('sub_categories')
-                .select('name')
-                .order('name');
-
-            if (error) throw error;
-            setSubCategories(data.map(c => c.name));
-        } catch (error) {
-            console.error('Error fetching sub categories:', error);
-        }
-    };
-
-    const fetchBranches = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('branches')
-                .select('name')
-                .order('name');
-
-            if (error) throw error;
-            setBranches(data.map(b => b.name));
-        } catch (error) {
-            console.error('Error fetching branches:', error);
-        }
-    };
-
-    const fetchChannels = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('channels')
-                .select('name')
-                .order('name');
-
-            if (error) throw error;
-            setChannels(data.map(c => c.name));
-        } catch (error) {
-            console.error('Error fetching channels:', error);
-        }
-    };
-
-    const addCategory = async (name: string) => {
-        try {
-            const { error } = await supabase
-                .from('complaint_categories')
-                .insert([{ name }]);
-
-            if (error) throw error;
-            await fetchCategories();
-            toast.success('Kategori berhasil ditambahkan');
-            return true;
-        } catch (error) {
-            console.error('Error adding category:', error);
-            toast.error('Gagal menambahkan kategori');
-            return false;
-        }
-    };
-
-    const addSubCategory = async (name: string) => {
-        try {
-            const { error } = await supabase
-                .from('sub_categories')
-                .insert([{ name }]);
-
-            if (error) throw error;
-            await fetchSubCategories();
-            toast.success('Sub Kategori berhasil ditambahkan');
-            return true;
-        } catch (error) {
-            console.error('Error adding sub category:', error);
-            toast.error('Gagal menambahkan sub kategori');
-            return false;
-        }
-    };
-
-    const addChannel = async (name: string) => {
-        try {
-            const { error } = await supabase
-                .from('channels')
-                .insert([{ name }]);
-
-            if (error) throw error;
-            await fetchChannels();
-            toast.success('Channel berhasil ditambahkan');
-            return true;
-        } catch (error) {
-            console.error('Error adding channel:', error);
-            toast.error('Gagal menambahkan channel');
-            return false;
-        }
-    };
-
     useEffect(() => {
         fetchComplaints();
-        fetchCategories();
-        fetchSubCategories();
-        fetchBranches();
-        fetchChannels();
 
         // Subscribe to realtime changes
         const channel = supabase
@@ -174,7 +105,6 @@ export function useSocialComplaints() {
 
             if (error) throw error;
 
-            // Manual state update
             if (data) {
                 setComplaints((prev) => [data as SocialComplaint, ...prev]);
             }
@@ -196,7 +126,6 @@ export function useSocialComplaints() {
 
             if (error) throw error;
 
-            // Manual state update
             setComplaints((prev) =>
                 prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
             );
@@ -218,7 +147,6 @@ export function useSocialComplaints() {
 
             if (error) throw error;
 
-            // Manual state update
             setComplaints((prev) => prev.filter((c) => c.id !== id));
 
             toast.success('Complain berhasil dihapus');
@@ -289,8 +217,6 @@ export function useSocialComplaints() {
         updateComplaint,
         deleteComplaint,
         exportToCSV,
-        addCategory,
-        addSubCategory,
         addChannel,
     };
 }

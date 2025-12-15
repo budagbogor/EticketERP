@@ -18,8 +18,6 @@ const ComplainCompass = () => {
         updateComplaint,
         deleteComplaint,
         exportToCSV,
-        addCategory,
-        addSubCategory,
         addChannel,
     } = useSocialComplaints();
 
@@ -89,8 +87,6 @@ const ComplainCompass = () => {
                             subCategories={subCategories}
                             branches={branches}
                             channels={channels}
-                            onAddCategory={addCategory}
-                            onAddSubCategory={addSubCategory}
                             onAddChannel={addChannel}
                         />
                     </div>
