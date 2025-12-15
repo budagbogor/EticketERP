@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
-type UserRole = "admin" | "staff" | "tech_support" | "psd" | "viewer";
+type UserRole = "admin" | "staff" | "tech_support" | "psd" | "viewer" | "customer_service";
 
 interface AppUser {
   id: string;
@@ -86,6 +86,7 @@ export default function UserManagement() {
       case "tech_support": return "outline";
       case "psd": return "outline";
       case "viewer": return "secondary";
+      case "customer_service": return "secondary";
       default: return "secondary";
     }
   };

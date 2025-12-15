@@ -22,7 +22,7 @@ export type Database = {
           id: string
           name: string
           nik: string
-          role: Database["public"]["Enums"]["user_role"]
+          role: Database["public"]["Enums"]["user_role"] | "customer_service"
           updated_at: string
         }
         Insert: {
@@ -32,7 +32,7 @@ export type Database = {
           id?: string
           name: string
           nik: string
-          role?: Database["public"]["Enums"]["user_role"]
+          role?: Database["public"]["Enums"]["user_role"] | "customer_service"
           updated_at?: string
         }
         Update: {
@@ -42,7 +42,7 @@ export type Database = {
           id?: string
           name?: string
           nik?: string
-          role?: Database["public"]["Enums"]["user_role"]
+          role?: Database["public"]["Enums"]["user_role"] | "customer_service"
           updated_at?: string
         }
         Relationships: []

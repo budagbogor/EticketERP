@@ -57,6 +57,7 @@ export function AppSidebar() {
       tech_support: "Tech Support",
       psd: "PSD",
       viewer: "Viewer",
+      customer_service: "Customer Service",
     };
     return labels[role] || role;
   };

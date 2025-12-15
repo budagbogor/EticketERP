@@ -135,6 +135,7 @@ export const USER_ROLES = {
   TECH_SUPPORT: "tech_support",
   PSD: "psd",
   VIEWER: "viewer",
+  CUSTOMER_SERVICE: "customer_service",
 } as const;
 
 export const ROLE_LABELS: Record<string, string> = {
@@ -143,4 +144,5 @@ export const ROLE_LABELS: Record<string, string> = {
   tech_support: "Teknikal Support",
   psd: "Produk & Service Development",
   viewer: "Viewer",
+  customer_service: "Customer Service",
 };
