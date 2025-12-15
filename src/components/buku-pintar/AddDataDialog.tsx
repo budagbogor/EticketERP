@@ -37,12 +37,33 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
     // Transmission Oil
     const [transOilType, setTransOilType] = useState("");
     const [transOilCapacity, setTransOilCapacity] = useState("");
+    const [transOilBrands, setTransOilBrands] = useState("");
+
+    // Differential Oil
+    const [diffOilType, setDiffOilType] = useState("");
+    const [diffOilCapacity, setDiffOilCapacity] = useState("");
+    const [diffOilBrands, setDiffOilBrands] = useState("");
 
     // Parts
+    // Parts
     const [partOilFilter, setPartOilFilter] = useState("");
+    const [partOilFilterBrands, setPartOilFilterBrands] = useState("");
+    const [partOilFilterInterval, setPartOilFilterInterval] = useState("");
     const [partAirFilter, setPartAirFilter] = useState("");
+    const [partAirFilterBrands, setPartAirFilterBrands] = useState("");
+    const [partAirFilterInterval, setPartAirFilterInterval] = useState("");
     const [partCabinFilter, setPartCabinFilter] = useState("");
+    const [partCabinFilterBrands, setPartCabinFilterBrands] = useState("");
+    const [partCabinFilterInterval, setPartCabinFilterInterval] = useState("");
     const [partSparkPlug, setPartSparkPlug] = useState("");
+    const [partSparkPlugBrands, setPartSparkPlugBrands] = useState("");
+    const [partSparkPlugInterval, setPartSparkPlugInterval] = useState("");
+    const [partSolarFilter, setPartSolarFilter] = useState("");
+    const [partSolarFilterBrands, setPartSolarFilterBrands] = useState("");
+    const [partSolarFilterInterval, setPartSolarFilterInterval] = useState("");
+    const [partBensinFilter, setPartBensinFilter] = useState("");
+    const [partBensinFilterBrands, setPartBensinFilterBrands] = useState("");
+    const [partBensinFilterInterval, setPartBensinFilterInterval] = useState("");
 
     // Battery Specs
     const [batteryType, setBatteryType] = useState("");
@@ -57,16 +78,26 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
     const [brakeFluid, setBrakeFluid] = useState("");
     const [brakePadFront, setBrakePadFront] = useState("");
     const [brakeShoeRear, setBrakeShoeRear] = useState("");
+    const [brakeFrontBrands, setBrakeFrontBrands] = useState("");
+    const [brakeRearBrands, setBrakeRearBrands] = useState("");
 
     // Suspension Specs (Simplified for input, just main parts)
     const [shockFront, setShockFront] = useState("");
+    const [shockFrontBrands, setShockFrontBrands] = useState("");
     const [shockRear, setShockRear] = useState("");
+    const [shockRearBrands, setShockRearBrands] = useState("");
     const [rackEnd, setRackEnd] = useState("");
+    const [rackEndBrands, setRackEndBrands] = useState("");
     const [tieRod, setTieRod] = useState("");
+    const [tieRodBrands, setTieRodBrands] = useState("");
     const [linkStabilizer, setLinkStabilizer] = useState("");
+    const [linkStabilizerBrands, setLinkStabilizerBrands] = useState("");
     const [lowerArm, setLowerArm] = useState("");
+    const [lowerArmBrands, setLowerArmBrands] = useState("");
     const [upperArm, setUpperArm] = useState("");
+    const [upperArmBrands, setUpperArmBrands] = useState("");
     const [upperSupport, setUpperSupport] = useState("");
+    const [upperSupportBrands, setUpperSupportBrands] = useState("");
 
     // Tire Specs
     const [tireLocation, setTireLocation] = useState("Depan & Belakang");
@@ -102,13 +133,21 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                 },
                 transmission_oil: {
                     type: transOilType || "Standard",
-                    capacity_liter: Number(transOilCapacity) || 4
+                    capacity_liter: Number(transOilCapacity) || 4,
+                    recommended_brands: transOilBrands ? transOilBrands.split(",").map(b => b.trim()) : undefined
                 },
+                differential_oil: diffOilType ? {
+                    type: diffOilType,
+                    capacity_liter: Number(diffOilCapacity) || 0,
+                    recommended_brands: diffOilBrands ? diffOilBrands.split(",").map(b => b.trim()) : undefined
+                } : undefined,
                 parts: [
-                    ...(partOilFilter ? [{ category: "Filter Oli" as const, name: "Oil Filter", part_number: partOilFilter }] : []),
-                    ...(partAirFilter ? [{ category: "Filter Udara" as const, name: "Air Filter", part_number: partAirFilter }] : []),
-                    ...(partCabinFilter ? [{ category: "Filter Kabin" as const, name: "Cabin Filter", part_number: partCabinFilter }] : []),
-                    ...(partSparkPlug ? [{ category: "Busi" as const, name: "Spark Plug", part_number: partSparkPlug }] : []),
+                    ...(partOilFilter ? [{ category: "Filter Oli" as const, name: "Oil Filter", part_number: partOilFilter, compatible_brands: partOilFilterBrands ? partOilFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partOilFilterInterval) || undefined }] : []),
+                    ...(partAirFilter ? [{ category: "Filter Udara" as const, name: "Air Filter", part_number: partAirFilter, compatible_brands: partAirFilterBrands ? partAirFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partAirFilterInterval) || undefined }] : []),
+                    ...(partCabinFilter ? [{ category: "Filter Kabin" as const, name: "Cabin Filter", part_number: partCabinFilter, compatible_brands: partCabinFilterBrands ? partCabinFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partCabinFilterInterval) || undefined }] : []),
+                    ...(partSparkPlug ? [{ category: "Busi" as const, name: "Spark Plug", part_number: partSparkPlug, compatible_brands: partSparkPlugBrands ? partSparkPlugBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partSparkPlugInterval) || undefined }] : []),
+                    ...(partSolarFilter ? [{ category: "Filter Solar" as const, name: "Fuel Filter (Solar)", part_number: partSolarFilter, compatible_brands: partSolarFilterBrands ? partSolarFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partSolarFilterInterval) || undefined }] : []),
+                    ...(partBensinFilter ? [{ category: "Filter Bensin" as const, name: "Fuel Filter (Bensin)", part_number: partBensinFilter, compatible_brands: partBensinFilterBrands ? partBensinFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partBensinFilterInterval) || undefined }] : []),
                 ],
                 tires: tireSize ? [{
                     location: tireLocation as any,
@@ -130,17 +169,27 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                     rear_type: brakeRear,
                     fluid_type: brakeFluid,
                     pad_part_number_front: brakePadFront,
-                    shoe_part_number_rear: brakeShoeRear
+                    shoe_part_number_rear: brakeShoeRear,
+                    recommended_brands_front: brakeFrontBrands ? brakeFrontBrands.split(",").map(b => b.trim()) : undefined,
+                    recommended_brands_rear: brakeRearBrands ? brakeRearBrands.split(",").map(b => b.trim()) : undefined
                 } : undefined,
                 suspension: shockFront ? {
                     shock_absorber_front: shockFront,
+                    shock_absorber_front_brands: shockFrontBrands ? shockFrontBrands.split(",").map(b => b.trim()) : undefined,
                     shock_absorber_rear: shockRear,
+                    shock_absorber_rear_brands: shockRearBrands ? shockRearBrands.split(",").map(b => b.trim()) : undefined,
                     rack_end: rackEnd,
+                    rack_end_brands: rackEndBrands ? rackEndBrands.split(",").map(b => b.trim()) : undefined,
                     tie_rod_end: tieRod,
+                    tie_rod_end_brands: tieRodBrands ? tieRodBrands.split(",").map(b => b.trim()) : undefined,
                     link_stabilizer: linkStabilizer,
+                    link_stabilizer_brands: linkStabilizerBrands ? linkStabilizerBrands.split(",").map(b => b.trim()) : undefined,
                     lower_arm: lowerArm,
+                    lower_arm_brands: lowerArmBrands ? lowerArmBrands.split(",").map(b => b.trim()) : undefined,
                     upper_arm: upperArm,
-                    upper_support: upperSupport
+                    upper_arm_brands: upperArmBrands ? upperArmBrands.split(",").map(b => b.trim()) : undefined,
+                    upper_support: upperSupport,
+                    upper_support_brands: upperSupportBrands ? upperSupportBrands.split(",").map(b => b.trim()) : undefined
                 } : undefined
             }
         };
@@ -166,12 +215,31 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setOilCapacity("");
         setOilQuality("");
         setOilBrands("");
+        setOilBrands("");
         setTransOilType("");
         setTransOilCapacity("");
+        setTransOilBrands("");
+        setDiffOilType("");
+        setDiffOilCapacity("");
+        setDiffOilBrands("");
         setPartOilFilter("");
+        setPartOilFilterBrands("");
+        setPartOilFilterInterval("");
         setPartAirFilter("");
+        setPartAirFilterBrands("");
+        setPartAirFilterInterval("");
         setPartCabinFilter("");
+        setPartCabinFilterBrands("");
+        setPartCabinFilterInterval("");
         setPartSparkPlug("");
+        setPartSparkPlugBrands("");
+        setPartSparkPlugInterval("");
+        setPartSolarFilter("");
+        setPartSolarFilterBrands("");
+        setPartSolarFilterInterval("");
+        setPartBensinFilter("");
+        setPartBensinFilterBrands("");
+        setPartBensinFilterInterval("");
         setBatteryType("");
         setBatteryModel("");
         setBatteryType("");
@@ -181,15 +249,25 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setBrakeRear("");
         setBrakePadFront("");
         setBrakeShoeRear("");
+        setBrakeFrontBrands("");
+        setBrakeRearBrands("");
         setBrakeFluid("");
         setShockFront("");
+        setShockFrontBrands("");
         setShockRear("");
+        setShockRearBrands("");
         setRackEnd("");
+        setRackEndBrands("");
         setTieRod("");
+        setTieRodBrands("");
         setLinkStabilizer("");
+        setLinkStabilizerBrands("");
         setLowerArm("");
+        setLowerArmBrands("");
         setUpperArm("");
+        setUpperArmBrands("");
         setUpperSupport("");
+        setUpperSupportBrands("");
         setTireLocation("Depan & Belakang");
         setTireSize("");
         setTirePressureFront("");
@@ -393,6 +471,26 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                     <Label>Kapasitas (L)</Label>
                                     <Input type="number" placeholder="3.5" value={transOilCapacity} onChange={e => setTransOilCapacity(e.target.value)} />
                                 </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Merek Rekomendasi (Opsional)</Label>
+                                    <Input placeholder="Pisahkan dengan koma" value={transOilBrands} onChange={e => setTransOilBrands(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <h4 className="text-sm font-semibold mt-4 mb-2">Oli Differential (Gardan)</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Tipe Oli Differential</Label>
+                                    <Input placeholder="GL-5 80W-90" value={diffOilType} onChange={e => setDiffOilType(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Kapasitas (L)</Label>
+                                    <Input type="number" placeholder="2.5" value={diffOilCapacity} onChange={e => setDiffOilCapacity(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Merek Rekomendasi (Opsional)</Label>
+                                    <Input placeholder="Pisahkan dengan koma" value={diffOilBrands} onChange={e => setDiffOilBrands(e.target.value)} />
+                                </div>
                             </div>
                         </TabsContent>
 
@@ -401,18 +499,50 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 <div className="space-y-2">
                                     <Label>Filter Oli</Label>
                                     <Input placeholder="Part Number" value={partOilFilter} onChange={e => setPartOilFilter(e.target.value)} />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Input placeholder="Merek (koma)" className="text-xs h-8" value={partOilFilterBrands} onChange={e => setPartOilFilterBrands(e.target.value)} />
+                                        <Input type="number" placeholder="KM Ganti" className="text-xs h-8" value={partOilFilterInterval} onChange={e => setPartOilFilterInterval(e.target.value)} />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Filter Udara</Label>
                                     <Input placeholder="Part Number" value={partAirFilter} onChange={e => setPartAirFilter(e.target.value)} />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Input placeholder="Merek (koma)" className="text-xs h-8" value={partAirFilterBrands} onChange={e => setPartAirFilterBrands(e.target.value)} />
+                                        <Input type="number" placeholder="KM Ganti" className="text-xs h-8" value={partAirFilterInterval} onChange={e => setPartAirFilterInterval(e.target.value)} />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Filter Kabin / AC</Label>
                                     <Input placeholder="Part Number" value={partCabinFilter} onChange={e => setPartCabinFilter(e.target.value)} />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Input placeholder="Merek (koma)" className="text-xs h-8" value={partCabinFilterBrands} onChange={e => setPartCabinFilterBrands(e.target.value)} />
+                                        <Input type="number" placeholder="KM Ganti" className="text-xs h-8" value={partCabinFilterInterval} onChange={e => setPartCabinFilterInterval(e.target.value)} />
+                                    </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Busi</Label>
                                     <Input placeholder="Part Number" value={partSparkPlug} onChange={e => setPartSparkPlug(e.target.value)} />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Input placeholder="Merek (koma)" className="text-xs h-8" value={partSparkPlugBrands} onChange={e => setPartSparkPlugBrands(e.target.value)} />
+                                        <Input type="number" placeholder="KM Ganti" className="text-xs h-8" value={partSparkPlugInterval} onChange={e => setPartSparkPlugInterval(e.target.value)} />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Filter Solar (Diesel)</Label>
+                                    <Input placeholder="Part Number" value={partSolarFilter} onChange={e => setPartSolarFilter(e.target.value)} />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Input placeholder="Merek (koma)" className="text-xs h-8" value={partSolarFilterBrands} onChange={e => setPartSolarFilterBrands(e.target.value)} />
+                                        <Input type="number" placeholder="KM Ganti" className="text-xs h-8" value={partSolarFilterInterval} onChange={e => setPartSolarFilterInterval(e.target.value)} />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Filter Bensin</Label>
+                                    <Input placeholder="Part Number" value={partBensinFilter} onChange={e => setPartBensinFilter(e.target.value)} />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Input placeholder="Merek (koma)" className="text-xs h-8" value={partBensinFilterBrands} onChange={e => setPartBensinFilterBrands(e.target.value)} />
+                                        <Input type="number" placeholder="KM Ganti" className="text-xs h-8" value={partBensinFilterInterval} onChange={e => setPartBensinFilterInterval(e.target.value)} />
+                                    </div>
                                 </div>
                             </div>
                         </TabsContent>
@@ -489,6 +619,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 <div className="space-y-2">
                                     <Label>Part No. Kampas Depan</Label>
                                     <Input placeholder="04465-xxxxx" value={brakePadFront} onChange={e => setBrakePadFront(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={brakeFrontBrands} onChange={e => setBrakeFrontBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Rem Belakang</Label>
@@ -497,6 +628,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 <div className="space-y-2">
                                     <Label>Part No. Kampas Belakang</Label>
                                     <Input placeholder="04495-xxxxx" value={brakeShoeRear} onChange={e => setBrakeShoeRear(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={brakeRearBrands} onChange={e => setBrakeRearBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2 col-span-2">
                                     <Label>Minyak Rem</Label>
@@ -510,34 +642,42 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 <div className="space-y-2">
                                     <Label>Shock Depan</Label>
                                     <Input placeholder="Kode Part / Tipe" value={shockFront} onChange={e => setShockFront(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={shockFrontBrands} onChange={e => setShockFrontBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Shock Belakang</Label>
                                     <Input placeholder="Kode Part / Tipe" value={shockRear} onChange={e => setShockRear(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={shockRearBrands} onChange={e => setShockRearBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Rack End</Label>
                                     <Input placeholder="Kode Part" value={rackEnd} onChange={e => setRackEnd(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={rackEndBrands} onChange={e => setRackEndBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Tie Rod</Label>
                                     <Input placeholder="Kode Part" value={tieRod} onChange={e => setTieRod(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={tieRodBrands} onChange={e => setTieRodBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Link Stabilizer</Label>
                                     <Input placeholder="Kode Part" value={linkStabilizer} onChange={e => setLinkStabilizer(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={linkStabilizerBrands} onChange={e => setLinkStabilizerBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Lower Arm</Label>
                                     <Input placeholder="Kode Part" value={lowerArm} onChange={e => setLowerArm(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={lowerArmBrands} onChange={e => setLowerArmBrands(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Upper Arm (Optional)</Label>
                                     <Input placeholder="Kode Part" value={upperArm} onChange={e => setUpperArm(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={upperArmBrands} onChange={e => setUpperArmBrands(e.target.value)} />
                                 </div>
-                                <div className="space-y-2 col-span-2">
+                                <div className="space-y-2">
                                     <Label>Upper Support (Optional)</Label>
                                     <Input placeholder="Kode Part" value={upperSupport} onChange={e => setUpperSupport(e.target.value)} />
+                                    <Input placeholder="Merek Rekomendasi (koma)" className="text-xs h-8 mt-2" value={upperSupportBrands} onChange={e => setUpperSupportBrands(e.target.value)} />
                                 </div>
                             </div>
                         </TabsContent>

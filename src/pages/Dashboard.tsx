@@ -90,27 +90,27 @@ export default function Dashboard() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={branchData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="name" 
-                    tick={{ fontSize: 12 }} 
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fontSize: 12 }}
                     tickLine={false}
                     axisLine={false}
                   />
-                  <YAxis 
-                    tick={{ fontSize: 12 }} 
+                  <YAxis
+                    tick={{ fontSize: 12 }}
                     tickLine={false}
                     axisLine={false}
                   />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: "hsl(var(--card))", 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "8px"
                     }}
                   />
-                  <Bar 
-                    dataKey="complaints" 
-                    fill="hsl(var(--primary))" 
+                  <Bar
+                    dataKey="complaints"
+                    fill="hsl(var(--primary))"
                     radius={[4, 4, 0, 0]}
                     name="Komplain"
                   />
@@ -148,9 +148,9 @@ export default function Dashboard() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "hsl(var(--card))", 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
                         borderRadius: "8px"
                       }}
@@ -162,8 +162,8 @@ export default function Dashboard() {
                   {categoryData.map((item, index) => (
                     <div key={index} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
+                        <div
+                          className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: item.color }}
                         />
                         <span className="text-muted-foreground">{item.name}</span>
@@ -200,8 +200,8 @@ export default function Dashboard() {
           ) : recentComplaints.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {recentComplaints.map((complaint) => (
-                <Link 
-                  key={complaint.id} 
+                <Link
+                  key={complaint.id}
                   to={`/tickets/${complaint.id}`}
                   className="block"
                 >

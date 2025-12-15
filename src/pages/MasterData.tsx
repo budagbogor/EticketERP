@@ -11,23 +11,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Building, Tag, Layers, Loader2, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Building, Tag, Layers, Loader2, Search, Car, Disc } from "lucide-react";
+import VehicleData from "./VehicleData";
+import ManageTires from "./admin/ManageTires";
 
 interface MasterDataItem {
   id: string;
   name: string;
 }
 
-type DataType = "branches" | "complaint_categories" | "sub_categories";
+type GenericDataType = "branches" | "complaint_categories" | "sub_categories";
+type DataType = GenericDataType | "vehicles" | "tires";
+
+const GENERIC_TABS: GenericDataType[] = ["branches", "complaint_categories", "sub_categories"];
 
 export default function MasterData() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const { data: branches = [], isLoading: branchesLoading } = useBranches();
   const { data: categories = [], isLoading: categoriesLoading } = useComplaintCategories();
   const { data: subCategories = [], isLoading: subCategoriesLoading } = useSubCategories();
-  
+
   const [activeTab, setActiveTab] = useState<DataType>("branches");
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -38,8 +43,8 @@ export default function MasterData() {
   const [isSaving, setIsSaving] = useState(false);
 
   const getTableName = (type: DataType) => type;
-  
-  const getQueryKey = (type: DataType) => {
+
+  const getQueryKey = (type: GenericDataType) => {
     switch (type) {
       case "branches": return ["branches"];
       case "complaint_categories": return ["complaint-categories"];
@@ -52,6 +57,7 @@ export default function MasterData() {
       case "branches": return { singular: "Cabang", plural: "Cabang" };
       case "complaint_categories": return { singular: "Kategori", plural: "Kategori" };
       case "sub_categories": return { singular: "Sub-Kategori", plural: "Sub-Kategori" };
+      default: return { singular: "", plural: "" };
     }
   };
 
@@ -60,6 +66,7 @@ export default function MasterData() {
       case "branches": return branches;
       case "complaint_categories": return categories;
       case "sub_categories": return subCategories;
+      default: return [];
     }
   };
 
@@ -87,14 +94,14 @@ export default function MasterData() {
 
     setIsSaving(true);
     const { error } = await supabase
-      .from(getTableName(activeTab))
+      .from(getTableName(activeTab as GenericDataType) as GenericDataType)
       .insert({ name: formName.trim() });
 
     if (error) {
       toast({
         title: "Error",
-        description: error.message.includes("duplicate") 
-          ? `${getLabel(activeTab).singular} sudah ada` 
+        description: error.message.includes("duplicate")
+          ? `${getLabel(activeTab).singular} sudah ada`
           : `Gagal menambahkan ${getLabel(activeTab).singular.toLowerCase()}`,
         variant: "destructive",
       });
@@ -103,7 +110,7 @@ export default function MasterData() {
         title: "Berhasil",
         description: `${getLabel(activeTab).singular} "${formName}" berhasil ditambahkan`,
       });
-      queryClient.invalidateQueries({ queryKey: getQueryKey(activeTab) });
+      queryClient.invalidateQueries({ queryKey: getQueryKey(activeTab as GenericDataType) });
       setIsAddOpen(false);
       setFormName("");
     }
@@ -122,15 +129,15 @@ export default function MasterData() {
 
     setIsSaving(true);
     const { error } = await supabase
-      .from(getTableName(activeTab))
+      .from(getTableName(activeTab as GenericDataType) as GenericDataType)
       .update({ name: formName.trim() })
       .eq("id", selectedItem.id);
 
     if (error) {
       toast({
         title: "Error",
-        description: error.message.includes("duplicate") 
-          ? `${getLabel(activeTab).singular} sudah ada` 
+        description: error.message.includes("duplicate")
+          ? `${getLabel(activeTab).singular} sudah ada`
           : `Gagal memperbarui ${getLabel(activeTab).singular.toLowerCase()}`,
         variant: "destructive",
       });
@@ -139,7 +146,7 @@ export default function MasterData() {
         title: "Berhasil",
         description: `${getLabel(activeTab).singular} berhasil diperbarui`,
       });
-      queryClient.invalidateQueries({ queryKey: getQueryKey(activeTab) });
+      queryClient.invalidateQueries({ queryKey: getQueryKey(activeTab as GenericDataType) });
       setIsEditOpen(false);
       setSelectedItem(null);
       setFormName("");
@@ -152,7 +159,7 @@ export default function MasterData() {
 
     setIsSaving(true);
     const { error } = await supabase
-      .from(getTableName(activeTab))
+      .from(getTableName(activeTab as GenericDataType) as GenericDataType)
       .delete()
       .eq("id", selectedItem.id);
 
@@ -167,7 +174,7 @@ export default function MasterData() {
         title: "Berhasil",
         description: `${getLabel(activeTab).singular} "${selectedItem.name}" berhasil dihapus`,
       });
-      queryClient.invalidateQueries({ queryKey: getQueryKey(activeTab) });
+      queryClient.invalidateQueries({ queryKey: getQueryKey(activeTab as GenericDataType) });
       setIsDeleteOpen(false);
       setSelectedItem(null);
     }
@@ -198,7 +205,7 @@ export default function MasterData() {
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as DataType); setSearchQuery(""); }}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="flex flex-wrap h-auto gap-2 bg-muted/50 p-1 w-full justify-start">
           <TabsTrigger value="branches" className="flex items-center gap-2">
             <Building className="w-4 h-4" />
             Cabang
@@ -211,87 +218,104 @@ export default function MasterData() {
             <Layers className="w-4 h-4" />
             Sub-Kategori
           </TabsTrigger>
+          <TabsTrigger value="vehicles" className="flex items-center gap-2">
+            <Car className="w-4 h-4" />
+            Kendaraan
+          </TabsTrigger>
+          <TabsTrigger value="tires" className="flex items-center gap-2">
+            <Disc className="w-4 h-4" />
+            Ban
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className="mt-6">
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <CardTitle className="text-lg">Daftar {getLabel(activeTab).plural}</CardTitle>
-                <div className="flex gap-2">
-                  <div className="relative flex-1 sm:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Cari..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
+        {GENERIC_TABS.includes(activeTab as GenericDataType) && (
+          <TabsContent value={activeTab} className="mt-6">
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <CardTitle className="text-lg">Daftar {getLabel(activeTab).plural}</CardTitle>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1 sm:w-64">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Cari..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <Button onClick={openAddDialog}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Tambah
+                    </Button>
                   </div>
-                  <Button onClick={openAddDialog}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Tambah
-                  </Button>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-lg border overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/50">
-                      <TableHead className="font-semibold">Nama</TableHead>
-                      <TableHead className="font-semibold w-[100px]">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {isLoading() ? (
-                      <TableRow>
-                        <TableCell colSpan={2} className="text-center py-8">
-                          <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
-                        </TableCell>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="font-semibold">Nama</TableHead>
+                        <TableHead className="font-semibold w-[100px]">Aksi</TableHead>
                       </TableRow>
-                    ) : filteredData.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={2} className="text-center py-8 text-muted-foreground">
-                          {searchQuery ? "Tidak ada data yang cocok" : `Belum ada ${getLabel(activeTab).singular.toLowerCase()}`}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredData.map((item) => (
-                        <TableRow key={item.id} className="hover:bg-muted/30">
-                          <TableCell className="font-medium">{item.name}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="text-destructive hover:text-destructive"
-                                onClick={() => openDeleteDialog(item)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
+                    </TableHeader>
+                    <TableBody>
+                      {isLoading() ? (
+                        <TableRow>
+                          <TableCell colSpan={2} className="text-center py-8">
+                            <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
                           </TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="mt-4 text-sm text-muted-foreground">
-                Menampilkan {filteredData.length} dari {getCurrentData().length} data
-              </div>
-            </CardContent>
-          </Card>
+                      ) : filteredData.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={2} className="text-center py-8 text-muted-foreground">
+                            {searchQuery ? "Tidak ada data yang cocok" : `Belum ada ${getLabel(activeTab).singular.toLowerCase()}`}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        filteredData.map((item) => (
+                          <TableRow key={item.id} className="hover:bg-muted/30">
+                            <TableCell className="font-medium">{item.name}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() => openDeleteDialog(item)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                <div className="mt-4 text-sm text-muted-foreground">
+                  Menampilkan {filteredData.length} dari {getCurrentData().length} data
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
+        <TabsContent value="vehicles" className="mt-6">
+          <VehicleData isEmbedded={true} />
         </TabsContent>
-      </Tabs>
+
+        <TabsContent value="tires" className="mt-6">
+          <ManageTires isEmbedded={true} />
+        </TabsContent>
+      </Tabs >
 
       {/* Dialog Tambah */}
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+      < Dialog open={isAddOpen} onOpenChange={setIsAddOpen} >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Tambah {getLabel(activeTab).singular}</DialogTitle>
@@ -318,10 +342,10 @@ export default function MasterData() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Dialog Edit */}
-      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+      < Dialog open={isEditOpen} onOpenChange={setIsEditOpen} >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Edit {getLabel(activeTab).singular}</DialogTitle>
@@ -347,10 +371,10 @@ export default function MasterData() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Dialog Hapus */}
-      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+      < AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen} >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus {getLabel(activeTab).singular}</AlertDialogTitle>
@@ -360,8 +384,8 @@ export default function MasterData() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isSaving}>Batal</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDelete} 
+            <AlertDialogAction
+              onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={isSaving}
             >
@@ -370,7 +394,7 @@ export default function MasterData() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
-    </div>
+      </AlertDialog >
+    </div >
   );
 }

@@ -15,13 +15,14 @@ import { BrakeSection } from "@/components/buku-pintar/BrakeSection";
 import { Vehicle, VehicleVariant } from "@/types/buku-pintar";
 import { AddDataDialog } from "@/components/buku-pintar/AddDataDialog";
 import { EditDataDialog } from "@/components/buku-pintar/EditDataDialog";
+import { ImportDataDialog } from "@/components/buku-pintar/ImportDataDialog";
 import { useBukuPintar } from "@/hooks/use-buku-pintar";
 
 export default function BukuPintar() {
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [selectedVariant, setSelectedVariant] = useState<VehicleVariant | null>(null);
     const [viewMode, setViewMode] = useState<"search" | "table">("search");
-    const { vehicles, supabaseBrands, addVariantData, updateVariantData, deleteVariantData } = useBukuPintar();
+    const { vehicles, supabaseBrands, addVariantData, updateVariantData, deleteVariantData, importVehicleData } = useBukuPintar();
 
     // Update selectedVariant when vehicles data changes (e.g., after edit)
     useEffect(() => {
@@ -80,6 +81,7 @@ export default function BukuPintar() {
                         Export CSV
                     </Button>
                     <AddDataDialog brands={supabaseBrands} onAdd={addVariantData} />
+                    <ImportDataDialog onImport={importVehicleData} />
                 </div>
             </div>
 
@@ -141,6 +143,7 @@ export default function BukuPintar() {
                                     <OilSection
                                         engineOil={selectedVariant.specifications.engine_oil}
                                         transmissionOil={selectedVariant.specifications.transmission_oil}
+                                        differentialOil={selectedVariant.specifications.differential_oil}
                                     />
                                 </TabsContent>
 

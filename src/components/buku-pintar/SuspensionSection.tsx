@@ -28,15 +28,32 @@ export function SuspensionSection({ suspension }: SuspensionSectionProps) {
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {parts.map((part, idx) => (
+                    {[
+                        { label: "Rack End", value: suspension.rack_end, brands: suspension.rack_end_brands },
+                        { label: "Tie Rod End", value: suspension.tie_rod_end, brands: suspension.tie_rod_end_brands },
+                        { label: "Link Stabilizer", value: suspension.link_stabilizer, brands: suspension.link_stabilizer_brands },
+                        { label: "Lower Arm", value: suspension.lower_arm, brands: suspension.lower_arm_brands },
+                        { label: "Upper Arm", value: suspension.upper_arm, brands: suspension.upper_arm_brands },
+                        { label: "Upper Support", value: suspension.upper_support, brands: suspension.upper_support_brands },
+                        { label: "Shock Absorber Depan", value: suspension.shock_absorber_front, brands: suspension.shock_absorber_front_brands },
+                        { label: "Shock Absorber Belakang", value: suspension.shock_absorber_rear, brands: suspension.shock_absorber_rear_brands },
+                    ].map((part, idx) => (
                         part.value ? (
-                            <div key={idx} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                <span className="text-muted-foreground text-sm">{part.label}</span>
-                                <span className="font-medium text-right">{part.value}</span>
+                            <div key={idx} className="flex flex-col gap-1 p-3 bg-muted/50 rounded-lg">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-muted-foreground text-sm">{part.label}</span>
+                                    <span className="font-medium text-right">{part.value}</span>
+                                </div>
+                                {part.brands && part.brands.length > 0 && (
+                                    <div className="flex justify-between items-center text-xs pt-1 border-t border-muted-foreground/20 mt-1">
+                                        <span className="text-muted-foreground">Rekomendasi</span>
+                                        <span className="text-primary font-medium text-right">{part.brands.join(", ")}</span>
+                                    </div>
+                                )}
                             </div>
                         ) : null
                     ))}
-                    {parts.every(p => !p.value) && (
+                    {Object.values(suspension).every(v => !v || (Array.isArray(v) && v.length === 0)) && (
                         <div className="col-span-2 text-center text-muted-foreground py-4">Data belum tersedia</div>
                     )}
                 </div>

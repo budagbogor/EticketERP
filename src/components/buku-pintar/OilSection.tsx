@@ -5,11 +5,12 @@ import { Droplet } from "lucide-react";
 interface OilSectionProps {
     engineOil: EngineOilSpec;
     transmissionOil: FluidSpec;
+    differentialOil?: FluidSpec;
 }
 
-export function OilSection({ engineOil, transmissionOil }: OilSectionProps) {
+export function OilSection({ engineOil, transmissionOil, differentialOil }: OilSectionProps) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
                 <CardHeader className="flex flex-row items-center gap-2 pb-2">
                     <Droplet className="w-5 h-5 text-amber-500" />
@@ -65,8 +66,59 @@ export function OilSection({ engineOil, transmissionOil }: OilSectionProps) {
                             </>
                         )}
                     </div>
+
+                    {transmissionOil.recommended_brands && (
+                        <div className="pt-2 border-t">
+                            <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
+                            <div className="flex flex-wrap gap-2">
+                                {transmissionOil.recommended_brands.map((brand, idx) => (
+                                    <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full dark:bg-blue-900 dark:text-blue-100">
+                                        {brand}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
+
+            {differentialOil && (
+                <Card>
+                    <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                        <Droplet className="w-5 h-5 text-emerald-500" />
+                        <CardTitle className="text-lg">Oli Gardan</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
+                            <span className="font-medium">{differentialOil.type}</span>
+
+                            <span className="text-muted-foreground">Kapasitas:</span>
+                            <span className="font-medium">{differentialOil.capacity_liter} Liter</span>
+
+                            {differentialOil.replacement_interval_km && (
+                                <>
+                                    <span className="text-muted-foreground">Interval Ganti:</span>
+                                    <span className="font-medium">{differentialOil.replacement_interval_km.toLocaleString()} KM</span>
+                                </>
+                            )}
+                        </div>
+
+                        {differentialOil.recommended_brands && (
+                            <div className="pt-2 border-t">
+                                <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
+                                <div className="flex flex-wrap gap-2">
+                                    {differentialOil.recommended_brands.map((brand, idx) => (
+                                        <span key={idx} className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full dark:bg-emerald-900 dark:text-emerald-100">
+                                            {brand}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }

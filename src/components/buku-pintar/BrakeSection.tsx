@@ -29,6 +29,12 @@ export function BrakeSection({ brakes }: BrakeSectionProps) {
                                 <span className="font-mono text-sm">{brakes.pad_part_number_front}</span>
                             </div>
                         )}
+                        {brakes.recommended_brands_front && brakes.recommended_brands_front.length > 0 && (
+                            <div className="flex justify-between">
+                                <span>Rekomendasi Merek</span>
+                                <span className="font-medium text-primary text-right">{brakes.recommended_brands_front.join(", ")}</span>
+                            </div>
+                        )}
                     </div>
                     <div className="space-y-4">
                         <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Belakang</h4>
@@ -40,6 +46,12 @@ export function BrakeSection({ brakes }: BrakeSectionProps) {
                             <div className="flex justify-between">
                                 <span>Part Number Kampas/Shoe</span>
                                 <span className="font-mono text-sm">{brakes.shoe_part_number_rear}</span>
+                            </div>
+                        )}
+                        {brakes.recommended_brands_rear && brakes.recommended_brands_rear.length > 0 && (
+                            <div className="flex justify-between">
+                                <span>Rekomendasi Merek</span>
+                                <span className="font-medium text-primary text-right">{brakes.recommended_brands_rear.join(", ")}</span>
                             </div>
                         )}
                     </div>

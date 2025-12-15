@@ -10,7 +10,9 @@ import {
   LogOut,
   Lock,
   BookOpen,
-  MessageSquareWarning
+  MessageSquareWarning,
+  CircleDashed,
+  Briefcase
 } from "lucide-react";
 import logoMobeng from "@/assets/logo-mobeng.jpg";
 import { NavLink } from "@/components/NavLink";
@@ -36,11 +38,11 @@ const mainMenuItems = [
   { title: "Laporan Teknik", url: "/reports", icon: FileText, end: true },
   { title: "Buku Pintar", url: "/buku-pintar", icon: BookOpen, end: true },
   { title: "Complain Compass", url: "/complain-compass", icon: MessageSquareWarning, end: true },
+  { title: "Upgrade Ban", url: "/tire-upgrade", icon: CircleDashed, end: true },
 ];
 
 const adminMenuItems = [
   { title: "Manajemen Pengguna", url: "/users", icon: Users, end: true },
-  { title: "Data Kendaraan", url: "/vehicles", icon: Car, end: true },
   { title: "Data Master", url: "/master-data", icon: Database, end: true },
   { title: "Pengaturan", url: "/settings", icon: Settings, end: true },
 ];

@@ -18,6 +18,7 @@ export interface VehicleVariant {
     specifications: {
         engine_oil: EngineOilSpec;
         transmission_oil: FluidSpec;
+        differential_oil?: FluidSpec; // New field
         parts: RecommendedPart[];
         tires: TireSpec[];
         suspension?: SuspensionSpec;
@@ -38,10 +39,11 @@ export interface FluidSpec {
     type: string; // e.g. "CVT Fluid FE"
     capacity_liter: number;
     replacement_interval_km?: number;
+    recommended_brands?: string[]; // New field
 }
 
 export interface RecommendedPart {
-    category: "Filter Oli" | "Filter Udara" | "Filter Kabin" | "Busi" | "Kampas Rem Depan" | "Kampas Rem Belakang" | "V-Belt" | "Wiper" | "Lainnya";
+    category: "Filter Oli" | "Filter Udara" | "Filter Kabin" | "Busi" | "Kampas Rem Depan" | "Kampas Rem Belakang" | "V-Belt" | "Wiper" | "Filter Solar" | "Filter Bensin" | "Lainnya";
     name: string;
     part_number: string;
     description?: string;
@@ -60,13 +62,21 @@ export interface TireSpec {
 
 export interface SuspensionSpec {
     rack_end?: string;
+    rack_end_brands?: string[];
     tie_rod_end?: string;
+    tie_rod_end_brands?: string[];
     link_stabilizer?: string;
+    link_stabilizer_brands?: string[];
     lower_arm?: string;
+    lower_arm_brands?: string[];
     upper_arm?: string;
+    upper_arm_brands?: string[];
     upper_support?: string;
+    upper_support_brands?: string[];
     shock_absorber_front?: string;
+    shock_absorber_front_brands?: string[];
     shock_absorber_rear?: string;
+    shock_absorber_rear_brands?: string[];
 }
 
 export interface BatterySpec {
@@ -83,4 +93,6 @@ export interface BrakeSpec {
     fluid_type: string; // e.g. "DOT 3" or "DOT 4"
     pad_part_number_front?: string;
     shoe_part_number_rear?: string;
+    recommended_brands_front?: string[];
+    recommended_brands_rear?: string[];
 }

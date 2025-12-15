@@ -27,6 +27,8 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import BukuPintar from "./pages/BukuPintar";
 import ComplainCompass from "./pages/ComplainCompass";
+import TireUpgrade from "./pages/TireUpgrade";
+import ManageTires from "./pages/admin/ManageTires";
 
 const queryClient = new QueryClient();
 
@@ -148,6 +150,26 @@ const App = () => (
                     <ComplainCompass />
                   </AppLayout>
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tire-upgrade"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <TireUpgrade />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/tires"
+              element={
+                <AdminRoute>
+                  <AppLayout>
+                    <ManageTires />
+                  </AppLayout>
+                </AdminRoute>
               }
             />
             <Route

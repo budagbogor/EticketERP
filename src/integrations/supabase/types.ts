@@ -509,6 +509,89 @@ export type Database = {
         }
         Relationships: []
       }
+      tire_brands: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          country: string | null
+          logo: string | null
+          tier: 'premium' | 'mid' | 'budget' | null
+          description: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          country?: string | null
+          logo?: string | null
+          tier?: 'premium' | 'mid' | 'budget' | null
+          description?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          country?: string | null
+          logo?: string | null
+          tier?: 'premium' | 'mid' | 'budget' | null
+          description?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      tire_products: {
+        Row: {
+          id: string
+          brand_id: string
+          name: string
+          sizes: string[] | null
+          types: string[] | null
+          price_min: number | null
+          price_max: number | null
+          features: string[] | null
+          rating: number | null
+          warranty: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          brand_id: string
+          name: string
+          sizes?: string[] | null
+          types?: string[] | null
+          price_min?: number | null
+          price_max?: number | null
+          features?: string[] | null
+          rating?: number | null
+          warranty?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          brand_id?: string
+          name?: string
+          sizes?: string[] | null
+          types?: string[] | null
+          price_min?: number | null
+          price_max?: number | null
+          features?: string[] | null
+          rating?: number | null
+          warranty?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tire_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "tire_brands"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

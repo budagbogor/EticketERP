@@ -22,7 +22,11 @@ interface CarBrand {
   models: CarModel[];
 }
 
-export default function VehicleData() {
+interface VehicleDataProps {
+  isEmbedded?: boolean;
+}
+
+export default function VehicleData({ isEmbedded = false }: VehicleDataProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [brands, setBrands] = useState<CarBrand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,7 +87,7 @@ export default function VehicleData() {
 
   const handleAddModel = async () => {
     if (!selectedBrand || !newModelName.trim()) return;
-    
+
     setIsSaving(true);
     try {
       const { error } = await supabase
@@ -215,16 +219,26 @@ export default function VehicleData() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Data Kendaraan</h1>
-          <p className="text-muted-foreground">Kelola data merek dan model kendaraan</p>
+      {!isEmbedded && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Data Kendaraan</h1>
+            <p className="text-muted-foreground">Kelola data merek dan model kendaraan</p>
+          </div>
+          <Button onClick={() => setIsAddBrandOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Merek
+          </Button>
         </div>
-        <Button onClick={() => setIsAddBrandOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Tambah Merek
-        </Button>
-      </div>
+      )}
+      {isEmbedded && (
+        <div className="flex justify-end mb-4">
+          <Button onClick={() => setIsAddBrandOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Merek
+          </Button>
+        </div>
+      )}
 
       <Card>
         <CardHeader className="pb-4">
@@ -241,8 +255,8 @@ export default function VehicleData() {
         <CardContent>
           <Accordion type="single" collapsible className="space-y-2">
             {filteredBrands.map((brand) => (
-              <AccordionItem 
-                key={brand.id} 
+              <AccordionItem
+                key={brand.id}
                 value={brand.id}
                 className="border rounded-lg px-4"
               >
@@ -270,16 +284,16 @@ export default function VehicleData() {
                       )}
                     </div>
                     <div className="mt-4 flex gap-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => openAddModelDialog(brand)}
                       >
                         <Plus className="w-3 h-3 mr-1" />
                         Tambah Model
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => openEditBrandDialog(brand)}
                       >

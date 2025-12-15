@@ -175,6 +175,53 @@ export function useBukuPintar() {
         localStorage.setItem(BUKU_PINTAR_STORAGE_KEY, JSON.stringify(newCustomData));
     };
 
+    const importVehicleData = (
+        data: { brand: string; model: string; variant: VehicleVariant }[]
+    ) => {
+        const newCustomData = [...customData];
+
+        data.forEach(item => {
+            const { brand, model, variant } = item;
+            let vehicleIndex = newCustomData.findIndex(
+                v => v.brand.toLowerCase() === brand.toLowerCase() &&
+                    v.model.toLowerCase() === model.toLowerCase()
+            );
+
+            if (vehicleIndex === -1) {
+                // Create new vehicle entry
+                newCustomData.push({
+                    id: crypto.randomUUID(),
+                    brand: brand,
+                    model: model,
+                    year_start: variant.year_start || new Date().getFullYear(),
+                    year_end: variant.year_end || null,
+                    variants: [variant]
+                });
+            } else {
+                // Check if variant already exists
+                const variantIndex = newCustomData[vehicleIndex].variants.findIndex(
+                    v => v.name.toLowerCase() === variant.name.toLowerCase()
+                );
+
+                if (variantIndex !== -1) {
+                    // Update existing variant (overwrite)
+                    newCustomData[vehicleIndex].variants[variantIndex] = {
+                        ...newCustomData[vehicleIndex].variants[variantIndex],
+                        ...variant,
+                        id: newCustomData[vehicleIndex].variants[variantIndex].id // Keep existing ID
+                    };
+                } else {
+                    // Add new variant
+                    newCustomData[vehicleIndex].variants.push(variant);
+                }
+            }
+        });
+
+        setCustomData(newCustomData);
+        localStorage.setItem(BUKU_PINTAR_STORAGE_KEY, JSON.stringify(newCustomData));
+        refreshVehicles();
+    };
+
     return {
         vehicles: completeData,
         supabaseBrands,
@@ -182,6 +229,7 @@ export function useBukuPintar() {
         refreshVehicles,
         addVariantData,
         updateVariantData,
-        deleteVariantData
+        deleteVariantData,
+        importVehicleData
     };
 }
