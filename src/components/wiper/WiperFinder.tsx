@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useWiperData } from "@/contexts/WiperDataContext";
 import { useDeleteWiperSpecification } from "@/hooks/useWiperData";
+import { EditWiperDataDialog } from "@/components/wiper/EditWiperDataDialog";
 import type { VehicleWiperSpec } from "@/data/wiperData";
 
 interface SelectionState {
@@ -27,6 +28,8 @@ export const WiperFinder = () => {
     const [selection, setSelection] = useState<SelectionState>(initialSelection);
     const [search, setSearch] = useState("");
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [editData, setEditData] = useState<VehicleWiperSpec | null>(null);
+    const [editOpen, setEditOpen] = useState(false);
     const { data, getBrands, getModelsByBrand, getYearsForBrandModel, findWiperSpec } = useWiperData();
     const deleteMutation = useDeleteWiperSpecification();
 
@@ -273,14 +276,27 @@ export const WiperFinder = () => {
                                                     )}
                                                 </td>
                                                 <td className="px-3 py-2 align-top">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                        onClick={() => setDeleteId(row.id)}
-                                                    >
-                                                        <Trash2 className="h-3.5 w-3.5" />
-                                                    </Button>
+                                                    <div className="flex gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-7 w-7 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                                                            onClick={() => {
+                                                                setEditData(row);
+                                                                setEditOpen(true);
+                                                            }}
+                                                        >
+                                                            <Pencil className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                            onClick={() => setDeleteId(row.id)}
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );
@@ -303,6 +319,8 @@ export const WiperFinder = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            <EditWiperDataDialog data={editData} open={editOpen} onOpenChange={setEditOpen} />
 
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                 <AlertDialogContent>
