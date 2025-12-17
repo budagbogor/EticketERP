@@ -184,7 +184,7 @@ export function useImportWiperData() {
             }[]
         ) => {
             let imported = 0;
-            let skipped = 0;
+            let updated = 0;
             let failed = 0;
 
             for (const item of data) {
@@ -201,47 +201,76 @@ export function useImportWiperData() {
                     if (checkError) throw checkError;
 
                     if (existing) {
-                        // Data already exists, skip
-                        skipped++;
-                        continue;
+                        // Update existing data
+                        const { error: updateSpecError } = await supabase
+                            .from("wiper_specifications")
+                            .update({
+                                year_end: item.specification.year_end,
+                                notes: item.specification.notes,
+                            })
+                            .eq("id", existing.id);
+
+                        if (updateSpecError) throw updateSpecError;
+
+                        // Delete old sizes
+                        const { error: deleteSizesError } = await supabase
+                            .from("wiper_sizes")
+                            .delete()
+                            .eq("specification_id", existing.id);
+
+                        if (deleteSizesError) throw deleteSizesError;
+
+                        // Insert new sizes
+                        const sizesWithSpecId = item.sizes.map((size) => ({
+                            ...size,
+                            specification_id: existing.id,
+                        }));
+
+                        const { error: insertSizesError } = await supabase
+                            .from("wiper_sizes")
+                            .insert(sizesWithSpecId);
+
+                        if (insertSizesError) throw insertSizesError;
+
+                        updated++;
+                    } else {
+                        // Insert new specification
+                        const { data: specData, error: specError } = await supabase
+                            .from("wiper_specifications")
+                            .insert(item.specification)
+                            .select()
+                            .single();
+
+                        if (specError) throw specError;
+
+                        // Insert sizes
+                        const sizesWithSpecId = item.sizes.map((size) => ({
+                            ...size,
+                            specification_id: specData.id,
+                        }));
+
+                        const { error: sizesError } = await supabase
+                            .from("wiper_sizes")
+                            .insert(sizesWithSpecId);
+
+                        if (sizesError) throw sizesError;
+
+                        imported++;
                     }
-
-                    // Insert specification
-                    const { data: specData, error: specError } = await supabase
-                        .from("wiper_specifications")
-                        .insert(item.specification)
-                        .select()
-                        .single();
-
-                    if (specError) throw specError;
-
-                    // Insert sizes
-                    const sizesWithSpecId = item.sizes.map((size) => ({
-                        ...size,
-                        specification_id: specData.id,
-                    }));
-
-                    const { error: sizesError } = await supabase
-                        .from("wiper_sizes")
-                        .insert(sizesWithSpecId);
-
-                    if (sizesError) throw sizesError;
-
-                    imported++;
                 } catch (error) {
                     console.error("Error importing wiper data:", error);
                     failed++;
                 }
             }
 
-            return { imported, skipped, failed, total: data.length };
+            return { imported, updated, failed, total: data.length };
         },
         onSuccess: (result) => {
             queryClient.invalidateQueries({ queryKey: ["wiper-specifications"] });
 
             const messages = [];
-            if (result.imported > 0) messages.push(`${result.imported} data berhasil diimport`);
-            if (result.skipped > 0) messages.push(`${result.skipped} data dilewati (sudah ada)`);
+            if (result.imported > 0) messages.push(`${result.imported} data baru ditambahkan`);
+            if (result.updated > 0) messages.push(`${result.updated} data diperbarui`);
             if (result.failed > 0) messages.push(`${result.failed} data gagal`);
 
             toast({
