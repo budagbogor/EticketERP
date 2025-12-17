@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
-import { Search, Info, Trash2 } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useWiperData } from "@/contexts/WiperDataContext";
 import { useDeleteWiperSpecification } from "@/hooks/useWiperData";
@@ -156,22 +155,6 @@ export const WiperFinder = () => {
                                 Reset pilihan
                             </Button>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        type="button"
-                                        className="inline-flex items-center gap-1 text-xs text-muted-foreground/80 underline-offset-4 hover:text-foreground/90 hover:underline"
-                                    >
-                                        <Info className="size-3.5" />
-                                        Sumber data & catatan
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-xs text-xs leading-relaxed">
-                                    Angka di sini disarikan dari beberapa panduan publik (Moladin, Shop&Drive, dll) dan dapat
-                                    dijadikan referensi awal. Untuk pemasangan di bengkel, selalu cocokkan kembali dengan katalog
-                                    produk resmi atau parts catalogue pabrikan.
-                                </TooltipContent>
-                            </Tooltip>
                         </div>
 
                         <div className="mt-2 rounded-xl border border-dashed border-border/70 bg-secondary/40 p-4 text-sm text-muted-foreground">
