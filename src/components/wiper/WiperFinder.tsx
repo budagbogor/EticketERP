@@ -79,7 +79,7 @@ export const WiperFinder = () => {
                             <span className="inline-flex size-5 items-center justify-center rounded-full bg-primary/15 text-primary">
                                 <Search className="size-3.5" />
                             </span>
-                            Untuk bengkel & teknisi: pilih mobil, kami hitungkan ukuran wiper.
+                            Pilih mobil, kami hitungkan ukuran wiper.
                         </div>
                         <CardTitle className="mt-4 text-2xl md:text-3xl">
                             Pilih kendaraan untuk melihat ukuran wiper yang direkomendasikan
