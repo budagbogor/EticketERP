@@ -187,148 +187,40 @@ export function AddWiperDataDialog() {
 
                     <div className="border-t pt-4">
                         <h4 className="font-semibold mb-4">Wiper Kiri (Penumpang) *</h4>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Ukuran (inch) *</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="24"
-                                    value={leftSize}
-                                    onChange={(e) => setLeftSize(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Merek Blade</Label>
-                                <Input
-                                    placeholder="Premium"
-                                    value={leftBrand}
-                                    onChange={(e) => setLeftBrand(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Kode Barang</Label>
-                                <Input
-                                    placeholder="WB-001"
-                                    value={leftPartCode}
-                                    onChange={(e) => setLeftPartCode(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Stok</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="5"
-                                    value={leftStock}
-                                    onChange={(e) => setLeftStock(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label>Harga (Rp)</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="85000"
-                                    value={leftPrice}
-                                    onChange={(e) => setLeftPrice(e.target.value)}
-                                />
-                            </div>
+                        <div className="space-y-2">
+                            <Label>Ukuran (inch) *</Label>
+                            <Input
+                                type="number"
+                                placeholder="24"
+                                value={leftSize}
+                                onChange={(e) => setLeftSize(e.target.value)}
+                            />
                         </div>
                     </div>
 
                     <div className="border-t pt-4">
                         <h4 className="font-semibold mb-4">Wiper Kanan (Pengemudi) *</h4>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Ukuran (inch) *</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="14"
-                                    value={rightSize}
-                                    onChange={(e) => setRightSize(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Merek Blade</Label>
-                                <Input
-                                    placeholder="Premium"
-                                    value={rightBrand}
-                                    onChange={(e) => setRightBrand(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Kode Barang</Label>
-                                <Input
-                                    placeholder="WB-002"
-                                    value={rightPartCode}
-                                    onChange={(e) => setRightPartCode(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Stok</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="5"
-                                    value={rightStock}
-                                    onChange={(e) => setRightStock(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label>Harga (Rp)</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="80000"
-                                    value={rightPrice}
-                                    onChange={(e) => setRightPrice(e.target.value)}
-                                />
-                            </div>
+                        <div className="space-y-2">
+                            <Label>Ukuran (inch) *</Label>
+                            <Input
+                                type="number"
+                                placeholder="14"
+                                value={rightSize}
+                                onChange={(e) => setRightSize(e.target.value)}
+                            />
                         </div>
                     </div>
 
                     <div className="border-t pt-4">
                         <h4 className="font-semibold mb-4">Wiper Belakang (Opsional)</h4>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Ukuran (inch)</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="12"
-                                    value={rearSize}
-                                    onChange={(e) => setRearSize(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Merek Blade</Label>
-                                <Input
-                                    placeholder="Universal"
-                                    value={rearBrand}
-                                    onChange={(e) => setRearBrand(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Kode Barang</Label>
-                                <Input
-                                    placeholder="WB-003"
-                                    value={rearPartCode}
-                                    onChange={(e) => setRearPartCode(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Stok</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="3"
-                                    value={rearStock}
-                                    onChange={(e) => setRearStock(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2 col-span-2">
-                                <Label>Harga (Rp)</Label>
-                                <Input
-                                    type="number"
-                                    placeholder="60000"
-                                    value={rearPrice}
-                                    onChange={(e) => setRearPrice(e.target.value)}
-                                />
-                            </div>
+                        <div className="space-y-2">
+                            <Label>Ukuran (inch)</Label>
+                            <Input
+                                type="number"
+                                placeholder="12"
+                                value={rearSize}
+                                onChange={(e) => setRearSize(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
