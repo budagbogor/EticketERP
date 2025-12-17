@@ -186,7 +186,7 @@ export function AddWiperDataDialog() {
                     </div>
 
                     <div className="border-t pt-4">
-                        <h4 className="font-semibold mb-4">Wiper Kiri (Pengemudi) *</h4>
+                        <h4 className="font-semibold mb-4">Wiper Kiri (Penumpang) *</h4>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label>Ukuran (inch) *</Label>
@@ -235,7 +235,7 @@ export function AddWiperDataDialog() {
                     </div>
 
                     <div className="border-t pt-4">
-                        <h4 className="font-semibold mb-4">Wiper Kanan (Penumpang) *</h4>
+                        <h4 className="font-semibold mb-4">Wiper Kanan (Pengemudi) *</h4>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label>Ukuran (inch) *</Label>

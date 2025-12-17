@@ -181,8 +181,8 @@ export const WiperFinder = () => {
                                                 className="group relative overflow-hidden rounded-xl border border-border/70 bg-gradient-to-b from-primary/5 to-card px-4 py-3 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:border-primary/70"
                                             >
                                                 <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground/80">
-                                                    {wiper.posisi === "kiri" && "Wiper kiri (pengemudi)"}
-                                                    {wiper.posisi === "kanan" && "Wiper kanan (penumpang)"}
+                                                    {wiper.posisi === "kiri" && "Wiper kiri (penumpang)"}
+                                                    {wiper.posisi === "kanan" && "Wiper kanan (pengemudi)"}
                                                     {wiper.posisi === "belakang" && "Wiper kaca belakang"}
                                                 </p>
                                                 <p className="mt-1 flex items-baseline gap-1 text-2xl font-semibold">
