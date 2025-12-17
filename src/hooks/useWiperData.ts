@@ -183,34 +183,71 @@ export function useImportWiperData() {
                 sizes: Omit<WiperSizeInsert, "specification_id">[];
             }[]
         ) => {
+            let imported = 0;
+            let skipped = 0;
+            let failed = 0;
+
             for (const item of data) {
-                // Insert specification
-                const { data: specData, error: specError } = await supabase
-                    .from("wiper_specifications")
-                    .insert(item.specification)
-                    .select()
-                    .single();
+                try {
+                    // Check if data already exists
+                    const { data: existing, error: checkError } = await supabase
+                        .from("wiper_specifications")
+                        .select("id")
+                        .eq("brand", item.specification.brand)
+                        .eq("model", item.specification.model)
+                        .eq("year_start", item.specification.year_start)
+                        .maybeSingle();
 
-                if (specError) throw specError;
+                    if (checkError) throw checkError;
 
-                // Insert sizes
-                const sizesWithSpecId = item.sizes.map((size) => ({
-                    ...size,
-                    specification_id: specData.id,
-                }));
+                    if (existing) {
+                        // Data already exists, skip
+                        skipped++;
+                        continue;
+                    }
 
-                const { error: sizesError } = await supabase
-                    .from("wiper_sizes")
-                    .insert(sizesWithSpecId);
+                    // Insert specification
+                    const { data: specData, error: specError } = await supabase
+                        .from("wiper_specifications")
+                        .insert(item.specification)
+                        .select()
+                        .single();
 
-                if (sizesError) throw sizesError;
+                    if (specError) throw specError;
+
+                    // Insert sizes
+                    const sizesWithSpecId = item.sizes.map((size) => ({
+                        ...size,
+                        specification_id: specData.id,
+                    }));
+
+                    const { error: sizesError } = await supabase
+                        .from("wiper_sizes")
+                        .insert(sizesWithSpecId);
+
+                    if (sizesError) throw sizesError;
+
+                    imported++;
+                } catch (error) {
+                    console.error("Error importing wiper data:", error);
+                    failed++;
+                }
             }
+
+            return { imported, skipped, failed, total: data.length };
         },
-        onSuccess: (_, variables) => {
+        onSuccess: (result) => {
             queryClient.invalidateQueries({ queryKey: ["wiper-specifications"] });
+
+            const messages = [];
+            if (result.imported > 0) messages.push(`${result.imported} data berhasil diimport`);
+            if (result.skipped > 0) messages.push(`${result.skipped} data dilewati (sudah ada)`);
+            if (result.failed > 0) messages.push(`${result.failed} data gagal`);
+
             toast({
-                title: "Sukses",
-                description: `Berhasil mengimport ${variables.length} data wiper`,
+                title: "Import Selesai",
+                description: messages.join(", "),
+                variant: result.failed > 0 ? "destructive" : "default",
             });
         },
         onError: (error: Error) => {
