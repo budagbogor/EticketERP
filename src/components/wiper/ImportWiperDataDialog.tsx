@@ -65,12 +65,15 @@ export function ImportWiperDataDialog() {
                     const wiperKiri = row["Ukuran Wiper Kiri (inch)"];
                     const wiperKanan = row["Ukuran Wiper Kanan (inch)"];
 
-                    if (!wiperKiri || Number(wiperKiri) <= 0) {
-                        return { status: "error", message: "Ukuran Wiper Kiri wajib diisi dan harus lebih dari 0", raw: row };
+                    const kiriNum = Number(wiperKiri);
+                    const kananNum = Number(wiperKanan);
+
+                    if (!wiperKiri || isNaN(kiriNum) || kiriNum <= 0) {
+                        return { status: "error", message: "Ukuran Wiper Kiri wajib diisi dan harus berupa angka lebih dari 0", raw: row };
                     }
 
-                    if (!wiperKanan || Number(wiperKanan) <= 0) {
-                        return { status: "error", message: "Ukuran Wiper Kanan wajib diisi dan harus lebih dari 0", raw: row };
+                    if (!wiperKanan || isNaN(kananNum) || kananNum <= 0) {
+                        return { status: "error", message: "Ukuran Wiper Kanan wajib diisi dan harus berupa angka lebih dari 0", raw: row };
                     }
 
                     const specification: TablesInsert<"wiper_specifications"> = {
@@ -84,7 +87,7 @@ export function ImportWiperDataDialog() {
                     const sizes: Omit<TablesInsert<"wiper_sizes">, "specification_id">[] = [
                         {
                             position: "kiri",
-                            size_inch: Number(wiperKiri),
+                            size_inch: kiriNum,
                             blade_brand: null,
                             part_code: null,
                             stock: null,
@@ -92,7 +95,7 @@ export function ImportWiperDataDialog() {
                         },
                         {
                             position: "kanan",
-                            size_inch: Number(wiperKanan),
+                            size_inch: kananNum,
                             blade_brand: null,
                             part_code: null,
                             stock: null,
@@ -101,15 +104,18 @@ export function ImportWiperDataDialog() {
                     ];
 
                     const wiperBelakang = row["Ukuran Wiper Belakang (inch)"];
-                    if (wiperBelakang && Number(wiperBelakang) > 0) {
-                        sizes.push({
-                            position: "belakang",
-                            size_inch: Number(wiperBelakang),
-                            blade_brand: null,
-                            part_code: null,
-                            stock: null,
-                            price: null,
-                        });
+                    if (wiperBelakang) {
+                        const belakangNum = Number(wiperBelakang);
+                        if (!isNaN(belakangNum) && belakangNum > 0) {
+                            sizes.push({
+                                position: "belakang",
+                                size_inch: belakangNum,
+                                blade_brand: null,
+                                part_code: null,
+                                stock: null,
+                                price: null,
+                            });
+                        }
                     }
 
                     return {
