@@ -12,7 +12,8 @@ import {
   BookOpen,
   MessageSquareWarning,
   CircleDashed,
-  Briefcase
+  Briefcase,
+  Wrench
 } from "lucide-react";
 import logoMobeng from "@/assets/logo-mobeng.jpg";
 import { NavLink } from "@/components/NavLink";
@@ -39,6 +40,7 @@ const mainMenuItems = [
   { title: "Buku Pintar", url: "/buku-pintar", icon: BookOpen, end: true },
   { title: "Complain Compass", url: "/complain-compass", icon: MessageSquareWarning, end: true },
   { title: "Upgrade Ban", url: "/tire-upgrade", icon: CircleDashed, end: true },
+  { title: "Pencari Ukuran Wiper", url: "/wiper-fit-finder", icon: Wrench, end: true },
 ];
 
 const adminMenuItems = [

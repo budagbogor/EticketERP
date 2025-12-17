@@ -592,6 +592,86 @@ export type Database = {
           }
         ]
       }
+      wiper_specifications: {
+        Row: {
+          id: string
+          brand: string
+          model: string
+          year_start: number
+          year_end: number | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          brand: string
+          model: string
+          year_start: number
+          year_end?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          brand?: string
+          model?: string
+          year_start?: number
+          year_end?: number | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wiper_sizes: {
+        Row: {
+          id: string
+          specification_id: string
+          position: "kiri" | "kanan" | "belakang"
+          size_inch: number
+          blade_brand: string | null
+          part_code: string | null
+          stock: number | null
+          price: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          specification_id: string
+          position: "kiri" | "kanan" | "belakang"
+          size_inch: number
+          blade_brand?: string | null
+          part_code?: string | null
+          stock?: number | null
+          price?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          specification_id?: string
+          position?: "kiri" | "kanan" | "belakang"
+          size_inch?: number
+          blade_brand?: string | null
+          part_code?: string | null
+          stock?: number | null
+          price?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wiper_sizes_specification_id_fkey"
+            columns: ["specification_id"]
+            isOneToOne: false
+            referencedRelation: "wiper_specifications"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -29,6 +29,7 @@ import BukuPintar from "./pages/BukuPintar";
 import ComplainCompass from "./pages/ComplainCompass";
 import TireUpgrade from "./pages/TireUpgrade";
 import ManageTires from "./pages/admin/ManageTires";
+import WiperFitFinder from "./pages/WiperFitFinder";
 
 const queryClient = new QueryClient();
 
@@ -158,6 +159,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <TireUpgrade />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wiper-fit-finder"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <WiperFitFinder />
                   </AppLayout>
                 </ProtectedRoute>
               }
