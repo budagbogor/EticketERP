@@ -167,10 +167,17 @@ export default function ManageTires({ isEmbedded = false }: ManageTiresProps) {
                             continue;
                         }
 
-                        // Validate tier
-                        const tierValue = row["Tier"]?.toLowerCase();
-                        const validTiers = ["premium", "mid", "budget"];
-                        const tier = validTiers.includes(tierValue) ? tierValue : "mid";
+                        // Validate tier - handle variations
+                        const tierValue = row["Tier"]?.toString().toLowerCase().trim();
+                        let tier: "premium" | "mid" | "budget" = "mid";
+
+                        if (tierValue?.includes("premium")) {
+                            tier = "premium";
+                        } else if (tierValue?.includes("mid")) {
+                            tier = "mid"; // handles "mid", "mid-range", etc.
+                        } else if (tierValue?.includes("budget") || tierValue?.includes("ekonomis")) {
+                            tier = "budget";
+                        }
 
                         // Validate type
                         const typeValue = row["Type"]?.toLowerCase() || "all-season";
