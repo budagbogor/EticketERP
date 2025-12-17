@@ -185,18 +185,30 @@ export default function ManageTires({ isEmbedded = false }: ManageTiresProps) {
                         const type = validTypes.includes(typeValue) ? typeValue : "all-season";
 
                         // 1. Find or Create Brand
-                        let brandId = brands.find(b => b.name.toLowerCase() === brandName.toLowerCase())?.id;
+                        const cleanBrandName = brandName.trim();
+                        let brandId = brands.find(b => b.name.toLowerCase().trim() === cleanBrandName.toLowerCase())?.id;
 
                         if (!brandId) {
-                            console.log(`Creating brand: ${brandName}`);
-                            const newBrand = await tireService.createBrand({
-                                name: brandName,
-                                country: row["Country"] || "Unknown",
-                                logo: "🛞",
-                                tier: tier as "premium" | "mid" | "budget",
-                                description: `Imported ${brandName}`
-                            });
-                            brandId = newBrand.id;
+                            console.log(`Creating brand: ${cleanBrandName}`);
+                            try {
+                                const newBrand = await tireService.createBrand({
+                                    name: cleanBrandName,
+                                    country: row["Country"] || "Unknown",
+                                    logo: "🛞",
+                                    tier: tier as "premium" | "mid" | "budget",
+                                    description: `Imported ${cleanBrandName}`
+                                });
+                                brandId = newBrand.id;
+                            } catch (brandError: any) {
+                                // If brand creation fails due to duplicate, try to find it again
+                                if (brandError.code === '23505') {
+                                    const refreshedBrands = await tireService.getBrands();
+                                    brandId = refreshedBrands.find(b => b.name.toLowerCase().trim() === cleanBrandName.toLowerCase())?.id;
+                                    if (!brandId) throw brandError;
+                                } else {
+                                    throw brandError;
+                                }
+                            }
                         }
 
                         // 2. Find or Create/Update Product
