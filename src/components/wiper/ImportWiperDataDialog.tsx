@@ -20,10 +20,9 @@ interface ImportRow {
 }
 
 const TEMPLATE_COLUMNS = [
-    "Merek", "Model", "Tahun Mulai", "Tahun Selesai", "Catatan",
-    "Wiper Kiri - Ukuran (inch)", "Wiper Kiri - Merek Blade", "Wiper Kiri - Kode Barang", "Wiper Kiri - Stok", "Wiper Kiri - Harga",
-    "Wiper Kanan - Ukuran (inch)", "Wiper Kanan - Merek Blade", "Wiper Kanan - Kode Barang", "Wiper Kanan - Stok", "Wiper Kanan - Harga",
-    "Wiper Belakang - Ukuran (inch)", "Wiper Belakang - Merek Blade", "Wiper Belakang - Kode Barang", "Wiper Belakang - Stok", "Wiper Belakang - Harga"
+    "Merek", "Model", "Tahun Mulai", "Tahun Selesai",
+    "Ukuran Wiper Kiri (inch)", "Ukuran Wiper Kanan (inch)", "Ukuran Wiper Belakang (inch)",
+    "Catatan"
 ];
 
 export function ImportWiperDataDialog() {
@@ -38,7 +37,7 @@ export function ImportWiperDataDialog() {
         const wb = utils.book_new();
         const ws = utils.aoa_to_sheet([
             TEMPLATE_COLUMNS,
-            ["Toyota", "Avanza", 2012, 2018, "Termasuk Veloz generasi awal", 24, "Premium", "WB-001", 5, 85000, 14, "Premium", "WB-002", 5, 80000, 12, "Universal", "WB-003", 3, 60000]
+            ["Toyota", "Avanza", 2012, 2018, 24, 14, 12, "Termasuk Veloz generasi awal"]
         ]);
 
         const wscols = TEMPLATE_COLUMNS.map(c => ({ wch: c.length + 5 }));
@@ -73,30 +72,30 @@ export function ImportWiperDataDialog() {
                     const sizes: Omit<TablesInsert<"wiper_sizes">, "specification_id">[] = [
                         {
                             position: "kiri",
-                            size_inch: Number(row["Wiper Kiri - Ukuran (inch)"]) || 0,
-                            blade_brand: row["Wiper Kiri - Merek Blade"] || null,
-                            part_code: row["Wiper Kiri - Kode Barang"] || null,
-                            stock: row["Wiper Kiri - Stok"] ? Number(row["Wiper Kiri - Stok"]) : null,
-                            price: row["Wiper Kiri - Harga"] ? Number(row["Wiper Kiri - Harga"]) : null,
+                            size_inch: Number(row["Ukuran Wiper Kiri (inch)"]) || 0,
+                            blade_brand: null,
+                            part_code: null,
+                            stock: null,
+                            price: null,
                         },
                         {
                             position: "kanan",
-                            size_inch: Number(row["Wiper Kanan - Ukuran (inch)"]) || 0,
-                            blade_brand: row["Wiper Kanan - Merek Blade"] || null,
-                            part_code: row["Wiper Kanan - Kode Barang"] || null,
-                            stock: row["Wiper Kanan - Stok"] ? Number(row["Wiper Kanan - Stok"]) : null,
-                            price: row["Wiper Kanan - Harga"] ? Number(row["Wiper Kanan - Harga"]) : null,
+                            size_inch: Number(row["Ukuran Wiper Kanan (inch)"]) || 0,
+                            blade_brand: null,
+                            part_code: null,
+                            stock: null,
+                            price: null,
                         },
                     ];
 
-                    if (row["Wiper Belakang - Ukuran (inch)"]) {
+                    if (row["Ukuran Wiper Belakang (inch)"]) {
                         sizes.push({
                             position: "belakang",
-                            size_inch: Number(row["Wiper Belakang - Ukuran (inch)"]),
-                            blade_brand: row["Wiper Belakang - Merek Blade"] || null,
-                            part_code: row["Wiper Belakang - Kode Barang"] || null,
-                            stock: row["Wiper Belakang - Stok"] ? Number(row["Wiper Belakang - Stok"]) : null,
-                            price: row["Wiper Belakang - Harga"] ? Number(row["Wiper Belakang - Harga"]) : null,
+                            size_inch: Number(row["Ukuran Wiper Belakang (inch)"]),
+                            blade_brand: null,
+                            part_code: null,
+                            stock: null,
+                            price: null,
                         });
                     }
 
