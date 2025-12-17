@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Search, Info } from "lucide-react";
+import { Search, Info, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useWiperData } from "@/contexts/WiperDataContext";
+import { useDeleteWiperSpecification } from "@/hooks/useWiperData";
 import type { VehicleWiperSpec } from "@/data/wiperData";
 
 interface SelectionState {
@@ -25,7 +27,9 @@ const initialSelection: SelectionState = {
 export const WiperFinder = () => {
     const [selection, setSelection] = useState<SelectionState>(initialSelection);
     const [search, setSearch] = useState("");
+    const [deleteId, setDeleteId] = useState<string | null>(null);
     const { data, getBrands, getModelsByBrand, getYearsForBrandModel, findWiperSpec } = useWiperData();
+    const deleteMutation = useDeleteWiperSpecification();
 
     const brands = useMemo(() => getBrands(), [getBrands]);
     const models = useMemo(() => (selection.brand ? getModelsByBrand(selection.brand) : []), [selection.brand, getModelsByBrand]);
@@ -52,6 +56,16 @@ export const WiperFinder = () => {
 
     const handleReset = () => {
         setSelection(initialSelection);
+    };
+
+    const handleDelete = () => {
+        if (deleteId) {
+            deleteMutation.mutate(deleteId, {
+                onSuccess: () => {
+                    setDeleteId(null);
+                },
+            });
+        }
     };
 
     return (
@@ -231,6 +245,7 @@ export const WiperFinder = () => {
                                         <th className="px-3 py-2">Tahun</th>
                                         <th className="px-3 py-2">Depan (kiri/kanan)</th>
                                         <th className="px-3 py-2">Belakang</th>
+                                        <th className="px-3 py-2 w-[60px]">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -274,6 +289,16 @@ export const WiperFinder = () => {
                                                         <span className="text-muted-foreground/70">-</span>
                                                     )}
                                                 </td>
+                                                <td className="px-3 py-2 align-top">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                        onClick={() => setDeleteId(row.id)}
+                                                    >
+                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </td>
                                             </tr>
                                         );
                                     })}
@@ -281,7 +306,7 @@ export const WiperFinder = () => {
                                     {filteredData.length === 0 && (
                                         <tr>
                                             <td
-                                                colSpan={4}
+                                                colSpan={5}
                                                 className="px-4 py-10 text-center text-xs text-muted-foreground/80"
                                             >
                                                 Belum ada data yang cocok dengan kata kunci tersebut. Coba kata kunci lain atau tambah data di
@@ -295,6 +320,23 @@ export const WiperFinder = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Data Wiper?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Apakah Anda yakin ingin menghapus data wiper ini? Tindakan ini tidak dapat dibatalkan.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                            Hapus
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </section>
     );
 };
