@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
-import { useAddWiperSpecification } from "@/hooks/useWiperData";
+import { useAddWiperSpecification, useWiperSpecifications } from "@/hooks/useWiperData";
 import { TablesInsert } from "@/integrations/supabase/types";
 
 type WiperSizeInsert = Omit<TablesInsert<"wiper_sizes">, "specification_id">;
@@ -13,6 +14,11 @@ type WiperSizeInsert = Omit<TablesInsert<"wiper_sizes">, "specification_id">;
 export function AddWiperDataDialog() {
     const [open, setOpen] = useState(false);
     const addMutation = useAddWiperSpecification();
+    const { data: wiperSpecs } = useWiperSpecifications();
+
+    // Brand/Model selection state
+    const [isNewBrand, setIsNewBrand] = useState(false);
+    const [isNewModel, setIsNewModel] = useState(false);
 
     // Specification fields
     const [brand, setBrand] = useState("");
@@ -40,9 +46,27 @@ export function AddWiperDataDialog() {
     const [rearStock, setRearStock] = useState("");
     const [rearPrice, setRearPrice] = useState("");
 
+    // Extract unique brands from wiper specifications
+    const availableBrands = useMemo(() => {
+        if (!wiperSpecs) return [];
+        const brands = Array.from(new Set(wiperSpecs.map(spec => spec.brand)));
+        return brands.sort();
+    }, [wiperSpecs]);
+
+    // Extract models for selected brand
+    const availableModels = useMemo(() => {
+        if (!wiperSpecs || !brand || isNewBrand) return [];
+        const models = wiperSpecs
+            .filter(spec => spec.brand === brand)
+            .map(spec => spec.model);
+        return Array.from(new Set(models)).sort();
+    }, [wiperSpecs, brand, isNewBrand]);
+
     const resetForm = () => {
         setBrand("");
         setModel("");
+        setIsNewBrand(false);
+        setIsNewModel(false);
         setYearStart("");
         setYearEnd("");
         setNotes("");
@@ -133,22 +157,85 @@ export function AddWiperDataDialog() {
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="brand">Merek *</Label>
-                            <Input
-                                id="brand"
-                                placeholder="Toyota"
-                                value={brand}
-                                onChange={(e) => setBrand(e.target.value)}
-                            />
+                            <div className="flex justify-between items-center">
+                                <Label>Merek</Label>
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="new-brand"
+                                        className="rounded border-gray-300"
+                                        checked={isNewBrand}
+                                        onChange={(e) => {
+                                            setIsNewBrand(e.target.checked);
+                                            setBrand("");
+                                            setModel("");
+                                            if (e.target.checked) setIsNewModel(true);
+                                            else setIsNewModel(false);
+                                        }}
+                                    />
+                                    <Label htmlFor="new-brand" className="text-xs font-normal cursor-pointer text-muted-foreground">Merek Baru?</Label>
+                                </div>
+                            </div>
+
+                            {isNewBrand ? (
+                                <Input
+                                    placeholder="Nama Merek Baru"
+                                    value={brand}
+                                    onChange={e => setBrand(e.target.value)}
+                                />
+                            ) : (
+                                <Select value={brand} onValueChange={setBrand}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih Merek" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {availableBrands.map(b => (
+                                            <SelectItem key={b} value={b}>{b}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
                         </div>
+
                         <div className="space-y-2">
-                            <Label htmlFor="model">Model *</Label>
-                            <Input
-                                id="model"
-                                placeholder="Avanza"
-                                value={model}
-                                onChange={(e) => setModel(e.target.value)}
-                            />
+                            <div className="flex justify-between items-center">
+                                <Label>Model</Label>
+                                {!isNewBrand && (
+                                    <div className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            id="new-model"
+                                            className="rounded border-gray-300"
+                                            checked={isNewModel}
+                                            onChange={(e) => {
+                                                setIsNewModel(e.target.checked);
+                                                setModel("");
+                                            }}
+                                        />
+                                        <Label htmlFor="new-model" className="text-xs font-normal cursor-pointer text-muted-foreground">Model Baru?</Label>
+                                    </div>
+                                )}
+                            </div>
+
+                            {isNewModel || isNewBrand ? (
+                                <Input
+                                    placeholder="Nama Model Baru"
+                                    value={model}
+                                    onChange={e => setModel(e.target.value)}
+                                    disabled={!isNewBrand && !brand}
+                                />
+                            ) : (
+                                <Select value={model} onValueChange={setModel} disabled={!brand}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih Model" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {availableModels.map(m => (
+                                            <SelectItem key={m} value={m}>{m}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
                         </div>
                     </div>
 
