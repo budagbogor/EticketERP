@@ -81,7 +81,7 @@ export const WiperFinder = () => {
                             </span>
                             Pilih mobil, kami hitungkan ukuran wiper.
                         </div>
-                        <CardTitle className="mt-4 text-2xl md:text-3xl">
+                        <CardTitle className="mt-4 text-lg">
                             Pilih kendaraan untuk melihat ukuran wiper yang direkomendasikan
                         </CardTitle>
                     </CardHeader>
