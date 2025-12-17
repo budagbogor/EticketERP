@@ -153,12 +153,29 @@ export default function ManageTires({ isEmbedded = false }: ManageTiresProps) {
                 // Process Data
                 let successCount = 0;
                 let errorCount = 0;
+                const errors: string[] = [];
 
-                for (const row of data as any[]) {
+                for (let i = 0; i < (data as any[]).length; i++) {
+                    const row = (data as any[])[i];
                     try {
                         const brandName = row["Brand"];
                         const modelName = row["Model"];
-                        if (!brandName || !modelName) continue;
+
+                        if (!brandName || !modelName) {
+                            errors.push(`Baris ${i + 2}: Brand dan Model wajib diisi`);
+                            errorCount++;
+                            continue;
+                        }
+
+                        // Validate tier
+                        const tierValue = row["Tier"]?.toLowerCase();
+                        const validTiers = ["premium", "mid", "budget"];
+                        const tier = validTiers.includes(tierValue) ? tierValue : "mid";
+
+                        // Validate type
+                        const typeValue = row["Type"]?.toLowerCase() || "all-season";
+                        const validTypes = ["performance", "all-season", "touring", "all-terrain", "rain"];
+                        const type = validTypes.includes(typeValue) ? typeValue : "all-season";
 
                         // 1. Find or Create Brand
                         let brandId = brands.find(b => b.name.toLowerCase() === brandName.toLowerCase())?.id;
@@ -169,7 +186,7 @@ export default function ManageTires({ isEmbedded = false }: ManageTiresProps) {
                                 name: brandName,
                                 country: row["Country"] || "Unknown",
                                 logo: "🛞",
-                                tier: (row["Tier"] as any) || "mid",
+                                tier: tier as "premium" | "mid" | "budget",
                                 description: `Imported ${brandName}`
                             });
                             brandId = newBrand.id;
@@ -184,9 +201,14 @@ export default function ManageTires({ isEmbedded = false }: ManageTiresProps) {
                             ? row["Sizes (comma separated)"].toString().split(',').map((s: string) => s.trim().toUpperCase())
                             : [];
 
+                        if (sizes.length === 0) {
+                            errors.push(`Baris ${i + 2}: ${brandName} ${modelName} - Ukuran ban wajib diisi`);
+                            errorCount++;
+                            continue;
+                        }
+
                         const priceMin = Number(row["PriceMin"]) || 0;
                         const priceMax = Number(row["PriceMax"]) || 0;
-                        const type = row["Type"] || "all-season";
 
                         if (existingProduct) {
                             // Update
@@ -215,18 +237,40 @@ export default function ManageTires({ isEmbedded = false }: ManageTiresProps) {
                             });
                         }
                         successCount++;
-                    } catch (err) {
-                        console.error("Error creating row", row, err);
+                    } catch (err: any) {
+                        const errorMsg = err?.message || "Unknown error";
+                        errors.push(`Baris ${i + 2}: ${row["Brand"]} ${row["Model"]} - ${errorMsg}`);
+                        console.error(`Error on row ${i + 2}:`, row, err);
                         errorCount++;
                     }
                 }
 
                 queryClient.invalidateQueries({ queryKey: ['tire-products'] });
                 queryClient.invalidateQueries({ queryKey: ['tire-brands'] });
+
+                let description = `Berhasil memproses ${successCount} data.`;
+                if (errorCount > 0) {
+                    description += ` Gagal: ${errorCount}`;
+                }
+
                 toast({
                     title: "Import Selesai",
-                    description: `Berhasil memproses ${successCount} data. Gagal: ${errorCount}`
+                    description,
+                    variant: errorCount > 0 ? "destructive" : "default",
                 });
+
+                // Show detailed errors if any
+                if (errors.length > 0) {
+                    console.error("Import errors:", errors);
+                    // Show first 3 errors in console for debugging
+                    errors.slice(0, 3).forEach(err => {
+                        toast({
+                            title: "Error Detail",
+                            description: err,
+                            variant: "destructive",
+                        });
+                    });
+                }
 
             } catch (error: any) {
                 console.error("Import Error", error);
