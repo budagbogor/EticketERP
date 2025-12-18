@@ -334,51 +334,20 @@ export function findMatchingProducts(
     tireType: string,
     products: Array<TireProduct & { brand: TireBrand }> = []
 ): Array<TireProduct & { brand: TireBrand }> {
-    const typeMapping: Record<string, string[]> = {
-        'Performance Summer': ['performance'],
-        'All-Season': ['all-season'],
-        'Touring Comfort': ['touring'],
-        'All-Terrain': ['all-terrain'],
-        'Wet Performance': ['rain', 'all-season'],
-    };
-
-    const targetTypes = typeMapping[tireType] || ['all-season'];
+    // Normalize the target size for exact matching
+    const targetSize = size.replace(/\s/g, '').toUpperCase();
 
     return products
         .filter((product) => {
-            const sizeMatch = product.sizes.some((s) => {
+            // Only match products that have the EXACT tire size
+            const hasExactSize = product.sizes.some((s) => {
                 const productSize = s.replace(/\s/g, '').toUpperCase();
-                const targetSize = size.replace(/\s/g, '').toUpperCase();
-                return productSize === targetSize || isSimilarSize(productSize, targetSize);
+                return productSize === targetSize;
             });
-            const typeMatch = product.types.some((t) => targetTypes.includes(t));
-            return sizeMatch || typeMatch;
+
+            return hasExactSize;
         })
         .sort((a, b) => b.rating - a.rating);
-}
-
-function isSimilarSize(productSize: string, targetSize: string): boolean {
-    const parseSize = (s: string) => {
-        const match = s.match(/(\d{3})\/(\d{2})R(\d{2})/i);
-        if (!match) return null;
-        return {
-            width: parseInt(match[1]),
-            aspectRatio: parseInt(match[2]),
-            rim: parseInt(match[3]),
-        };
-    };
-
-    const prod = parseSize(productSize);
-    const target = parseSize(targetSize);
-
-    if (!prod || !target) return false;
-
-    // Match if width is within 10mm, aspect within 5, and rim matches
-    return (
-        Math.abs(prod.width - target.width) <= 10 &&
-        Math.abs(prod.aspectRatio - target.aspectRatio) <= 5 &&
-        prod.rim === target.rim
-    );
 }
 
 export function getBrandsByTier(tier: 'premium' | 'mid' | 'budget'): TireBrand[] {

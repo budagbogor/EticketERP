@@ -105,8 +105,8 @@ function determineTireType(conditions: string[]): { type: string; typeId: string
 
 function getSafetyLevel(diameterDiff: number): 'safe' | 'moderate' | 'caution' {
     const absDiff = Math.abs(diameterDiff);
-    if (absDiff <= 1.5) return 'safe';
-    if (absDiff <= 3) return 'moderate';
+    if (absDiff <= 1.0) return 'safe';      // Stricter for same-rim upgrades
+    if (absDiff <= 2.0) return 'moderate';  // Within acceptable range
     return 'caution';
 }
 
@@ -128,10 +128,8 @@ function getProsCons(
         cons.push('Konsumsi BBM sedikit naik');
     }
 
-    if (rimDiff > 0) {
-        pros.push(`Tampilan lebih sporty (velg +${rimDiff}")`);
-        cons.push('Kenyamanan sedikit berkurang');
-    }
+    // Rim size doesn't change in same-rim upgrades
+    // Removed rim-related pros/cons
 
     if (aspectDiff < 0) {
         pros.push('Handling lebih responsif');
@@ -160,6 +158,20 @@ function getProsCons(
     return { pros: pros.slice(0, 3), cons: cons.slice(0, 2) };
 }
 
+/**
+ * Generate tire upgrade recommendations using industry-standard formulas.
+ * Only generates same-rim upgrades to maintain compatibility with existing wheels.
+ * 
+ * Formula References:
+ * - Overall Diameter: OD = (2 × Width × AspectRatio / 2540) + RimDiameter (inches)
+ * - Safe diameter tolerance: ±3% (industry standard)
+ * - Speedometer accuracy: ±1% for minimal impact
+ * 
+ * Sources:
+ * - https://www.tiresize.com/calculator/
+ * - https://www.calculator.net/tire-size-calculator.html
+ * - Indonesian standards: https://dunlop.co.id (±1-3% diameter tolerance)
+ */
 export function generateRecommendations(
     originalSize: TireSize,
     conditions: string[]
@@ -167,43 +179,43 @@ export function generateRecommendations(
     const originalDiameter = calculateOverallDiameter(originalSize);
     const { type, typeId } = determineTireType(conditions);
 
-    // Common upgrade patterns
+    // Same-rim upgrade patterns only (no plus-sizing)
     const upgrades: TireSize[] = [
-        // Same rim, wider tire
+        // Pattern 1: Wider tire, same aspect ratio
         {
             width: originalSize.width + 10,
             aspectRatio: originalSize.aspectRatio,
             rimDiameter: originalSize.rimDiameter
         },
-        // Wider tire, lower profile (maintain diameter)
+        // Pattern 2: Wider tire, lower profile (compensate for width increase)
         {
             width: originalSize.width + 10,
             aspectRatio: originalSize.aspectRatio - 5,
             rimDiameter: originalSize.rimDiameter
         },
-        // Plus-one: bigger rim, lower profile
-        {
-            width: originalSize.width + 10,
-            aspectRatio: originalSize.aspectRatio - 5,
-            rimDiameter: originalSize.rimDiameter + 1
-        },
-        // Plus-one: wider and bigger rim
-        {
-            width: originalSize.width + 15,
-            aspectRatio: originalSize.aspectRatio - 10,
-            rimDiameter: originalSize.rimDiameter + 1
-        },
-        // Slightly wider only
+        // Pattern 3: Slightly wider, same profile
         {
             width: originalSize.width + 5,
             aspectRatio: originalSize.aspectRatio,
             rimDiameter: originalSize.rimDiameter
         },
-        // Plus-two option (more aggressive)
+        // Pattern 4: Much wider, compensated profile
         {
             width: originalSize.width + 20,
-            aspectRatio: originalSize.aspectRatio - 10,
-            rimDiameter: originalSize.rimDiameter + 2
+            aspectRatio: originalSize.aspectRatio - 5,
+            rimDiameter: originalSize.rimDiameter
+        },
+        // Pattern 5: Moderate width increase, profile reduction
+        {
+            width: originalSize.width + 15,
+            aspectRatio: originalSize.aspectRatio - 5,
+            rimDiameter: originalSize.rimDiameter
+        },
+        // Pattern 6: Conservative upgrade
+        {
+            width: originalSize.width + 5,
+            aspectRatio: originalSize.aspectRatio - 5,
+            rimDiameter: originalSize.rimDiameter
         },
     ];
 
@@ -218,8 +230,8 @@ export function generateRecommendations(
         const newDiameter = calculateOverallDiameter(upgrade);
         const diameterDiff = calculateDiameterDifference(originalDiameter, newDiameter);
 
-        // Only include if within ±3% diameter difference
-        if (Math.abs(diameterDiff) <= 3.5) {
+        // Industry standard: ±3% diameter tolerance for same-rim upgrades
+        if (Math.abs(diameterDiff) <= 3.0) {
             const { pros, cons } = getProsCons(originalSize, upgrade, typeId, diameterDiff);
 
             recommendations.push({

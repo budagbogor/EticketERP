@@ -1,6 +1,5 @@
-import { TireProduct, TireBrand, formatPrice } from "@/lib/tireBrands";
+import { TireProduct, TireBrand } from "@/lib/tireBrands";
 import { cn } from "@/lib/utils";
-import { Star, Shield, Tag } from "lucide-react";
 
 interface BrandProductCardProps {
     product: TireProduct & { brand: TireBrand };
@@ -55,37 +54,9 @@ export function BrandProductCard({ product, index, size }: BrandProductCardProps
                 </span>
             </div>
 
-            {/* Rating */}
-            <div className="flex items-center gap-1 mb-3">
-                {[...Array(5)].map((_, i) => (
-                    <Star
-                        key={i}
-                        size={12}
-                        className={cn(
-                            i < Math.floor(product.rating)
-                                ? "fill-warning text-warning"
-                                : "text-muted-foreground/30"
-                        )}
-                    />
-                ))}
-                <span className="text-xs text-muted-foreground ml-1">
-                    {product.rating.toFixed(1)}
-                </span>
-            </div>
-
-            {/* Price */}
-            <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                    <Tag size={14} className="text-primary" />
-                    <span className="text-sm font-semibold text-foreground">
-                        {formatPrice(product.priceRange.min)} - {formatPrice(product.priceRange.max)}
-                    </span>
-                </div>
-            </div>
-
             {/* Features */}
             <div className="flex flex-wrap gap-1 mb-3">
-                {product.features.slice(0, 2).map((feature, i) => (
+                {product.features.slice(0, 3).map((feature, i) => (
                     <span
                         key={i}
                         className="text-xs px-2 py-0.5 rounded-full bg-secondary text-muted-foreground"
@@ -96,12 +67,7 @@ export function BrandProductCard({ product, index, size }: BrandProductCardProps
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/50">
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Shield size={12} />
-                    <span>Garansi {product.warranty}</span>
-                </div>
-
+            <div className="flex items-center justify-end mt-4 pt-3 border-t border-border/50">
                 <button
                     onClick={handleCheckPrice}
                     className="text-xs font-medium text-primary hover:text-primary/80 hover:underline flex items-center gap-1 transition-colors"
