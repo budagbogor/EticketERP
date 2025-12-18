@@ -12,7 +12,7 @@ import { TireSection } from "@/components/buku-pintar/TireSection";
 import { SuspensionSection } from "@/components/buku-pintar/SuspensionSection";
 import { BatterySection } from "@/components/buku-pintar/BatterySection";
 import { BrakeSection } from "@/components/buku-pintar/BrakeSection";
-import { Vehicle, VehicleVariant } from "@/types/buku-pintar";
+import { Vehicle, VehicleVariant, RecommendedPart, TireSpec, BrakeSpec } from "@/types/buku-pintar";
 import { AddDataDialog } from "@/components/buku-pintar/AddDataDialog";
 import { EditDataDialog } from "@/components/buku-pintar/EditDataDialog";
 import { ImportDataDialog } from "@/components/buku-pintar/ImportDataDialog";
@@ -45,6 +45,79 @@ export default function BukuPintar() {
     const handleSelectVehicle = (vehicle: Vehicle, variant: VehicleVariant) => {
         setSelectedVehicle(vehicle);
         setSelectedVariant(variant);
+    };
+
+    // Transform data for components
+    const getTransformedParts = (variant: VehicleVariant): RecommendedPart[] => {
+        const parts: RecommendedPart[] = [];
+        const specs = variant.specifications;
+
+        if (specs.filters) {
+            if (specs.filters.oil_filter) parts.push({ category: "Filter Oli", name: "Filter Oli", part_number: specs.filters.oil_filter });
+            if (specs.filters.air_filter) parts.push({ category: "Filter Udara", name: "Filter Udara", part_number: specs.filters.air_filter });
+            if (specs.filters.cabin_filter) parts.push({ category: "Filter Kabin", name: "Filter Kabin", part_number: specs.filters.cabin_filter });
+            if (specs.filters.fuel_filter) parts.push({ category: "Filter Bensin", name: "Filter Bahan Bakar", part_number: specs.filters.fuel_filter });
+            if (specs.filters.spark_plug) parts.push({ category: "Busi", name: "Busi", part_number: specs.filters.spark_plug });
+        }
+
+        if (specs.wiper) {
+            if (specs.wiper.driver) parts.push({ category: "Wiper", name: "Wiper Depan (Kanan)", part_number: specs.wiper.driver });
+            if (specs.wiper.passenger) parts.push({ category: "Wiper", name: "Wiper Depan (Kiri)", part_number: specs.wiper.passenger });
+            if (specs.wiper.rear) parts.push({ category: "Wiper", name: "Wiper Belakang", part_number: specs.wiper.rear });
+        }
+
+        if (specs.parts) {
+            parts.push(...specs.parts);
+        }
+
+        return parts;
+    };
+
+    const getTransformedTires = (variant: VehicleVariant): TireSpec[] => {
+        const tires: TireSpec[] = [];
+        const specs = variant.specifications;
+
+        if (specs.tire) {
+            // Front tire
+            if (specs.tire.front_size) {
+                tires.push({
+                    location: "Depan",
+                    size: specs.tire.front_size,
+                    pressure_psi_front: parseInt(specs.tire.front_pressure || "0") || undefined,
+                    recommended_brands: []
+                });
+            }
+            // Rear tire
+            if (specs.tire.rear_size) {
+                tires.push({
+                    location: "Belakang",
+                    size: specs.tire.rear_size,
+                    pressure_psi_rear: parseInt(specs.tire.rear_pressure || "0") || undefined,
+                    recommended_brands: []
+                });
+            }
+        }
+
+        if (specs.tires) {
+            tires.push(...specs.tires);
+        }
+
+        return tires;
+    };
+
+    const getTransformedBrakes = (variant: VehicleVariant): BrakeSpec => {
+        const specs = variant.specifications;
+        const brakes: BrakeSpec = {
+            ...specs.brakes,
+            pad_part_number_front: specs.brake_parts?.front_pad || specs.brakes?.pad_part_number_front,
+            shoe_part_number_rear: specs.brake_parts?.rear_pad || specs.brakes?.shoe_part_number_rear,
+            // Map legacy props if available, or current structure to legacy
+        };
+        // Ensure some fields are present so component doesn't look too empty
+        if (specs.brake_parts?.front_pad && !brakes.front_type) brakes.front_type = "Disc"; // Assumption
+        if (specs.brake_parts?.rear_pad && !brakes.rear_type) brakes.rear_type = "Disc/Drum"; // Assumption
+
+        return brakes;
     };
 
     return (
@@ -166,8 +239,7 @@ export default function BukuPintar() {
 
                                 <TabsContent value="parts" className="mt-6">
                                     <PartSection
-                                        wiper={selectedVariant.specifications.wiper}
-                                        filters={selectedVariant.specifications.filters}
+                                        parts={getTransformedParts(selectedVariant)}
                                     />
                                 </TabsContent>
 
@@ -176,7 +248,7 @@ export default function BukuPintar() {
                                 </TabsContent>
 
                                 <TabsContent value="brakes" className="mt-6">
-                                    <BrakeSection brakes={selectedVariant.specifications.brake_parts} />
+                                    <BrakeSection brakes={getTransformedBrakes(selectedVariant)} />
                                 </TabsContent>
 
                                 <TabsContent value="battery" className="mt-6">
@@ -184,7 +256,7 @@ export default function BukuPintar() {
                                 </TabsContent>
 
                                 <TabsContent value="tires" className="mt-6">
-                                    <TireSection tires={selectedVariant.specifications.tire} />
+                                    <TireSection tires={getTransformedTires(selectedVariant)} />
                                 </TabsContent>
                             </Tabs>
                         </div>
