@@ -104,8 +104,7 @@ export default function BukuPintar() {
                                             {selectedVehicle.brand} {selectedVehicle.model} - {selectedVariant.name}
                                         </h2>
                                         <p className="text-sm text-muted-foreground">
-                                            Tahun: {selectedVehicle.year_start} - {selectedVehicle.year_end || "Sekarang"} •
-                                            Kode Mesin: {selectedVariant.engine_code} •
+                                            Tahun: {selectedVariant.year_start} - {selectedVariant.year_end || "Sekarang"} •
                                             Type Mesin: {selectedVariant.engine_type || "-"}
                                         </p>
                                     </div>
@@ -141,30 +140,36 @@ export default function BukuPintar() {
 
                                 <TabsContent value="oil" className="mt-6">
                                     <OilSection
-                                        engineOil={selectedVariant.specifications.engine_oil}
-                                        transmissionOil={selectedVariant.specifications.transmission_oil}
-                                        differentialOil={selectedVariant.specifications.differential_oil}
+                                        engineOil={selectedVariant.engine_oil}
+                                        transmissionOil={selectedVariant.transmission_oil}
+                                        powerSteeringOil={selectedVariant.power_steering_oil}
+                                        brakeOil={selectedVariant.brake_oil}
+                                        radiatorCoolant={selectedVariant.radiator_coolant}
+                                        acFreon={selectedVariant.ac_freon}
                                     />
                                 </TabsContent>
 
                                 <TabsContent value="parts" className="mt-6">
-                                    <PartSection parts={selectedVariant.specifications.parts} />
+                                    <PartSection
+                                        wiper={selectedVariant.wiper}
+                                        filters={selectedVariant.filters}
+                                    />
                                 </TabsContent>
 
                                 <TabsContent value="suspension" className="mt-6">
-                                    <SuspensionSection suspension={selectedVariant.specifications.suspension} />
+                                    <SuspensionSection suspension={selectedVariant.suspension} />
                                 </TabsContent>
 
                                 <TabsContent value="brakes" className="mt-6">
-                                    <BrakeSection brakes={selectedVariant.specifications.brakes} />
+                                    <BrakeSection brakes={selectedVariant.brake_parts} />
                                 </TabsContent>
 
                                 <TabsContent value="battery" className="mt-6">
-                                    <BatterySection battery={selectedVariant.specifications.battery} />
+                                    <BatterySection battery={selectedVariant.battery} />
                                 </TabsContent>
 
                                 <TabsContent value="tires" className="mt-6">
-                                    <TireSection tires={selectedVariant.specifications.tires} />
+                                    <TireSection tires={selectedVariant.tire} />
                                 </TabsContent>
                             </Tabs>
                         </div>

@@ -9,37 +9,116 @@ export interface Vehicle {
 
 export interface VehicleVariant {
     id: string;
-    name: string; // Restoring name field
-    transmission: "AT" | "MT" | "CVT" | "DCT" | "Manual" | "Automatic";
-    engine_type?: "Bensin" | "Diesel" | "Hybrid" | "Listrik" | "Gas" | "Bensin Turbo" | "Diesel Turbo";
-    year_start?: number; // Added specific year range for variant
-    year_end?: number;
-    engine_code: string;
-    specifications: {
-        engine_oil: EngineOilSpec;
-        transmission_oil: FluidSpec;
-        differential_oil?: FluidSpec; // New field
-        parts: RecommendedPart[];
-        tires: TireSpec[];
-        suspension?: SuspensionSpec;
-        battery?: BatterySpec;
-        brakes?: BrakeSpec;
+    name: string;
+    year_start?: number;
+    year_end?: number | null;
+    engine_type?: string;
+
+    // Engine oils and fluids
+    engine_oil?: {
+        capacity?: string;
+        type?: string;
+    };
+    transmission_oil?: {
+        capacity?: string;
+        type?: string;
+    };
+    power_steering_oil?: {
+        capacity?: string;
+        type?: string;
+    };
+    brake_oil?: {
+        type?: string;
+    };
+    radiator_coolant?: {
+        capacity?: string;
+        type?: string;
+    };
+    ac_freon?: {
+        capacity?: string;
+        type?: string;
+    };
+
+    // Tire specifications
+    tire?: {
+        front_size?: string;
+        rear_size?: string;
+        front_pressure?: string;
+        rear_pressure?: string;
+    };
+
+    // Battery
+    battery?: {
+        type?: string;
+    };
+
+    // Wiper
+    wiper?: {
+        driver?: string;
+        passenger?: string;
+        rear?: string;
+    };
+
+    // Filters
+    filters?: {
+        spark_plug?: string;
+        air_filter?: string;
+        cabin_filter?: string;
+        fuel_filter?: string;
+        oil_filter?: string;
+    };
+
+    // Brake parts
+    brake_parts?: {
+        front_pad?: string;
+        rear_pad?: string;
+        front_disc?: string;
+        rear_disc?: string;
+    };
+
+    // Suspension
+    suspension?: {
+        shock_depan?: {
+            recommended_brands?: string;
+        };
+        shock_belakang?: {
+            recommended_brands?: string;
+        };
+        rack_end?: {
+            recommended_brands?: string;
+        };
+        tie_rod?: {
+            recommended_brands?: string;
+        };
+        link_stabilizer?: {
+            recommended_brands?: string;
+        };
+        lower_arm?: {
+            recommended_brands?: string;
+        };
+        upper_arm?: {
+            recommended_brands?: string;
+        };
+        upper_support?: {
+            recommended_brands?: string;
+        };
     };
 }
 
+// Legacy interfaces kept for backward compatibility
 export interface EngineOilSpec {
-    viscosity_options: string[]; // e.g. ["0W-20", "5W-30"]
+    viscosity_options: string[];
     capacity_liter: number;
     capacity_with_filter_liter: number;
-    quality_standard: string; // e.g. "API SP / ILSAC GF-6A"
+    quality_standard: string;
     recommended_brands?: string[];
 }
 
 export interface FluidSpec {
-    type: string; // e.g. "CVT Fluid FE"
+    type: string;
     capacity_liter: number;
     replacement_interval_km?: number;
-    recommended_brands?: string[]; // New field
+    recommended_brands?: string[];
 }
 
 export interface RecommendedPart {
@@ -48,15 +127,15 @@ export interface RecommendedPart {
     part_number: string;
     description?: string;
     replacement_interval_km?: number;
-    compatible_brands?: string[]; // e.g. ["Denso", "Bosch"]
+    compatible_brands?: string[];
 }
 
 export interface TireSpec {
     location: "Depan & Belakang" | "Depan" | "Belakang";
-    size: string; // e.g. "185/65 R15"
+    size: string;
     pressure_psi_front: number;
     pressure_psi_rear: number;
-    load_speed_index?: string; // e.g. "88H"
+    load_speed_index?: string;
     recommended_brands?: string[];
 }
 
@@ -80,17 +159,17 @@ export interface SuspensionSpec {
 }
 
 export interface BatterySpec {
-    type: string; // e.g. "Dry" or "Wet"
-    model: string; // e.g. "NS40ZL"
+    type: string;
+    model: string;
     ampere: number;
     voltage: number;
     dimensions?: string;
 }
 
 export interface BrakeSpec {
-    front_type: string; // e.g. "Ventilated Disc"
-    rear_type: string; // e.g. "Drum"
-    fluid_type: string; // e.g. "DOT 3" or "DOT 4"
+    front_type: string;
+    rear_type: string;
+    fluid_type: string;
     pad_part_number_front?: string;
     shoe_part_number_rear?: string;
     recommended_brands_front?: string[];
