@@ -68,13 +68,19 @@ CREATE TABLE IF NOT EXISTS vehicle_specifications (
 );
 
 -- Create index for faster queries
-CREATE INDEX idx_vehicle_specifications_brand_model ON vehicle_specifications(brand_id, model_id);
-CREATE INDEX idx_vehicle_specifications_created_by ON vehicle_specifications(created_by);
+CREATE INDEX IF NOT EXISTS idx_vehicle_specifications_brand_model ON vehicle_specifications(brand_id, model_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_specifications_created_by ON vehicle_specifications(created_by);
 
 -- Enable Row Level Security
 ALTER TABLE vehicle_specifications ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Allow authenticated users to read vehicle specifications" ON vehicle_specifications;
+DROP POLICY IF EXISTS "Allow authenticated users to insert vehicle specifications" ON vehicle_specifications;
+DROP POLICY IF EXISTS "Allow users to update vehicle specifications" ON vehicle_specifications;
+DROP POLICY IF EXISTS "Allow users to delete vehicle specifications" ON vehicle_specifications;
+
 -- Allow authenticated users to read all specifications
 CREATE POLICY "Allow authenticated users to read vehicle specifications"
     ON vehicle_specifications
