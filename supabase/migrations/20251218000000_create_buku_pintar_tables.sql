@@ -99,7 +99,7 @@ CREATE POLICY "Allow users to update vehicle specifications"
         EXISTS (
             SELECT 1 FROM app_users
             WHERE app_users.id = auth.uid()
-            AND app_users.role IN ('admin', 'super_admin')
+            AND app_users.role = 'admin'
         )
     );
 
@@ -113,7 +113,7 @@ CREATE POLICY "Allow users to delete vehicle specifications"
         EXISTS (
             SELECT 1 FROM app_users
             WHERE app_users.id = auth.uid()
-            AND app_users.role IN ('admin', 'super_admin')
+            AND app_users.role = 'admin'
         )
     );
 
