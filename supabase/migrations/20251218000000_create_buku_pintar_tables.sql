@@ -97,9 +97,9 @@ CREATE POLICY "Allow users to update vehicle specifications"
     USING (
         auth.uid() = created_by OR
         EXISTS (
-            SELECT 1 FROM profiles
-            WHERE profiles.id = auth.uid()
-            AND profiles.role IN ('admin', 'super_admin')
+            SELECT 1 FROM app_users
+            WHERE app_users.id = auth.uid()
+            AND app_users.role IN ('admin', 'super_admin')
         )
     );
 
@@ -111,9 +111,9 @@ CREATE POLICY "Allow users to delete vehicle specifications"
     USING (
         auth.uid() = created_by OR
         EXISTS (
-            SELECT 1 FROM profiles
-            WHERE profiles.id = auth.uid()
-            AND profiles.role IN ('admin', 'super_admin')
+            SELECT 1 FROM app_users
+            WHERE app_users.id = auth.uid()
+            AND app_users.role IN ('admin', 'super_admin')
         )
     );
 
