@@ -110,7 +110,7 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
         setTransmission(variant.transmission);
 
         // Oil
-        setOilViscosity(variant.specifications.engine_oil.viscosity_options[0] || "");
+        setOilViscosity(variant.specifications.engine_oil.viscosity_options?.[0] || "");
         setOilCapacity(variant.specifications.engine_oil.capacity_liter.toString());
         setOilQuality(variant.specifications.engine_oil.quality_standard || "");
         setOilBrands(variant.specifications.engine_oil.recommended_brands?.join(", ") || "");

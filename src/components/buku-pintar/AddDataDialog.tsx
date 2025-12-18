@@ -276,7 +276,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setTireBrands("");
     };
 
-    const currentModels = brands.find(b => b.name === selectedBrand)?.models || [];
+    const currentModels = brands?.find(b => b.name === selectedBrand)?.models || [];
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -326,7 +326,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                         <SelectValue placeholder="Pilih Merek" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {brands.map(b => (
+                                        {brands?.map(b => (
                                             <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
                                         ))}
                                     </SelectContent>

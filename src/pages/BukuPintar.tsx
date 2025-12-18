@@ -22,7 +22,7 @@ export default function BukuPintar() {
     const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
     const [selectedVariant, setSelectedVariant] = useState<VehicleVariant | null>(null);
     const [viewMode, setViewMode] = useState<"search" | "table">("search");
-    const { vehicles, supabaseBrands, addVariantData, updateVariantData, deleteVariantData, importVehicleData } = useBukuPintar();
+    const { vehicles, supabaseBrands, addVariantData, updateVariantData, deleteVariantData, importVehicleData, error } = useBukuPintar();
 
     // Update selectedVariant when vehicles data changes (e.g., after edit)
     useEffect(() => {
@@ -85,6 +85,21 @@ export default function BukuPintar() {
                 </div>
             </div>
 
+            {error && (
+                <div className="bg-destructive/15 border border-destructive text-destructive px-4 py-3 rounded-lg flex items-center gap-2">
+                    <Info className="w-5 h-5 flex-shrink-0" />
+                    <div>
+                        <p className="font-semibold">Terjadi Kesalahan</p>
+                        <p className="text-sm">
+                            Gagal memuat data. Kemungkinan tabel database belum dibuat atau ada masalah koneksi.
+                            Silakan hubungi administrator atau jalankan script migrasi.
+                            <br />
+                            Detail: {error instanceof Error ? error.message : JSON.stringify(error)}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {viewMode === "search" ? (
                 <>
                     <VehicleSelector onSelect={(v, var_data) => {
@@ -140,36 +155,36 @@ export default function BukuPintar() {
 
                                 <TabsContent value="oil" className="mt-6">
                                     <OilSection
-                                        engineOil={selectedVariant.engine_oil}
-                                        transmissionOil={selectedVariant.transmission_oil}
-                                        powerSteeringOil={selectedVariant.power_steering_oil}
-                                        brakeOil={selectedVariant.brake_oil}
-                                        radiatorCoolant={selectedVariant.radiator_coolant}
-                                        acFreon={selectedVariant.ac_freon}
+                                        engineOil={selectedVariant.specifications.engine_oil}
+                                        transmissionOil={selectedVariant.specifications.transmission_oil}
+                                        powerSteeringOil={selectedVariant.specifications.power_steering_oil}
+                                        brakeOil={selectedVariant.specifications.brake_oil}
+                                        radiatorCoolant={selectedVariant.specifications.radiator_coolant}
+                                        acFreon={selectedVariant.specifications.ac_freon}
                                     />
                                 </TabsContent>
 
                                 <TabsContent value="parts" className="mt-6">
                                     <PartSection
-                                        wiper={selectedVariant.wiper}
-                                        filters={selectedVariant.filters}
+                                        wiper={selectedVariant.specifications.wiper}
+                                        filters={selectedVariant.specifications.filters}
                                     />
                                 </TabsContent>
 
                                 <TabsContent value="suspension" className="mt-6">
-                                    <SuspensionSection suspension={selectedVariant.suspension} />
+                                    <SuspensionSection suspension={selectedVariant.specifications.suspension} />
                                 </TabsContent>
 
                                 <TabsContent value="brakes" className="mt-6">
-                                    <BrakeSection brakes={selectedVariant.brake_parts} />
+                                    <BrakeSection brakes={selectedVariant.specifications.brake_parts} />
                                 </TabsContent>
 
                                 <TabsContent value="battery" className="mt-6">
-                                    <BatterySection battery={selectedVariant.battery} />
+                                    <BatterySection battery={selectedVariant.specifications.battery} />
                                 </TabsContent>
 
                                 <TabsContent value="tires" className="mt-6">
-                                    <TireSection tires={selectedVariant.tire} />
+                                    <TireSection tires={selectedVariant.specifications.tire} />
                                 </TabsContent>
                             </Tabs>
                         </div>

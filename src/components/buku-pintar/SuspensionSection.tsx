@@ -38,11 +38,12 @@ export function SuspensionSection({ suspension }: SuspensionSectionProps) {
                         { label: "Shock Absorber Depan", value: suspension.shock_absorber_front, brands: suspension.shock_absorber_front_brands },
                         { label: "Shock Absorber Belakang", value: suspension.shock_absorber_rear, brands: suspension.shock_absorber_rear_brands },
                     ].map((part, idx) => (
-                        part.value ? (
+
+                        (part.value || (part.brands && part.brands.length > 0)) ? (
                             <div key={idx} className="flex flex-col gap-1 p-3 bg-muted/50 rounded-lg">
                                 <div className="flex justify-between items-center">
                                     <span className="text-muted-foreground text-sm">{part.label}</span>
-                                    <span className="font-medium text-right">{part.value}</span>
+                                    <span className="font-medium text-right">{part.value || "-"}</span>
                                 </div>
                                 {part.brands && part.brands.length > 0 && (
                                     <div className="flex justify-between items-center text-xs pt-1 border-t border-muted-foreground/20 mt-1">
