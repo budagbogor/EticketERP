@@ -672,6 +672,175 @@ export type Database = {
           }
         ]
       }
+      vehicle_specifications: {
+        Row: {
+          id: string
+          brand_id: string
+          model_id: string
+          variant_name: string
+          year_start: number
+          year_end: number | null
+          engine_type: string | null
+          engine_oil_capacity: string | null
+          engine_oil_type: string | null
+          transmission_oil_capacity: string | null
+          transmission_oil_type: string | null
+          power_steering_oil_capacity: string | null
+          power_steering_oil_type: string | null
+          brake_oil_type: string | null
+          radiator_coolant_capacity: string | null
+          radiator_coolant_type: string | null
+          ac_freon_capacity: string | null
+          ac_freon_type: string | null
+          tire_size_front: string | null
+          tire_size_rear: string | null
+          tire_pressure_front: string | null
+          tire_pressure_rear: string | null
+          battery_type: string | null
+          wiper_size_driver: string | null
+          wiper_size_passenger: string | null
+          wiper_size_rear: string | null
+          spark_plug_type: string | null
+          air_filter_type: string | null
+          cabin_filter_type: string | null
+          fuel_filter_type: string | null
+          oil_filter_type: string | null
+          brake_pad_front_type: string | null
+          brake_pad_rear_type: string | null
+          brake_disc_front_type: string | null
+          brake_disc_rear_type: string | null
+          shock_depan_recommended_brands: string | null
+          shock_belakang_recommended_brands: string | null
+          rack_end_recommended_brands: string | null
+          tie_rod_recommended_brands: string | null
+          link_stabilizer_recommended_brands: string | null
+          lower_arm_recommended_brands: string | null
+          upper_arm_recommended_brands: string | null
+          upper_support_recommended_brands: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          brand_id: string
+          model_id: string
+          variant_name: string
+          year_start: number
+          year_end?: number | null
+          engine_type?: string | null
+          engine_oil_capacity?: string | null
+          engine_oil_type?: string | null
+          transmission_oil_capacity?: string | null
+          transmission_oil_type?: string | null
+          power_steering_oil_capacity?: string | null
+          power_steering_oil_type?: string | null
+          brake_oil_type?: string | null
+          radiator_coolant_capacity?: string | null
+          radiator_coolant_type?: string | null
+          ac_freon_capacity?: string | null
+          ac_freon_type?: string | null
+          tire_size_front?: string | null
+          tire_size_rear?: string | null
+          tire_pressure_front?: string | null
+          tire_pressure_rear?: string | null
+          battery_type?: string | null
+          wiper_size_driver?: string | null
+          wiper_size_passenger?: string | null
+          wiper_size_rear?: string | null
+          spark_plug_type?: string | null
+          air_filter_type?: string | null
+          cabin_filter_type?: string | null
+          fuel_filter_type?: string | null
+          oil_filter_type?: string | null
+          brake_pad_front_type?: string | null
+          brake_pad_rear_type?: string | null
+          brake_disc_front_type?: string | null
+          brake_disc_rear_type?: string | null
+          shock_depan_recommended_brands?: string | null
+          shock_belakang_recommended_brands?: string | null
+          rack_end_recommended_brands?: string | null
+          tie_rod_recommended_brands?: string | null
+          link_stabilizer_recommended_brands?: string | null
+          lower_arm_recommended_brands?: string | null
+          upper_arm_recommended_brands?: string | null
+          upper_support_recommended_brands?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          brand_id?: string
+          model_id?: string
+          variant_name?: string
+          year_start?: number
+          year_end?: number | null
+          engine_type?: string | null
+          engine_oil_capacity?: string | null
+          engine_oil_type?: string | null
+          transmission_oil_capacity?: string | null
+          transmission_oil_type?: string | null
+          power_steering_oil_capacity?: string | null
+          power_steering_oil_type?: string | null
+          brake_oil_type?: string | null
+          radiator_coolant_capacity?: string | null
+          radiator_coolant_type?: string | null
+          ac_freon_capacity?: string | null
+          ac_freon_type?: string | null
+          tire_size_front?: string | null
+          tire_size_rear?: string | null
+          tire_pressure_front?: string | null
+          tire_pressure_rear?: string | null
+          battery_type?: string | null
+          wiper_size_driver?: string | null
+          wiper_size_passenger?: string | null
+          wiper_size_rear?: string | null
+          spark_plug_type?: string | null
+          air_filter_type?: string | null
+          cabin_filter_type?: string | null
+          fuel_filter_type?: string | null
+          oil_filter_type?: string | null
+          brake_pad_front_type?: string | null
+          brake_pad_rear_type?: string | null
+          brake_disc_front_type?: string | null
+          brake_disc_rear_type?: string | null
+          shock_depan_recommended_brands?: string | null
+          shock_belakang_recommended_brands?: string | null
+          rack_end_recommended_brands?: string | null
+          tie_rod_recommended_brands?: string | null
+          link_stabilizer_recommended_brands?: string | null
+          lower_arm_recommended_brands?: string | null
+          upper_arm_recommended_brands?: string | null
+          upper_support_recommended_brands?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_specifications_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "car_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_specifications_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "car_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_specifications_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
