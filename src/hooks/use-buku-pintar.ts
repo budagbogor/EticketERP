@@ -53,87 +53,110 @@ export function useBukuPintar() {
                         spec.car_models?.name.toLowerCase() === model.name.toLowerCase()
                 );
 
-                // Convert Supabase specs to VehicleVariant format
+                // Convert Supabase specs to VehicleVariant format with nested specifications
                 const supabaseVariants: VehicleVariant[] = supabaseSpecs.map((spec: any) => ({
                     id: spec.id,
                     name: spec.variant_name,
                     year_start: spec.year_start,
                     year_end: spec.year_end,
                     engine_type: spec.engine_type,
-                    engine_oil: {
-                        capacity: spec.engine_oil_capacity,
-                        type: spec.engine_oil_type
-                    },
-                    transmission_oil: {
-                        capacity: spec.transmission_oil_capacity,
-                        type: spec.transmission_oil_type
-                    },
-                    power_steering_oil: {
-                        capacity: spec.power_steering_oil_capacity,
-                        type: spec.power_steering_oil_type
-                    },
-                    brake_oil: {
-                        type: spec.brake_oil_type
-                    },
-                    radiator_coolant: {
-                        capacity: spec.radiator_coolant_capacity,
-                        type: spec.radiator_coolant_type
-                    },
-                    ac_freon: {
-                        capacity: spec.ac_freon_capacity,
-                        type: spec.ac_freon_type
-                    },
-                    tire: {
-                        front_size: spec.tire_size_front,
-                        rear_size: spec.tire_size_rear,
-                        front_pressure: spec.tire_pressure_front,
-                        rear_pressure: spec.tire_pressure_rear
-                    },
-                    battery: {
-                        type: spec.battery_type
-                    },
-                    wiper: {
-                        driver: spec.wiper_size_driver,
-                        passenger: spec.wiper_size_passenger,
-                        rear: spec.wiper_size_rear
-                    },
-                    filters: {
-                        spark_plug: spec.spark_plug_type,
-                        air_filter: spec.air_filter_type,
-                        cabin_filter: spec.cabin_filter_type,
-                        fuel_filter: spec.fuel_filter_type,
-                        oil_filter: spec.oil_filter_type
-                    },
-                    brake_parts: {
-                        front_pad: spec.brake_pad_front_type,
-                        rear_pad: spec.brake_pad_rear_type,
-                        front_disc: spec.brake_disc_front_type,
-                        rear_disc: spec.brake_disc_rear_type
-                    },
-                    suspension: {
-                        shock_depan: {
-                            recommended_brands: spec.shock_depan_recommended_brands
+                    transmission: "AT" as any, // Default, will be updated if needed
+                    engine_code: "", // Not stored in Supabase yet
+                    specifications: {
+                        engine_oil: {
+                            viscosity_options: spec.engine_oil_type ? [spec.engine_oil_type] : [],
+                            capacity_liter: parseFloat(spec.engine_oil_capacity) || 0,
+                            capacity_with_filter_liter: parseFloat(spec.engine_oil_capacity) || 0,
+                            quality_standard: spec.engine_oil_type || "",
+                            recommended_brands: []
                         },
-                        shock_belakang: {
-                            recommended_brands: spec.shock_belakang_recommended_brands
+                        transmission_oil: {
+                            type: spec.transmission_oil_type || "",
+                            capacity_liter: parseFloat(spec.transmission_oil_capacity) || 0,
+                            recommended_brands: []
                         },
-                        rack_end: {
-                            recommended_brands: spec.rack_end_recommended_brands
+                        differential_oil: spec.power_steering_oil_type ? {
+                            type: spec.power_steering_oil_type,
+                            capacity_liter: parseFloat(spec.power_steering_oil_capacity) || 0,
+                            recommended_brands: []
+                        } : undefined,
+                        parts: [
+                            ...(spec.oil_filter_type ? [{
+                                category: "Filter Oli" as any,
+                                name: spec.oil_filter_type,
+                                part_number: "",
+                                compatible_brands: []
+                            }] : []),
+                            ...(spec.air_filter_type ? [{
+                                category: "Filter Udara" as any,
+                                name: spec.air_filter_type,
+                                part_number: "",
+                                compatible_brands: []
+                            }] : []),
+                            ...(spec.cabin_filter_type ? [{
+                                category: "Filter Kabin" as any,
+                                name: spec.cabin_filter_type,
+                                part_number: "",
+                                compatible_brands: []
+                            }] : []),
+                            ...(spec.spark_plug_type ? [{
+                                category: "Busi" as any,
+                                name: spec.spark_plug_type,
+                                part_number: "",
+                                compatible_brands: []
+                            }] : []),
+                            ...(spec.fuel_filter_type ? [{
+                                category: "Filter Bensin" as any,
+                                name: spec.fuel_filter_type,
+                                part_number: "",
+                                compatible_brands: []
+                            }] : []),
+                            ...(spec.wiper_size_driver ? [{
+                                category: "Wiper" as any,
+                                name: `Driver: ${spec.wiper_size_driver}, Passenger: ${spec.wiper_size_passenger || '-'}, Rear: ${spec.wiper_size_rear || '-'}`,
+                                part_number: "",
+                                compatible_brands: []
+                            }] : [])
+                        ],
+                        tires: spec.tire_size_front ? [{
+                            location: "Depan & Belakang" as any,
+                            size: spec.tire_size_front,
+                            pressure_psi_front: parseFloat(spec.tire_pressure_front) || 0,
+                            pressure_psi_rear: parseFloat(spec.tire_pressure_rear) || 0,
+                            recommended_brands: []
+                        }] : [],
+                        suspension: {
+                            shock_absorber_front: "",
+                            shock_absorber_front_brands: spec.shock_depan_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                            shock_absorber_rear: "",
+                            shock_absorber_rear_brands: spec.shock_belakang_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                            rack_end: "",
+                            rack_end_brands: spec.rack_end_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                            tie_rod_end: "",
+                            tie_rod_end_brands: spec.tie_rod_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                            link_stabilizer: "",
+                            link_stabilizer_brands: spec.link_stabilizer_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                            lower_arm: "",
+                            lower_arm_brands: spec.lower_arm_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                            upper_arm: "",
+                            upper_arm_brands: spec.upper_arm_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                            upper_support: "",
+                            upper_support_brands: spec.upper_support_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                         },
-                        tie_rod: {
-                            recommended_brands: spec.tie_rod_recommended_brands
-                        },
-                        link_stabilizer: {
-                            recommended_brands: spec.link_stabilizer_recommended_brands
-                        },
-                        lower_arm: {
-                            recommended_brands: spec.lower_arm_recommended_brands
-                        },
-                        upper_arm: {
-                            recommended_brands: spec.upper_arm_recommended_brands
-                        },
-                        upper_support: {
-                            recommended_brands: spec.upper_support_recommended_brands
+                        battery: spec.battery_type ? {
+                            type: spec.battery_type,
+                            model: "",
+                            ampere: 0,
+                            voltage: 12
+                        } : undefined,
+                        brakes: {
+                            front_type: spec.brake_disc_front_type || "",
+                            rear_type: spec.brake_disc_rear_type || "",
+                            fluid_type: spec.brake_oil_type || "",
+                            pad_part_number_front: spec.brake_pad_front_type || "",
+                            shoe_part_number_rear: spec.brake_pad_rear_type || "",
+                            recommended_brands_front: [],
+                            recommended_brands_rear: []
                         }
                     }
                 }));
