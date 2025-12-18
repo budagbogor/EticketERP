@@ -184,7 +184,7 @@ export default function BukuPintar() {
                                 </TabsContent>
 
                                 <TabsContent value="tires" className="mt-6">
-                                    <TireSection tires={selectedVariant.specifications.tire} />
+                                    <TireSection tire={selectedVariant.specifications.tire} />
                                 </TabsContent>
                             </Tabs>
                         </div>
