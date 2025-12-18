@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import { read, utils, writeFile } from "xlsx";
+import { read, utils } from "xlsx";
+import { downloadExcel } from "@/lib/excelUtils";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useImportWiperData } from "@/hooks/useWiperData";
@@ -39,12 +40,13 @@ export function ImportWiperDataDialog() {
             TEMPLATE_COLUMNS,
             ["Toyota", "Avanza", 2012, 2018, 24, 14, 12, "Termasuk Veloz generasi awal"]
         ]);
-
-        const wscols = TEMPLATE_COLUMNS.map(c => ({ wch: c.length + 5 }));
-        ws['!cols'] = wscols;
-
         utils.book_append_sheet(wb, ws, "Template Wiper");
-        writeFile(wb, "Template_Import_Wiper.xlsx");
+
+        toast({
+            title: "Mengunduh Template",
+            description: "Template Wiper sedang disiapkan...",
+        });
+        downloadExcel(wb, "Template_Import_Wiper.xlsx");
     };
 
     const processFile = async (file: File) => {

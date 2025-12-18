@@ -30,6 +30,7 @@ import ComplainCompass from "./pages/ComplainCompass";
 import TireUpgrade from "./pages/TireUpgrade";
 import ManageTires from "./pages/admin/ManageTires";
 import WiperFitFinder from "./pages/WiperFitFinder";
+import TireDataManagement from "./pages/TireDataManagement";
 
 const queryClient = new QueryClient();
 
@@ -209,6 +210,16 @@ const App = () => (
                 <AdminRoute>
                   <AppLayout>
                     <MasterData />
+                  </AppLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/tire-data-management"
+              element={
+                <AdminRoute>
+                  <AppLayout>
+                    <TireDataManagement />
                   </AppLayout>
                 </AdminRoute>
               }

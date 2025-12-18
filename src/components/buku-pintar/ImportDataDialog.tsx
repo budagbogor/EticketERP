@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import { read, utils, writeFile } from "xlsx";
+import { read, utils } from "xlsx";
+import { downloadExcel } from "@/lib/excelUtils";
 import { VehicleVariant } from "@/types/buku-pintar";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -57,7 +58,7 @@ export function ImportDataDialog({ onImport }: ImportDataDialogProps) {
         const wb = utils.book_new();
         const ws = utils.aoa_to_sheet([
             TEMPLATE_COLUMNS,
-            ["Toyota", "Avanza", "1.5 G CVT", 2022, "", "2NR-VE", "CVT", "Bensin", "0W-20", 4, "API SP", "TMO", "CVT FE", 3.5, "TMO, Castrol", "GL-5 80W-90", 2.5, "TMO, Shell", "123-456", "Denso", 10000, "789-012", "Denso", 20000, "345-678", "Denso", 30000, "901-234", "NGK", 40000, "", "", 20000, "", "", 40000, "195/60 R16", 33, 33, "Dunlop", "MF", "34B19L", 35, 12, "", "Cakram", "04465-123", "Tromol", "04495-456", "DOT 3", "Part-001", "Part-002", "Part-003", "Part-004", "Part-005", "Part-006", "", ""]
+            ["Toyota", "Avanza", "1.5 G CVT", 2022, "", "2NR-VE", "CVT", "Bensin", "0W-20", 4, "API SP", "TMO", "CVT FE", 3.5, "TMO, Castrol", "GL-5 80W-90", 2.5, "TMO, Shell", "123-456", "Denso", 10000, "789-012", "Denso", 20000, "345-678", "Denso", 30000, "901-234", "NGK", 40000, "", "", 20000, "", "", 40000, "195/60 R16", 33, 33, "Dunlop", "MF", "34B19L", 35, 12, "", "Cakram", "04465-123", "Denso", "Tromol", "04495-456", "Denso", "DOT 3", "Part-001", "KYB", "Part-002", "KYB", "Part-003", "555", "Part-004", "555", "Part-005", "555", "Part-006", "555", "Part-007", "555", "Part-008", "555"]
         ]);
 
         // Auto-width columns
@@ -65,7 +66,11 @@ export function ImportDataDialog({ onImport }: ImportDataDialogProps) {
         ws['!cols'] = wscols;
 
         utils.book_append_sheet(wb, ws, "Template Buku Pintar");
-        writeFile(wb, "Template_Import_Buku_Pintar.xlsx");
+        toast({
+            title: "Mengunduh Template",
+            description: "Template Buku Pintar sedang disiapkan...",
+        });
+        downloadExcel(wb, "Template_Import_Buku_Pintar.xlsx");
     };
 
     const processFile = async (file: File) => {

@@ -13,7 +13,8 @@ import {
   MessageSquareWarning,
   CircleDashed,
   Briefcase,
-  Wrench
+  Wrench,
+  CircleDot
 } from "lucide-react";
 import logoMobeng from "@/assets/logo-mobeng.jpg";
 import { NavLink } from "@/components/NavLink";
@@ -46,6 +47,7 @@ const mainMenuItems = [
 const adminMenuItems = [
   { title: "Manajemen Pengguna", url: "/users", icon: Users, end: true },
   { title: "Data Master", url: "/master-data", icon: Database, end: true },
+  { title: "Data Ban", url: "/tire-data-management", icon: CircleDot, end: true },
   { title: "Pengaturan", url: "/settings", icon: Settings, end: true },
 ];
 

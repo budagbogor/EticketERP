@@ -144,6 +144,28 @@ export const tireService = {
         if (error) throw error;
     },
 
+    async updateBrand(id: string, updates: Partial<Omit<TireBrand, 'id'>>) {
+        const dbUpdates: any = {};
+        if (updates.name) {
+            dbUpdates.name = updates.name;
+            dbUpdates.slug = updates.name.toLowerCase().replace(/\s+/g, '-');
+        }
+        if (updates.country !== undefined) dbUpdates.country = updates.country;
+        if (updates.logo !== undefined) dbUpdates.logo = updates.logo;
+        if (updates.tier !== undefined) dbUpdates.tier = updates.tier;
+        if (updates.description !== undefined) dbUpdates.description = updates.description;
+
+        const { data, error } = await supabase
+            .from('tire_brands')
+            .update(dbUpdates)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return mapBrandFromDB(data as DBTireBrand);
+    },
+
     async updateProduct(id: string, updates: Partial<Omit<TireProduct, 'id' | 'brandId'>>) {
         const dbUpdates: any = {};
         if (updates.name) dbUpdates.name = updates.name;
