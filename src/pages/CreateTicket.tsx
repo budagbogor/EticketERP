@@ -431,7 +431,7 @@ export default function CreateTicket() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Tanggal Service Terakhir</Label>
+              <Label>Tanggal Transaksi Terakhir</Label>
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button
