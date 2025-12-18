@@ -1,14 +1,26 @@
 import { EngineOilSpec, FluidSpec } from "@/types/buku-pintar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Droplet } from "lucide-react";
+import { Droplet, Thermometer } from "lucide-react";
 
 interface OilSectionProps {
     engineOil: EngineOilSpec;
     transmissionOil: FluidSpec;
     differentialOil?: FluidSpec;
+    powerSteeringOil?: FluidSpec;
+    brakeOil?: FluidSpec;
+    radiatorCoolant?: FluidSpec;
+    acFreon?: FluidSpec;
 }
 
-export function OilSection({ engineOil, transmissionOil, differentialOil }: OilSectionProps) {
+export function OilSection({
+    engineOil,
+    transmissionOil,
+    differentialOil,
+    powerSteeringOil,
+    brakeOil,
+    radiatorCoolant,
+    acFreon
+}: OilSectionProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card>
@@ -19,19 +31,19 @@ export function OilSection({ engineOil, transmissionOil, differentialOil }: OilS
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-2 text-sm">
                         <span className="text-muted-foreground">Viskositas:</span>
-                        <span className="font-medium">{engineOil.viscosity_options.join(" / ")}</span>
+                        <span className="font-medium">{engineOil.viscosity_options?.join(" / ") || "-"}</span>
 
                         <span className="text-muted-foreground">Kapasitas (Tanpa Filter):</span>
-                        <span className="font-medium">{engineOil.capacity_liter} Liter</span>
+                        <span className="font-medium">{engineOil.capacity_liter || "-"} Liter</span>
 
                         <span className="text-muted-foreground">Kapasitas (Ganti Filter):</span>
-                        <span className="font-medium">{engineOil.capacity_with_filter_liter} Liter</span>
+                        <span className="font-medium">{engineOil.capacity_with_filter_liter || "-"} Liter</span>
 
                         <span className="text-muted-foreground">Standar Kualitas:</span>
-                        <span className="font-medium">{engineOil.quality_standard}</span>
+                        <span className="font-medium">{engineOil.quality_standard || "-"}</span>
                     </div>
 
-                    {engineOil.recommended_brands && (
+                    {engineOil.recommended_brands && engineOil.recommended_brands.length > 0 && (
                         <div className="pt-2 border-t">
                             <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
                             <div className="flex flex-wrap gap-2">
@@ -54,12 +66,12 @@ export function OilSection({ engineOil, transmissionOil, differentialOil }: OilS
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-2 text-sm">
                         <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
-                        <span className="font-medium">{transmissionOil.type}</span>
+                        <span className="font-medium">{transmissionOil?.type || "-"}</span>
 
                         <span className="text-muted-foreground">Kapasitas:</span>
-                        <span className="font-medium">{transmissionOil.capacity_liter} Liter</span>
+                        <span className="font-medium">{transmissionOil?.capacity_liter || "-"} Liter</span>
 
-                        {transmissionOil.replacement_interval_km && (
+                        {transmissionOil?.replacement_interval_km && (
                             <>
                                 <span className="text-muted-foreground">Interval Ganti:</span>
                                 <span className="font-medium">{transmissionOil.replacement_interval_km.toLocaleString()} KM</span>
@@ -67,7 +79,7 @@ export function OilSection({ engineOil, transmissionOil, differentialOil }: OilS
                         )}
                     </div>
 
-                    {transmissionOil.recommended_brands && (
+                    {transmissionOil?.recommended_brands && transmissionOil.recommended_brands.length > 0 && (
                         <div className="pt-2 border-t">
                             <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
                             <div className="flex flex-wrap gap-2">
@@ -91,10 +103,10 @@ export function OilSection({ engineOil, transmissionOil, differentialOil }: OilS
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-2 text-sm">
                             <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
-                            <span className="font-medium">{differentialOil.type}</span>
+                            <span className="font-medium">{differentialOil.type || "-"}</span>
 
                             <span className="text-muted-foreground">Kapasitas:</span>
-                            <span className="font-medium">{differentialOil.capacity_liter} Liter</span>
+                            <span className="font-medium">{differentialOil.capacity_liter || "-"} Liter</span>
 
                             {differentialOil.replacement_interval_km && (
                                 <>
@@ -104,7 +116,7 @@ export function OilSection({ engineOil, transmissionOil, differentialOil }: OilS
                             )}
                         </div>
 
-                        {differentialOil.recommended_brands && (
+                        {differentialOil.recommended_brands && differentialOil.recommended_brands.length > 0 && (
                             <div className="pt-2 border-t">
                                 <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
                                 <div className="flex flex-wrap gap-2">
@@ -116,6 +128,75 @@ export function OilSection({ engineOil, transmissionOil, differentialOil }: OilS
                                 </div>
                             </div>
                         )}
+                    </CardContent>
+                </Card>
+            )}
+
+            {powerSteeringOil && (
+                <Card>
+                    <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                        <Droplet className="w-5 h-5 text-purple-500" />
+                        <CardTitle className="text-lg">Power Steering</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
+                            <span className="font-medium">{powerSteeringOil.type || "-"}</span>
+
+                            <span className="text-muted-foreground">Kapasitas:</span>
+                            <span className="font-medium">{powerSteeringOil.capacity_liter || "-"} Liter</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {brakeOil && (
+                <Card>
+                    <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                        <Droplet className="w-5 h-5 text-yellow-500" />
+                        <CardTitle className="text-lg">Minyak Rem</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
+                            <span className="font-medium">{brakeOil.type || "-"}</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {radiatorCoolant && (
+                <Card>
+                    <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                        <Droplet className="w-5 h-5 text-cyan-500" />
+                        <CardTitle className="text-lg">Radiator Coolant</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
+                            <span className="font-medium">{radiatorCoolant.type || "-"}</span>
+
+                            <span className="text-muted-foreground">Kapasitas:</span>
+                            <span className="font-medium">{radiatorCoolant.capacity_liter || "-"} Liter</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {acFreon && (
+                <Card>
+                    <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                        <Thermometer className="w-5 h-5 text-sky-500" />
+                        <CardTitle className="text-lg">AC Freon</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
+                            <span className="font-medium">{acFreon.type || "-"}</span>
+
+                            <span className="text-muted-foreground">Kapasitas:</span>
+                            <span className="font-medium">{acFreon.capacity_liter || "-"}</span>
+                        </div>
                     </CardContent>
                 </Card>
             )}
