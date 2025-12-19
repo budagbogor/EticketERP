@@ -28,16 +28,25 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
     const [oilCapacity, setOilCapacity] = useState("");
     const [oilQuality, setOilQuality] = useState("");
     const [oilBrands, setOilBrands] = useState("");
+    const [oilInterval, setOilInterval] = useState("");
 
     // Transmission Oil
     const [transOilType, setTransOilType] = useState("");
     const [transOilCapacity, setTransOilCapacity] = useState("");
     const [transOilBrands, setTransOilBrands] = useState("");
+    const [transOilInterval, setTransOilInterval] = useState("");
 
     // Differential Oil
     const [diffOilType, setDiffOilType] = useState("");
     const [diffOilCapacity, setDiffOilCapacity] = useState("");
     const [diffOilBrands, setDiffOilBrands] = useState("");
+    const [diffOilInterval, setDiffOilInterval] = useState("");
+
+    // Radiator & Freon
+    const [radiatorType, setRadiatorType] = useState("");
+    const [radiatorCapacity, setRadiatorCapacity] = useState("");
+    const [freonType, setFreonType] = useState("");
+    const [freonCapacity, setFreonCapacity] = useState("");
 
     // Parts
     const [partOilFilter, setPartOilFilter] = useState("");
@@ -93,6 +102,14 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
     const [upperSupport, setUpperSupport] = useState("");
     const [upperSupportBrands, setUpperSupportBrands] = useState("");
 
+    // Tire Specs
+    const [tireLocation, setTireLocation] = useState("Depan & Belakang");
+    const [tireSize, setTireSize] = useState("");
+    const [tirePressureFront, setTirePressureFront] = useState("");
+    const [tirePressureRear, setTirePressureRear] = useState("");
+    const [tireLoadSpeed, setTireLoadSpeed] = useState("");
+    const [tireBrands, setTireBrands] = useState("");
+
     const { toast } = useToast();
 
     // Load data when dialog opens
@@ -111,25 +128,45 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
 
         // Oil
         setOilViscosity(variant.specifications.engine_oil.viscosity_options?.[0] || "");
-        setOilCapacity(variant.specifications.engine_oil.capacity_liter.toString());
+        setOilCapacity(variant.specifications.engine_oil.capacity || variant.specifications.engine_oil.capacity_liter?.toString() || "");
         setOilQuality(variant.specifications.engine_oil.quality_standard || "");
         setOilBrands(variant.specifications.engine_oil.recommended_brands?.join(", ") || "");
+        setOilInterval(variant.specifications.engine_oil.replacement_interval_km?.toString() || "");
 
         // Transmission Oil
-        // Transmission Oil
         setTransOilType(variant.specifications.transmission_oil.type);
-        setTransOilCapacity(variant.specifications.transmission_oil.capacity_liter.toString());
+        setTransOilCapacity(variant.specifications.transmission_oil.capacity || variant.specifications.transmission_oil.capacity_liter?.toString() || "");
         setTransOilBrands(variant.specifications.transmission_oil.recommended_brands?.join(", ") || "");
+        setTransOilInterval(variant.specifications.transmission_oil.replacement_interval_km?.toString() || "");
 
         // Differential Oil
         if (variant.specifications.differential_oil) {
             setDiffOilType(variant.specifications.differential_oil.type);
-            setDiffOilCapacity(variant.specifications.differential_oil.capacity_liter.toString());
+            setDiffOilCapacity(variant.specifications.differential_oil.capacity || variant.specifications.differential_oil.capacity_liter?.toString() || "");
             setDiffOilBrands(variant.specifications.differential_oil.recommended_brands?.join(", ") || "");
+            setDiffOilInterval(variant.specifications.differential_oil.replacement_interval_km?.toString() || "");
         } else {
             setDiffOilType("");
             setDiffOilCapacity("");
             setDiffOilBrands("");
+            setDiffOilInterval("");
+        }
+
+        // Radiator & Freon
+        if (variant.specifications.radiator_coolant) {
+            setRadiatorType(variant.specifications.radiator_coolant.type || "");
+            setRadiatorCapacity(variant.specifications.radiator_coolant.capacity || "");
+        } else {
+            setRadiatorType("");
+            setRadiatorCapacity("");
+        }
+
+        if (variant.specifications.ac_freon) {
+            setFreonType(variant.specifications.ac_freon.type || "");
+            setFreonCapacity(variant.specifications.ac_freon.capacity || "");
+        } else {
+            setFreonType("");
+            setFreonCapacity("");
         }
 
         // Parts
@@ -166,6 +203,30 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
             setBatteryAmpere(variant.specifications.battery.ampere?.toString() || "");
             setBatteryVoltage(variant.specifications.battery.voltage?.toString() || "");
             setBatteryDimensions(variant.specifications.battery.dimensions || "");
+        } else {
+            setBatteryType("");
+            setBatteryModel("");
+            setBatteryAmpere("");
+            setBatteryVoltage("");
+            setBatteryDimensions("");
+        }
+
+        // Tires
+        const tire = variant.specifications.tires?.[0];
+        if (tire) {
+            setTireLocation(tire.location || "Depan & Belakang");
+            setTireSize(tire.size || "");
+            setTirePressureFront(tire.pressure_psi_front?.toString() || "");
+            setTirePressureRear(tire.pressure_psi_rear?.toString() || "");
+            setTireLoadSpeed(tire.load_speed_index || "");
+            setTireBrands(tire.recommended_brands?.join(", ") || "");
+        } else {
+            setTireLocation("Depan & Belakang");
+            setTireSize("");
+            setTirePressureFront("");
+            setTirePressureRear("");
+            setTireLoadSpeed("");
+            setTireBrands("");
         }
 
         // Brakes
@@ -179,7 +240,6 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
             setBrakeRearBrands(variant.specifications.brakes.recommended_brands_rear?.join(", ") || "");
         }
 
-        // Suspension
         // Suspension
         if (variant.specifications.suspension) {
             setShockFront(variant.specifications.suspension.shock_absorber_front || "");
@@ -215,22 +275,38 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
             year_end: yearEnd ? Number(yearEnd) : variant.year_end,
             engine_code: engineCode || variant.engine_code,
             specifications: {
+                ...variant.specifications, // Preserve other specs
+                power_steering_oil: undefined, // Explicitly remove to avoid shadowing differential_oil
                 engine_oil: {
                     viscosity_options: [oilViscosity || "5W-30"],
-                    capacity_liter: Number(oilCapacity) || 4,
-                    capacity_with_filter_liter: (Number(oilCapacity) || 4) + 0.2,
+                    capacity: oilCapacity,
+                    capacity_liter: parseFloat(oilCapacity.replace(",", ".")) || 0,
+                    capacity_with_filter_liter: (parseFloat(oilCapacity.replace(",", ".")) || 4) + 0.2,
                     quality_standard: oilQuality || "API SP",
-                    recommended_brands: oilBrands ? oilBrands.split(",").map(b => b.trim()) : undefined
+                    recommended_brands: oilBrands ? oilBrands.split(",").map(b => b.trim()) : undefined,
+                    replacement_interval_km: Number(oilInterval) || undefined
                 },
                 transmission_oil: {
                     type: transOilType || "Standard",
-                    capacity_liter: Number(transOilCapacity) || 4,
-                    recommended_brands: transOilBrands ? transOilBrands.split(",").map(b => b.trim()) : undefined
+                    capacity: transOilCapacity,
+                    capacity_liter: parseFloat(transOilCapacity.replace(",", ".")) || 0,
+                    recommended_brands: transOilBrands ? transOilBrands.split(",").map(b => b.trim()) : undefined,
+                    replacement_interval_km: Number(transOilInterval) || undefined
                 },
                 differential_oil: diffOilType ? {
                     type: diffOilType,
-                    capacity_liter: Number(diffOilCapacity) || 0,
-                    recommended_brands: diffOilBrands ? diffOilBrands.split(",").map(b => b.trim()) : undefined
+                    capacity: diffOilCapacity,
+                    capacity_liter: parseFloat(diffOilCapacity.replace(",", ".")) || 0,
+                    recommended_brands: diffOilBrands ? diffOilBrands.split(",").map(b => b.trim()) : undefined,
+                    replacement_interval_km: Number(diffOilInterval) || undefined
+                } : undefined,
+                radiator_coolant: radiatorType ? {
+                    type: radiatorType,
+                    capacity: radiatorCapacity || undefined
+                } : undefined,
+                ac_freon: freonType ? {
+                    type: freonType,
+                    capacity: freonCapacity || undefined
                 } : undefined,
                 parts: [
                     ...(partOilFilter ? [{ category: "Filter Oli" as const, name: "Oil Filter", part_number: partOilFilter, compatible_brands: partOilFilterBrands ? partOilFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partOilFilterInterval) || undefined }] : []),
@@ -240,7 +316,14 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                     ...(partSolarFilter ? [{ category: "Filter Solar" as const, name: "Fuel Filter (Solar)", part_number: partSolarFilter, compatible_brands: partSolarFilterBrands ? partSolarFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partSolarFilterInterval) || undefined }] : []),
                     ...(partBensinFilter ? [{ category: "Filter Bensin" as const, name: "Fuel Filter (Bensin)", part_number: partBensinFilter, compatible_brands: partBensinFilterBrands ? partBensinFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partBensinFilterInterval) || undefined }] : []),
                 ],
-                tires: variant.specifications.tires,
+                tires: tireSize ? [{
+                    location: tireLocation as any,
+                    size: tireSize,
+                    pressure_psi_front: Number(tirePressureFront) || 32,
+                    pressure_psi_rear: Number(tirePressureRear) || 32,
+                    load_speed_index: tireLoadSpeed || undefined,
+                    recommended_brands: tireBrands ? tireBrands.split(",").map(b => b.trim()) : undefined
+                }] : [],
                 battery: batteryType ? {
                     type: batteryType,
                     model: batteryModel,
@@ -338,9 +421,10 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                     </div>
 
                     <Tabs defaultValue="oil" className="w-full">
-                        <TabsList className="grid w-full grid-cols-5">
+                        <TabsList className="grid w-full grid-cols-6">
                             <TabsTrigger value="oil">Oli</TabsTrigger>
                             <TabsTrigger value="parts">Part</TabsTrigger>
+                            <TabsTrigger value="tires">Ban</TabsTrigger>
                             <TabsTrigger value="battery">Aki</TabsTrigger>
                             <TabsTrigger value="brakes">Rem</TabsTrigger>
                             <TabsTrigger value="suspension">Kaki-kaki</TabsTrigger>
@@ -354,7 +438,7 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Kapasitas (L)</Label>
-                                    <Input type="number" placeholder="4.0" value={oilCapacity} onChange={e => setOilCapacity(e.target.value)} />
+                                    <Input placeholder="4.0" value={oilCapacity} onChange={e => setOilCapacity(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Standar Kualitas (API)</Label>
@@ -363,6 +447,10 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                                 <div className="space-y-2">
                                     <Label>Merek Rekomendasi</Label>
                                     <Input placeholder="Pisahkan dengan koma (TMO, Shell)" value={oilBrands} onChange={e => setOilBrands(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Interval Ganti (KM)</Label>
+                                    <Input type="number" placeholder="10000" value={oilInterval} onChange={e => setOilInterval(e.target.value)} />
                                 </div>
                             </div>
 
@@ -374,11 +462,15 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Kapasitas (L)</Label>
-                                    <Input type="number" placeholder="3.5" value={transOilCapacity} onChange={e => setTransOilCapacity(e.target.value)} />
+                                    <Input placeholder="3.5" value={transOilCapacity} onChange={e => setTransOilCapacity(e.target.value)} />
                                 </div>
                                 <div className="space-y-2 col-span-2">
                                     <Label>Merek Rekomendasi (Opsional)</Label>
                                     <Input placeholder="Pisahkan dengan koma" value={transOilBrands} onChange={e => setTransOilBrands(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Interval Ganti (KM)</Label>
+                                    <Input type="number" placeholder="40000" value={transOilInterval} onChange={e => setTransOilInterval(e.target.value)} />
                                 </div>
                             </div>
 
@@ -390,11 +482,35 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Kapasitas (L)</Label>
-                                    <Input type="number" placeholder="2.5" value={diffOilCapacity} onChange={e => setDiffOilCapacity(e.target.value)} />
+                                    <Input placeholder="2.5" value={diffOilCapacity} onChange={e => setDiffOilCapacity(e.target.value)} />
                                 </div>
                                 <div className="space-y-2 col-span-2">
                                     <Label>Merek Rekomendasi (Opsional)</Label>
                                     <Input placeholder="Pisahkan dengan koma" value={diffOilBrands} onChange={e => setDiffOilBrands(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Interval Ganti (KM)</Label>
+                                    <Input type="number" placeholder="40000" value={diffOilInterval} onChange={e => setDiffOilInterval(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <h4 className="text-sm font-semibold mt-4 mb-2">Air Radiator & Freon</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Tipe Air Radiator</Label>
+                                    <Input placeholder="Long Life Coolant" value={radiatorType} onChange={e => setRadiatorType(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Kapasitas (L)</Label>
+                                    <Input placeholder="4.5 Liter" value={radiatorCapacity} onChange={e => setRadiatorCapacity(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Tipe Freon</Label>
+                                    <Input placeholder="R134a" value={freonType} onChange={e => setFreonType(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Kapasitas (g)</Label>
+                                    <Input placeholder="450 gram" value={freonCapacity} onChange={e => setFreonCapacity(e.target.value)} />
                                 </div>
                             </div>
                         </TabsContent>
@@ -448,6 +564,44 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                                         <Input placeholder="Merek (koma)" className="text-xs h-8" value={partBensinFilterBrands} onChange={e => setPartBensinFilterBrands(e.target.value)} />
                                         <Input type="number" placeholder="KM Ganti" className="text-xs h-8" value={partBensinFilterInterval} onChange={e => setPartBensinFilterInterval(e.target.value)} />
                                     </div>
+                                </div>
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="tires" className="space-y-4 pt-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Lokasi Ban</Label>
+                                    <Select value={tireLocation} onValueChange={setTireLocation}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih Lokasi" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Depan & Belakang">Depan & Belakang</SelectItem>
+                                            <SelectItem value="Depan">Depan</SelectItem>
+                                            <SelectItem value="Belakang">Belakang</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Ukuran Ban</Label>
+                                    <Input placeholder="Contoh: 185/65 R15" value={tireSize} onChange={e => setTireSize(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Tekanan Depan (PSI)</Label>
+                                    <Input type="number" placeholder="32" value={tirePressureFront} onChange={e => setTirePressureFront(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Tekanan Belakang (PSI)</Label>
+                                    <Input type="number" placeholder="32" value={tirePressureRear} onChange={e => setTirePressureRear(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Load & Speed Index (Opsional)</Label>
+                                    <Input placeholder="Contoh: 88H" value={tireLoadSpeed} onChange={e => setTireLoadSpeed(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Merek Rekomendasi</Label>
+                                    <Input placeholder="Pisahkan dengan koma" value={tireBrands} onChange={e => setTireBrands(e.target.value)} />
                                 </div>
                             </div>
                         </TabsContent>

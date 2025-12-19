@@ -34,13 +34,24 @@ export function OilSection({
                         <span className="font-medium">{engineOil.viscosity_options?.join(" / ") || "-"}</span>
 
                         <span className="text-muted-foreground">Kapasitas (Tanpa Filter):</span>
-                        <span className="font-medium">{engineOil.capacity_liter || "-"} Liter</span>
+                        <span className="font-medium">
+                            {engineOil.capacity || (engineOil.capacity_liter ? `${engineOil.capacity_liter} Liter` : "-")}
+                        </span>
 
                         <span className="text-muted-foreground">Kapasitas (Ganti Filter):</span>
-                        <span className="font-medium">{engineOil.capacity_with_filter_liter || "-"} Liter</span>
+                        <span className="font-medium">
+                            {engineOil.capacity_with_filter_liter ? `${engineOil.capacity_with_filter_liter} Liter` : "-"}
+                        </span>
 
                         <span className="text-muted-foreground">Standar Kualitas:</span>
                         <span className="font-medium">{engineOil.quality_standard || "-"}</span>
+
+                        {engineOil.replacement_interval_km && (
+                            <>
+                                <span className="text-muted-foreground">Interval Ganti:</span>
+                                <span className="font-medium">{engineOil.replacement_interval_km.toLocaleString()} KM</span>
+                            </>
+                        )}
                     </div>
 
                     {engineOil.recommended_brands && engineOil.recommended_brands.length > 0 && (
@@ -69,7 +80,9 @@ export function OilSection({
                         <span className="font-medium">{transmissionOil?.type || "-"}</span>
 
                         <span className="text-muted-foreground">Kapasitas:</span>
-                        <span className="font-medium">{transmissionOil?.capacity_liter || "-"} Liter</span>
+                        <span className="font-medium">
+                            {transmissionOil?.capacity || (transmissionOil?.capacity_liter ? `${transmissionOil.capacity_liter} Liter` : "-")}
+                        </span>
 
                         {transmissionOil?.replacement_interval_km && (
                             <>
@@ -106,7 +119,9 @@ export function OilSection({
                             <span className="font-medium">{differentialOil.type || "-"}</span>
 
                             <span className="text-muted-foreground">Kapasitas:</span>
-                            <span className="font-medium">{differentialOil.capacity_liter || "-"} Liter</span>
+                            <span className="font-medium">
+                                {differentialOil.capacity || (differentialOil.capacity_liter ? `${differentialOil.capacity_liter} Liter` : "-")}
+                            </span>
 
                             {differentialOil.replacement_interval_km && (
                                 <>
@@ -144,7 +159,9 @@ export function OilSection({
                             <span className="font-medium">{powerSteeringOil.type || "-"}</span>
 
                             <span className="text-muted-foreground">Kapasitas:</span>
-                            <span className="font-medium">{powerSteeringOil.capacity_liter || "-"} Liter</span>
+                            <span className="font-medium">
+                                {powerSteeringOil.capacity || (powerSteeringOil.capacity_liter ? `${powerSteeringOil.capacity_liter} Liter` : "-")}
+                            </span>
                         </div>
                     </CardContent>
                 </Card>
@@ -177,7 +194,9 @@ export function OilSection({
                             <span className="font-medium">{radiatorCoolant.type || "-"}</span>
 
                             <span className="text-muted-foreground">Kapasitas:</span>
-                            <span className="font-medium">{radiatorCoolant.capacity_liter || "-"} Liter</span>
+                            <span className="font-medium">
+                                {radiatorCoolant.capacity || (radiatorCoolant.capacity_liter ? `${radiatorCoolant.capacity_liter} Liter` : "-")}
+                            </span>
                         </div>
                     </CardContent>
                 </Card>
@@ -195,7 +214,9 @@ export function OilSection({
                             <span className="font-medium">{acFreon.type || "-"}</span>
 
                             <span className="text-muted-foreground">Kapasitas:</span>
-                            <span className="font-medium">{acFreon.capacity_liter || "-"}</span>
+                            <span className="font-medium">
+                                {acFreon.capacity || (acFreon.capacity_liter ? `${acFreon.capacity_liter} Liter` : "-")}
+                            </span>
                         </div>
                     </CardContent>
                 </Card>

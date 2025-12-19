@@ -44,6 +44,12 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
     const [diffOilCapacity, setDiffOilCapacity] = useState("");
     const [diffOilBrands, setDiffOilBrands] = useState("");
 
+    // Radiator & Freon
+    const [radiatorType, setRadiatorType] = useState("");
+    const [radiatorCapacity, setRadiatorCapacity] = useState("");
+    const [freonType, setFreonType] = useState("");
+    const [freonCapacity, setFreonCapacity] = useState("");
+
     // Parts
     // Parts
     const [partOilFilter, setPartOilFilter] = useState("");
@@ -126,20 +132,31 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
             specifications: {
                 engine_oil: {
                     viscosity_options: [oilViscosity || "5W-30"],
-                    capacity_liter: Number(oilCapacity) || 4,
-                    capacity_with_filter_liter: (Number(oilCapacity) || 4) + 0.2,
+                    capacity: oilCapacity,
+                    capacity_liter: parseFloat(oilCapacity.replace(",", ".")) || 0,
+                    capacity_with_filter_liter: (parseFloat(oilCapacity.replace(",", ".")) || 4) + 0.2,
                     quality_standard: oilQuality || "API SP",
                     recommended_brands: oilBrands ? oilBrands.split(",").map(b => b.trim()) : undefined
                 },
                 transmission_oil: {
                     type: transOilType || "Standard",
-                    capacity_liter: Number(transOilCapacity) || 4,
+                    capacity: transOilCapacity,
+                    capacity_liter: parseFloat(transOilCapacity.replace(",", ".")) || 0,
                     recommended_brands: transOilBrands ? transOilBrands.split(",").map(b => b.trim()) : undefined
                 },
                 differential_oil: diffOilType ? {
                     type: diffOilType,
-                    capacity_liter: Number(diffOilCapacity) || 0,
+                    capacity: diffOilCapacity,
+                    capacity_liter: parseFloat(diffOilCapacity.replace(",", ".")) || 0,
                     recommended_brands: diffOilBrands ? diffOilBrands.split(",").map(b => b.trim()) : undefined
+                } : undefined,
+                radiator_coolant: radiatorType ? {
+                    type: radiatorType,
+                    capacity: radiatorCapacity || undefined
+                } : undefined,
+                ac_freon: freonType ? {
+                    type: freonType,
+                    capacity: freonCapacity || undefined
                 } : undefined,
                 parts: [
                     ...(partOilFilter ? [{ category: "Filter Oli" as const, name: "Oil Filter", part_number: partOilFilter, compatible_brands: partOilFilterBrands ? partOilFilterBrands.split(",").map(b => b.trim()) : undefined, replacement_interval_km: Number(partOilFilterInterval) || undefined }] : []),
@@ -222,6 +239,10 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setDiffOilType("");
         setDiffOilCapacity("");
         setDiffOilBrands("");
+        setRadiatorType("");
+        setRadiatorCapacity("");
+        setFreonType("");
+        setFreonCapacity("");
         setPartOilFilter("");
         setPartOilFilterBrands("");
         setPartOilFilterInterval("");
@@ -337,7 +358,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
                                 <Label>Model</Label>
-                                {!isNewBrand && (
+                                {selectedBrand && !isNewBrand && (
                                     <div className="flex items-center space-x-2">
                                         <input
                                             type="checkbox"
@@ -449,7 +470,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Kapasitas (L)</Label>
-                                    <Input type="number" placeholder="4.0" value={oilCapacity} onChange={e => setOilCapacity(e.target.value)} />
+                                    <Input placeholder="4.0" value={oilCapacity} onChange={e => setOilCapacity(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Standar Kualitas (API)</Label>
@@ -469,7 +490,7 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Kapasitas (L)</Label>
-                                    <Input type="number" placeholder="3.5" value={transOilCapacity} onChange={e => setTransOilCapacity(e.target.value)} />
+                                    <Input placeholder="3.5" value={transOilCapacity} onChange={e => setTransOilCapacity(e.target.value)} />
                                 </div>
                                 <div className="space-y-2 col-span-2">
                                     <Label>Merek Rekomendasi (Opsional)</Label>
@@ -485,11 +506,31 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Kapasitas (L)</Label>
-                                    <Input type="number" placeholder="2.5" value={diffOilCapacity} onChange={e => setDiffOilCapacity(e.target.value)} />
+                                    <Input placeholder="2.5" value={diffOilCapacity} onChange={e => setDiffOilCapacity(e.target.value)} />
                                 </div>
                                 <div className="space-y-2 col-span-2">
                                     <Label>Merek Rekomendasi (Opsional)</Label>
                                     <Input placeholder="Pisahkan dengan koma" value={diffOilBrands} onChange={e => setDiffOilBrands(e.target.value)} />
+                                </div>
+                            </div>
+
+                            <h4 className="text-sm font-semibold mt-4 mb-2">Air Radiator & Freon</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Tipe Air Radiator</Label>
+                                    <Input placeholder="Long Life Coolant" value={radiatorType} onChange={e => setRadiatorType(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Kapasitas (L)</Label>
+                                    <Input placeholder="4.5 Liter" value={radiatorCapacity} onChange={e => setRadiatorCapacity(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Tipe Freon</Label>
+                                    <Input placeholder="R134a" value={freonType} onChange={e => setFreonType(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Kapasitas (g)</Label>
+                                    <Input placeholder="450 gram" value={freonCapacity} onChange={e => setFreonCapacity(e.target.value)} />
                                 </div>
                             </div>
                         </TabsContent>

@@ -23,8 +23,8 @@ export function BatterySection({ battery }: BatterySectionProps) {
                             <span className="font-semibold text-lg">{battery.type}</span>
                         </div>
                         <div>
-                            <span className="text-muted-foreground text-sm block">Kode Model</span>
-                            <span className="font-mono bg-secondary px-2 py-1 rounded text-sm">{battery.model}</span>
+                            <span className="text-muted-foreground text-sm block">Model</span>
+                            <span className="font-bold text-3xl text-green-600 dark:text-green-400">{battery.model}</span>
                         </div>
                     </div>
                     <div className="space-y-4">
