@@ -6,7 +6,6 @@ interface OilSectionProps {
     engineOil: EngineOilSpec;
     transmissionOil: FluidSpec;
     differentialOil?: FluidSpec;
-    powerSteeringOil?: FluidSpec;
     brakeOil?: FluidSpec;
     radiatorCoolant?: FluidSpec;
     acFreon?: FluidSpec;
@@ -16,7 +15,6 @@ export function OilSection({
     engineOil,
     transmissionOil,
     differentialOil,
-    powerSteeringOil,
     brakeOil,
     radiatorCoolant,
     acFreon
@@ -147,25 +145,7 @@ export function OilSection({
                 </Card>
             )}
 
-            {powerSteeringOil && (
-                <Card>
-                    <CardHeader className="flex flex-row items-center gap-2 pb-2">
-                        <Droplet className="w-5 h-5 text-purple-500" />
-                        <CardTitle className="text-lg">Power Steering</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                            <span className="text-muted-foreground">Tipe / Spesifikasi:</span>
-                            <span className="font-medium">{powerSteeringOil.type || "-"}</span>
 
-                            <span className="text-muted-foreground">Kapasitas:</span>
-                            <span className="font-medium">
-                                {powerSteeringOil.capacity || (powerSteeringOil.capacity_liter ? `${powerSteeringOil.capacity_liter} Liter` : "-")}
-                            </span>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
 
             {brakeOil && (
                 <Card>

@@ -231,7 +231,6 @@ export default function BukuPintar() {
                                         engineOil={selectedVariant.specifications.engine_oil}
                                         transmissionOil={selectedVariant.specifications.transmission_oil}
                                         differentialOil={selectedVariant.specifications.differential_oil}
-                                        powerSteeringOil={selectedVariant.specifications.power_steering_oil}
                                         brakeOil={selectedVariant.specifications.brake_oil}
                                         radiatorCoolant={selectedVariant.specifications.radiator_coolant}
                                         acFreon={selectedVariant.specifications.ac_freon}
