@@ -181,51 +181,86 @@ export function useBukuPintar() {
     }, [supabaseBrands, specifications, isSupabaseLoading, isSpecsLoading]);
 
     // Helper function to convert VehicleVariant to database format
-    const variantToDbFormat = (variant: VehicleVariant, brandId: string, modelId: string) => ({
-        brand_id: brandId,
-        model_id: modelId,
-        variant_name: variant.name,
-        year_start: variant.year_start || new Date().getFullYear(),
-        year_end: variant.year_end || null,
-        engine_type: variant.engine_type || null,
-        engine_oil_capacity: variant.specifications.engine_oil?.capacity_liter?.toString() || null,
-        engine_oil_type: variant.specifications.engine_oil?.type || null,
-        transmission_oil_capacity: variant.specifications.transmission_oil?.capacity_liter?.toString() || null,
-        transmission_oil_type: variant.specifications.transmission_oil?.type || null,
-        power_steering_oil_capacity: variant.specifications.power_steering_oil?.capacity_liter?.toString() || null,
-        power_steering_oil_type: variant.specifications.power_steering_oil?.type || null,
-        brake_oil_type: variant.specifications.brake_oil?.type || null,
-        radiator_coolant_capacity: variant.specifications.radiator_coolant?.capacity || null,
-        radiator_coolant_type: variant.specifications.radiator_coolant?.type || null,
-        ac_freon_capacity: variant.specifications.ac_freon?.capacity || null,
-        ac_freon_type: variant.specifications.ac_freon?.type || null,
-        tire_size_front: variant.specifications.tire?.front_size || null,
-        tire_size_rear: variant.specifications.tire?.rear_size || null,
-        tire_pressure_front: variant.specifications.tire?.front_pressure?.toString() || null,
-        tire_pressure_rear: variant.specifications.tire?.rear_pressure?.toString() || null,
-        battery_type: variant.specifications.battery?.type || null,
-        wiper_size_driver: variant.specifications.wiper?.driver || null,
-        wiper_size_passenger: variant.specifications.wiper?.passenger || null,
-        wiper_size_rear: variant.specifications.wiper?.rear || null,
-        spark_plug_type: variant.specifications.filters?.spark_plug || null,
-        air_filter_type: variant.specifications.filters?.air_filter || null,
-        cabin_filter_type: variant.specifications.filters?.cabin_filter || null,
-        fuel_filter_type: variant.specifications.filters?.fuel_filter || null,
-        oil_filter_type: variant.specifications.filters?.oil_filter || null,
-        brake_pad_front_type: variant.specifications.brake_parts?.front_pad || null,
-        brake_pad_rear_type: variant.specifications.brake_parts?.rear_pad || null,
-        brake_disc_front_type: variant.specifications.brake_parts?.front_disc || null,
-        brake_disc_rear_type: variant.specifications.brake_parts?.rear_disc || null,
-        shock_depan_recommended_brands: variant.specifications.suspension?.shock_absorber_front_brands?.join(", ") || null,
-        shock_belakang_recommended_brands: variant.specifications.suspension?.shock_absorber_rear_brands?.join(", ") || null,
-        rack_end_recommended_brands: variant.specifications.suspension?.rack_end_brands?.join(", ") || null,
-        tie_rod_recommended_brands: variant.specifications.suspension?.tie_rod_end_brands?.join(", ") || null,
-        link_stabilizer_recommended_brands: variant.specifications.suspension?.link_stabilizer_brands?.join(", ") || null,
-        lower_arm_recommended_brands: variant.specifications.suspension?.lower_arm_brands?.join(", ") || null,
-        upper_arm_recommended_brands: variant.specifications.suspension?.upper_arm_brands?.join(", ") || null,
-        upper_support_recommended_brands: variant.specifications.suspension?.upper_support_brands?.join(", ") || null,
-        created_by: user?.id || null
-    });
+    const variantToDbFormat = (variant: VehicleVariant, brandId: string, modelId: string) => {
+        // Map engine oil type from type OR viscosity (ImportDialog uses viscosity_options)
+        const engineOilType = variant.specifications.engine_oil?.type ||
+            variant.specifications.engine_oil?.viscosity_options?.[0] || null;
+
+        // Map brake oil from brake_oil.type OR brakes.fluid_type
+        const brakeOilType = variant.specifications.brake_oil?.type ||
+            variant.specifications.brakes?.fluid_type || null;
+
+        // Map differential oil to power_steering_oil columns (matching the fetcher logic behavior)
+        // detailed in useEffect above: differential_oil maps to power_steering_oil_*
+        const diffOil = variant.specifications.differential_oil || variant.specifications.diff_oil;
+        const psOilCapacity = diffOil?.capacity_liter?.toString() ||
+            variant.specifications.power_steering_oil?.capacity_liter?.toString() || null;
+        const psOilType = diffOil?.type ||
+            variant.specifications.power_steering_oil?.type || null;
+
+        // Map tires from legacy object OR array (ImportDialog uses tires array)
+        const tireSpec = variant.specifications.tire || variant.specifications.tires?.[0];
+
+        return {
+            brand_id: brandId,
+            model_id: modelId,
+            variant_name: variant.name,
+            year_start: variant.year_start || new Date().getFullYear(),
+            year_end: variant.year_end || null,
+            engine_type: variant.engine_type || null,
+
+            engine_oil_capacity: variant.specifications.engine_oil?.capacity_liter?.toString() || null,
+            engine_oil_type: engineOilType,
+
+            transmission_oil_capacity: variant.specifications.transmission_oil?.capacity_liter?.toString() || null,
+            transmission_oil_type: variant.specifications.transmission_oil?.type || null,
+
+            // Mapping Differential Oil input to Power Steering columns as per existing schema reuse
+            power_steering_oil_capacity: psOilCapacity,
+            power_steering_oil_type: psOilType,
+
+            brake_oil_type: brakeOilType,
+
+            radiator_coolant_capacity: variant.specifications.radiator_coolant?.capacity || null,
+            radiator_coolant_type: variant.specifications.radiator_coolant?.type || null,
+
+            ac_freon_capacity: variant.specifications.ac_freon?.capacity || null,
+            ac_freon_type: variant.specifications.ac_freon?.type || null,
+
+            tire_size_front: tireSpec?.front_size || tireSpec?.size || null,
+            tire_size_rear: tireSpec?.rear_size || tireSpec?.size || null,
+            tire_pressure_front: tireSpec?.front_pressure?.toString() || tireSpec?.pressure_psi_front?.toString() || null,
+            tire_pressure_rear: tireSpec?.rear_pressure?.toString() || tireSpec?.pressure_psi_rear?.toString() || null,
+
+            battery_type: variant.specifications.battery?.type || null,
+
+            wiper_size_driver: variant.specifications.wiper?.driver || null,
+            wiper_size_passenger: variant.specifications.wiper?.passenger || null,
+            wiper_size_rear: variant.specifications.wiper?.rear || null,
+
+            spark_plug_type: variant.specifications.filters?.spark_plug || null,
+            air_filter_type: variant.specifications.filters?.air_filter || null,
+            cabin_filter_type: variant.specifications.filters?.cabin_filter || null,
+            fuel_filter_type: variant.specifications.filters?.fuel_filter || null,
+            oil_filter_type: variant.specifications.filters?.oil_filter || null,
+
+            brake_pad_front_type: variant.specifications.brake_parts?.front_pad || variant.specifications.brakes?.pad_part_number_front || null,
+            brake_pad_rear_type: variant.specifications.brake_parts?.rear_pad || variant.specifications.brakes?.shoe_part_number_rear || null,
+            brake_disc_front_type: variant.specifications.brake_parts?.front_disc || variant.specifications.brakes?.front_type || null,
+            brake_disc_rear_type: variant.specifications.brake_parts?.rear_disc || variant.specifications.brakes?.rear_type || null,
+
+            shock_depan_recommended_brands: variant.specifications.suspension?.shock_absorber_front_brands?.join(", ") || null,
+            shock_belakang_recommended_brands: variant.specifications.suspension?.shock_absorber_rear_brands?.join(", ") || null,
+            rack_end_recommended_brands: variant.specifications.suspension?.rack_end_brands?.join(", ") || null,
+            tie_rod_recommended_brands: variant.specifications.suspension?.tie_rod_end_brands?.join(", ") || null,
+            link_stabilizer_recommended_brands: variant.specifications.suspension?.link_stabilizer_brands?.join(", ") || null,
+            lower_arm_recommended_brands: variant.specifications.suspension?.lower_arm_brands?.join(", ") || null,
+            upper_arm_recommended_brands: variant.specifications.suspension?.upper_arm_brands?.join(", ") || null,
+            upper_support_recommended_brands: variant.specifications.suspension?.upper_support_brands?.join(", ") || null,
+
+            created_by: user?.id || null
+        };
+    };
 
     // Add variant mutation
     const addVariantMutation = useMutation({
