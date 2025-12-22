@@ -329,7 +329,7 @@ export function useBukuPintar() {
         }
     });
 
-    // Import vehicle data mutation with batching and auto-create brand/model
+    // Import vehicle data mutation with batching and robust auto-create brand/model
     const importDataMutation = useMutation({
         mutationFn: async (data: { brand: string; model: string; variant: VehicleVariant }[]) => {
             const insertData = [];
@@ -345,39 +345,111 @@ export function useBukuPintar() {
                 let brandIndex = localBrands.findIndex((b: any) => b.name.toLowerCase() === item.brand.toLowerCase());
 
                 if (brandIndex === -1) {
-                    // Create Brand
-                    const { data: newBrand, error: brandError } = await supabase
-                        .from("car_brands")
-                        .insert({ name: item.brand })
-                        .select("id, name")
-                        .single();
+                    // Try to Create Brand
+                    try {
+                        const { data: newBrand, error: brandError } = await supabase
+                            .from("car_brands")
+                            .insert({ name: item.brand })
+                            .select("id, name")
+                            .single();
 
-                    if (brandError) throw brandError;
-
-                    const newBrandObj = { ...newBrand, models: [] };
-                    localBrands.push(newBrandObj);
-                    brandIndex = localBrands.length - 1;
-                    brandId = newBrand.id;
+                        if (brandError) {
+                            if (brandError.code === '23505') { // Unique violation
+                                const { data: existingBrand } = await supabase
+                                    .from("car_brands")
+                                    .select("id, name")
+                                    .ilike("name", item.brand)
+                                    .single();
+                                if (existingBrand) {
+                                    const newBrandObj = { ...existingBrand, models: [] };
+                                    localBrands.push(newBrandObj);
+                                    brandIndex = localBrands.length - 1;
+                                    brandId = existingBrand.id;
+                                } else {
+                                    throw brandError;
+                                }
+                            } else {
+                                throw brandError;
+                            }
+                        } else {
+                            const newBrandObj = { ...newBrand, models: [] };
+                            localBrands.push(newBrandObj);
+                            brandIndex = localBrands.length - 1;
+                            brandId = newBrand.id;
+                        }
+                    } catch (e) {
+                        // Fallback try to fetch if insert threw generic error but maybe it exists
+                        const { data: existingBrand } = await supabase
+                            .from("car_brands")
+                            .select("id, name")
+                            .ilike("name", item.brand)
+                            .single();
+                        if (existingBrand) {
+                            const newBrandObj = { ...existingBrand, models: [] };
+                            localBrands.push(newBrandObj);
+                            brandIndex = localBrands.length - 1;
+                            brandId = existingBrand.id;
+                        } else {
+                            throw e;
+                        }
+                    }
                 } else {
                     brandId = localBrands[brandIndex].id;
                 }
 
                 // 2. Find or Create Model
                 const currentBrand = localBrands[brandIndex];
+                // Need to fetch models if they are empty (potentially fresh brand obj) but we only populated it with []?
+                // Actually if we just fetched the brand from DB, it has no models loaded.
+                // But we can check if model exists in DB if not found in local array.
+
                 let model = currentBrand.models.find((m: any) => m.name.toLowerCase() === item.model.toLowerCase());
 
                 if (!model) {
-                    // Create Model
-                    const { data: newModel, error: modelError } = await supabase
-                        .from("car_models")
-                        .insert({ name: item.model, brand_id: brandId })
-                        .select("id, name, brand_id")
-                        .single();
+                    try {
+                        const { data: newModel, error: modelError } = await supabase
+                            .from("car_models")
+                            .insert({ name: item.model, brand_id: brandId })
+                            .select("id, name, brand_id")
+                            .single();
 
-                    if (modelError) throw modelError;
+                        if (modelError) {
+                            if (modelError.code === '23505') {
+                                const { data: existingModel } = await supabase
+                                    .from("car_models")
+                                    .select("id, name, brand_id")
+                                    .eq("brand_id", brandId)
+                                    .ilike("name", item.model)
+                                    .single();
 
-                    currentBrand.models.push(newModel);
-                    modelId = newModel.id;
+                                if (existingModel) {
+                                    currentBrand.models.push(existingModel);
+                                    modelId = existingModel.id;
+                                } else {
+                                    throw modelError;
+                                }
+                            } else {
+                                throw modelError;
+                            }
+                        } else {
+                            currentBrand.models.push(newModel);
+                            modelId = newModel.id;
+                        }
+                    } catch (e) {
+                        const { data: existingModel } = await supabase
+                            .from("car_models")
+                            .select("id, name, brand_id")
+                            .eq("brand_id", brandId)
+                            .ilike("name", item.model)
+                            .single();
+
+                        if (existingModel) {
+                            currentBrand.models.push(existingModel);
+                            modelId = existingModel.id;
+                        } else {
+                            throw e;
+                        }
+                    }
                 } else {
                     modelId = model.id;
                 }
