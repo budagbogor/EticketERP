@@ -132,6 +132,48 @@ export function useBukuPintar() {
 
                     const batteryParsed = spec.battery_type ? parseBatteryData(spec.battery_type) : { model: "", ampere: 0, voltage: 12 };
 
+                    // Helper to parse part string (e.g., "123-456 (Denso) [10000 KM]")
+                    const parsePartData = (rawString: string | null) => {
+                        if (!rawString) return { part_number: "", interval_km: 0, legacy_brands: [] as string[] };
+
+                        let cleanString = rawString;
+                        let interval_km = 0;
+                        let legacy_brands: string[] = [];
+
+                        // Extract Interval [10000 KM] or [10.000 KM]
+                        const intervalMatch = cleanString.match(/\[([\d\.]+)\s*KM\]/i);
+                        if (intervalMatch) {
+                            const numStr = intervalMatch[1].replace(/\./g, "");
+                            interval_km = parseInt(numStr);
+                            cleanString = cleanString.replace(intervalMatch[0], "");
+                        }
+
+                        // Extract Brands (Brand)
+                        const brandMatches = cleanString.match(/\((.*?)\)/g);
+                        if (brandMatches) {
+                            legacy_brands = brandMatches.map(m => m.replace(/[()]/g, "").trim());
+                            cleanString = cleanString.replace(/\(.*?\)/g, "");
+                        }
+
+                        cleanString = cleanString.trim().replace(/\s+/g, " ");
+                        return { part_number: cleanString, interval_km, legacy_brands };
+                    };
+
+                    const createPart = (category: any, name: string, rawString: string | null, dbBrandsString: string | null) => {
+                        if (!rawString) return null;
+                        const parsed = parsePartData(rawString);
+                        const dbBrands = dbBrandsString ? dbBrandsString.split(',').map(s => s.trim()) : [];
+                        const allBrands = Array.from(new Set([...dbBrands, ...parsed.legacy_brands]));
+
+                        return {
+                            category,
+                            name,
+                            part_number: parsed.part_number,
+                            replacement_interval_km: parsed.interval_km || undefined,
+                            compatible_brands: allBrands
+                        };
+                    };
+
                     return {
                         id: spec.id,
                         name: spec.variant_name,
@@ -159,36 +201,11 @@ export function useBukuPintar() {
                                 recommended_brands: psBrands
                             } : undefined,
                             parts: [
-                                ...(spec.oil_filter_type ? [{
-                                    category: "Filter Oli" as const,
-                                    name: "Oil Filter",
-                                    part_number: spec.oil_filter_type,
-                                    compatible_brands: spec.oil_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
-                                }] : []),
-                                ...(spec.air_filter_type ? [{
-                                    category: "Filter Udara" as const,
-                                    name: "Air Filter",
-                                    part_number: spec.air_filter_type,
-                                    compatible_brands: spec.air_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
-                                }] : []),
-                                ...(spec.cabin_filter_type ? [{
-                                    category: "Filter Kabin" as const,
-                                    name: "Cabin Filter",
-                                    part_number: spec.cabin_filter_type,
-                                    compatible_brands: spec.cabin_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
-                                }] : []),
-                                ...(spec.spark_plug_type ? [{
-                                    category: "Busi" as const,
-                                    name: "Spark Plug",
-                                    part_number: spec.spark_plug_type,
-                                    compatible_brands: spec.spark_plug_recommended_brands?.split(',').map((s: string) => s.trim()) || []
-                                }] : []),
-                                ...(spec.fuel_filter_type ? [{
-                                    category: "Filter Bensin" as const,
-                                    name: "Fuel Filter",
-                                    part_number: spec.fuel_filter_type,
-                                    compatible_brands: spec.fuel_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
-                                }] : []),
+                                ...(spec.oil_filter_type ? [createPart("Filter Oli", "Oil Filter", spec.oil_filter_type, spec.oil_filter_recommended_brands)!] : []),
+                                ...(spec.air_filter_type ? [createPart("Filter Udara", "Air Filter", spec.air_filter_type, spec.air_filter_recommended_brands)!] : []),
+                                ...(spec.cabin_filter_type ? [createPart("Filter Kabin", "Cabin Filter", spec.cabin_filter_type, spec.cabin_filter_recommended_brands)!] : []),
+                                ...(spec.spark_plug_type ? [createPart("Busi", "Spark Plug", spec.spark_plug_type, spec.spark_plug_recommended_brands)!] : []),
+                                ...(spec.fuel_filter_type ? [createPart("Filter Bensin", "Fuel Filter", spec.fuel_filter_type, spec.fuel_filter_recommended_brands)!] : []),
                                 ...(spec.wiper_size_driver ? [{
                                     category: "Wiper" as const,
                                     name: `Driver: ${spec.wiper_size_driver}, Passenger: ${spec.wiper_size_passenger || '-'}, Rear: ${spec.wiper_size_rear || '-'}`,

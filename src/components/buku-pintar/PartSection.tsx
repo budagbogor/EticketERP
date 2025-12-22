@@ -63,25 +63,27 @@ export function PartSection({ parts, wiper, filters }: PartSectionProps) {
                                     <td className="py-3 font-medium">{part.category}</td>
                                     <td className="py-3">
                                         {part.name}
-                                        {part.replacement_interval_km && (
-                                            <span className="block text-xs text-muted-foreground">
-                                                Ganti tiap {part.replacement_interval_km.toLocaleString()} KM
-                                            </span>
-                                        )}
                                     </td>
                                     <td className="py-3 text-right font-mono text-primary">{part.part_number || part.value || "-"}</td>
                                     <td className="py-3 text-right">
-                                        {part.compatible_brands && part.compatible_brands.length > 0 ? (
-                                            <div className="flex flex-wrap justify-end gap-1">
-                                                {part.compatible_brands.map((brand, bIdx) => (
-                                                    <span key={bIdx} className="text-xs bg-secondary px-1.5 py-0.5 rounded">
-                                                        {brand}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <span className="text-muted-foreground">-</span>
-                                        )}
+                                        <div className="flex flex-col items-end gap-1">
+                                            {part.replacement_interval_km && (
+                                                <span className="text-xs text-muted-foreground whitespace-nowrap mb-1">
+                                                    {part.replacement_interval_km.toLocaleString()} KM
+                                                </span>
+                                            )}
+                                            {part.compatible_brands && part.compatible_brands.length > 0 ? (
+                                                <div className="flex flex-wrap justify-end gap-1">
+                                                    {part.compatible_brands.map((brand, bIdx) => (
+                                                        <span key={bIdx} className="text-xs bg-secondary px-1.5 py-0.5 rounded">
+                                                            {brand}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                !part.replacement_interval_km && <span className="text-muted-foreground">-</span>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
