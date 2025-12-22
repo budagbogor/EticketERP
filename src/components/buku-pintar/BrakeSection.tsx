@@ -52,7 +52,7 @@ export function BrakeSection({ brakes }: BrakeSectionProps) {
 
                         {frontDisc && (
                             <div className="flex justify-between">
-                                <span>Piringan Cakram Depan</span>
+                                <span>Type Rem Depan</span>
                                 <span className="font-mono text-sm">{frontDisc}</span>
                             </div>
                         )}
@@ -85,7 +85,7 @@ export function BrakeSection({ brakes }: BrakeSectionProps) {
 
                         {rearDisc && (
                             <div className="flex justify-between">
-                                <span>Piringan/Tromol Belakang</span>
+                                <span>Type Rem Belakang</span>
                                 <span className="font-mono text-sm">{rearDisc}</span>
                             </div>
                         )}
