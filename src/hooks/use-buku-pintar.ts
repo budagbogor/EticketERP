@@ -28,6 +28,14 @@ export function useBukuPintar() {
                     brake_oil_recommended_brands,
                     radiator_coolant_recommended_brands,
                     ac_freon_recommended_brands,
+                    tire_recommended_brands,
+                    brake_pad_front_recommended_brands,
+                    brake_pad_rear_recommended_brands,
+                    oil_filter_recommended_brands,
+                    air_filter_recommended_brands,
+                    cabin_filter_recommended_brands,
+                    fuel_filter_recommended_brands,
+                    spark_plug_recommended_brands,
                     car_brands!vehicle_specifications_brand_id_fkey(id, name),
                     car_models!vehicle_specifications_model_id_fkey(id, name)
                 `)
@@ -119,37 +127,37 @@ export function useBukuPintar() {
                             } : undefined,
                             parts: [
                                 ...(spec.oil_filter_type ? [{
-                                    category: "Filter Oli" as any,
-                                    name: spec.oil_filter_type,
-                                    part_number: "",
-                                    compatible_brands: []
+                                    category: "Filter Oli" as const,
+                                    name: "Oil Filter",
+                                    part_number: spec.oil_filter_type,
+                                    compatible_brands: spec.oil_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                                 }] : []),
                                 ...(spec.air_filter_type ? [{
-                                    category: "Filter Udara" as any,
-                                    name: spec.air_filter_type,
-                                    part_number: "",
-                                    compatible_brands: []
+                                    category: "Filter Udara" as const,
+                                    name: "Air Filter",
+                                    part_number: spec.air_filter_type,
+                                    compatible_brands: spec.air_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                                 }] : []),
                                 ...(spec.cabin_filter_type ? [{
-                                    category: "Filter Kabin" as any,
-                                    name: spec.cabin_filter_type,
-                                    part_number: "",
-                                    compatible_brands: []
+                                    category: "Filter Kabin" as const,
+                                    name: "Cabin Filter",
+                                    part_number: spec.cabin_filter_type,
+                                    compatible_brands: spec.cabin_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                                 }] : []),
                                 ...(spec.spark_plug_type ? [{
-                                    category: "Busi" as any,
-                                    name: spec.spark_plug_type,
-                                    part_number: "",
-                                    compatible_brands: []
+                                    category: "Busi" as const,
+                                    name: "Spark Plug",
+                                    part_number: spec.spark_plug_type,
+                                    compatible_brands: spec.spark_plug_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                                 }] : []),
                                 ...(spec.fuel_filter_type ? [{
-                                    category: "Filter Bensin" as any,
-                                    name: spec.fuel_filter_type,
-                                    part_number: "",
-                                    compatible_brands: []
+                                    category: "Filter Bensin" as const,
+                                    name: "Fuel Filter",
+                                    part_number: spec.fuel_filter_type,
+                                    compatible_brands: spec.fuel_filter_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                                 }] : []),
                                 ...(spec.wiper_size_driver ? [{
-                                    category: "Wiper" as any,
+                                    category: "Wiper" as const,
                                     name: `Driver: ${spec.wiper_size_driver}, Passenger: ${spec.wiper_size_passenger || '-'}, Rear: ${spec.wiper_size_rear || '-'}`,
                                     part_number: "",
                                     compatible_brands: []
@@ -160,7 +168,7 @@ export function useBukuPintar() {
                                 size: spec.tire_size_front,
                                 pressure_psi_front: parseFloat(spec.tire_pressure_front) || 0,
                                 pressure_psi_rear: parseFloat(spec.tire_pressure_rear) || 0,
-                                recommended_brands: []
+                                recommended_brands: spec.tire_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                             }] : [],
                             suspension: {
                                 shock_absorber_front: "",
@@ -192,8 +200,8 @@ export function useBukuPintar() {
                                 fluid_type: cleanSpecString(spec.brake_oil_type) || "",
                                 pad_part_number_front: spec.brake_pad_front_type || "",
                                 shoe_part_number_rear: spec.brake_pad_rear_type || "",
-                                recommended_brands_front: [],
-                                recommended_brands_rear: []
+                                recommended_brands_front: spec.brake_pad_front_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                recommended_brands_rear: spec.brake_pad_rear_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                             }
                         }
                     };
@@ -243,7 +251,41 @@ export function useBukuPintar() {
             variant.specifications.power_steering_oil?.recommended_brands?.join(", ") || null;
 
         // Map tires from legacy object OR array (ImportDialog uses tires array)
-        const tireSpec = variant.specifications.tire || variant.specifications.tires?.[0];
+        // Use 'any' type to handle union of TireSpec definitions
+        const tireSpec: any = variant.specifications.tire || variant.specifications.tires?.[0] || {};
+        const tireBrands = tireSpec.recommended_brands?.join(", ") || null;
+
+        // Helpers to extract part data from 'parts' array if 'filters' object is missing
+        const getPart = (category: string, namePart: string) => {
+            return variant.specifications.parts?.find(p => p.category === category && p.name === namePart);
+        };
+        const getPartBrands = (category: string, namePart: string) => {
+            const part = getPart(category, namePart);
+            return part?.compatible_brands?.join(", ") || null;
+        };
+        const getPartNumber = (category: string, namePart: string) => {
+            const part = getPart(category, namePart);
+            return part?.part_number || null;
+        };
+
+        // Extract Filter values (try legacy object first, then parts array)
+        // Note: AddDataDialog uses "Spark Plug" as name, type is "Busi" in category logic above but here we search by Name if available
+        // Actually AddDataDialog saves: category="Busi", name="Spark Plug"
+        const sparkPlug = variant.specifications.filters?.spark_plug || getPartNumber("Busi", "Spark Plug");
+        const sparkPlugBrands = getPartBrands("Busi", "Spark Plug");
+
+        const airFilter = variant.specifications.filters?.air_filter || getPartNumber("Filter Udara", "Air Filter");
+        const airFilterBrands = getPartBrands("Filter Udara", "Air Filter");
+
+        const cabinFilter = variant.specifications.filters?.cabin_filter || getPartNumber("Filter Kabin", "Cabin Filter");
+        const cabinFilterBrands = getPartBrands("Filter Kabin", "Cabin Filter");
+
+        // Fuel Filter might be "Filter Bensin" or "Filter Solar"
+        const fuelFilter = variant.specifications.filters?.fuel_filter || getPartNumber("Filter Bensin", "Fuel Filter") || getPartNumber("Filter Solar", "Fuel Filter");
+        const fuelFilterBrands = getPartBrands("Filter Bensin", "Fuel Filter") || getPartBrands("Filter Solar", "Fuel Filter");
+
+        const oilFilter = variant.specifications.filters?.oil_filter || getPartNumber("Filter Oli", "Oil Filter");
+        const oilFilterBrands = getPartBrands("Filter Oli", "Oil Filter");
 
         return {
             brand_id: brandId,
@@ -274,10 +316,11 @@ export function useBukuPintar() {
             ac_freon_capacity: variant.specifications.ac_freon?.capacity || null,
             ac_freon_type: variant.specifications.ac_freon?.type || null,
 
-            tire_size_front: tireSpec?.front_size || tireSpec?.size || null,
-            tire_size_rear: tireSpec?.rear_size || tireSpec?.size || null,
-            tire_pressure_front: tireSpec?.front_pressure?.toString() || tireSpec?.pressure_psi_front?.toString() || null,
-            tire_pressure_rear: tireSpec?.rear_pressure?.toString() || tireSpec?.pressure_psi_rear?.toString() || null,
+            tire_size_front: tireSpec.front_size || tireSpec.size || null,
+            tire_size_rear: tireSpec.rear_size || tireSpec.size || null,
+            tire_pressure_front: tireSpec.front_pressure?.toString() || tireSpec.pressure_psi_front?.toString() || null,
+            tire_pressure_rear: tireSpec.rear_pressure?.toString() || tireSpec.pressure_psi_rear?.toString() || null,
+            tire_recommended_brands: tireBrands,
 
             battery_type: variant.specifications.battery?.type || null,
 
@@ -285,14 +328,21 @@ export function useBukuPintar() {
             wiper_size_passenger: variant.specifications.wiper?.passenger || null,
             wiper_size_rear: variant.specifications.wiper?.rear || null,
 
-            spark_plug_type: variant.specifications.filters?.spark_plug || null,
-            air_filter_type: variant.specifications.filters?.air_filter || null,
-            cabin_filter_type: variant.specifications.filters?.cabin_filter || null,
-            fuel_filter_type: variant.specifications.filters?.fuel_filter || null,
-            oil_filter_type: variant.specifications.filters?.oil_filter || null,
+            spark_plug_type: sparkPlug,
+            spark_plug_recommended_brands: sparkPlugBrands,
+            air_filter_type: airFilter,
+            air_filter_recommended_brands: airFilterBrands,
+            cabin_filter_type: cabinFilter,
+            cabin_filter_recommended_brands: cabinFilterBrands,
+            fuel_filter_type: fuelFilter,
+            fuel_filter_recommended_brands: fuelFilterBrands,
+            oil_filter_type: oilFilter,
+            oil_filter_recommended_brands: oilFilterBrands,
 
             brake_pad_front_type: variant.specifications.brake_parts?.front_pad || variant.specifications.brakes?.pad_part_number_front || null,
+            brake_pad_front_recommended_brands: variant.specifications.brakes?.recommended_brands_front?.join(", ") || null,
             brake_pad_rear_type: variant.specifications.brake_parts?.rear_pad || variant.specifications.brakes?.shoe_part_number_rear || null,
+            brake_pad_rear_recommended_brands: variant.specifications.brakes?.recommended_brands_rear?.join(", ") || null,
             brake_disc_front_type: variant.specifications.brake_parts?.front_disc || variant.specifications.brakes?.front_type || null,
             brake_disc_rear_type: variant.specifications.brake_parts?.rear_disc || variant.specifications.brakes?.rear_type || null,
 

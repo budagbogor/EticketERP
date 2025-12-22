@@ -8,6 +8,7 @@ interface TireSectionProps {
         rear_size?: string;
         front_pressure?: string;
         rear_pressure?: string;
+        recommended_brands?: string[];
     };
     tires?: TireSpec[]; // Legacy support
 }
@@ -63,7 +64,7 @@ export function TireSection({ tire, tires }: TireSectionProps) {
                         <CircleDot className="w-5 h-5 text-green-600" />
                         <CardTitle className="text-lg">Ban Depan</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span className="text-muted-foreground block">Ukuran Ban</span>
@@ -74,6 +75,18 @@ export function TireSection({ tire, tires }: TireSectionProps) {
                                 <span className="font-medium">{tire.front_pressure || "-"}</span>
                             </div>
                         </div>
+                        {tire.recommended_brands && tire.recommended_brands.length > 0 && (
+                            <div className="pt-2 border-t mt-2">
+                                <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
+                                <div className="flex flex-wrap gap-2">
+                                    {tire.recommended_brands.map((brand, idx) => (
+                                        <span key={idx} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-100">
+                                            {brand}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             )}
@@ -85,7 +98,7 @@ export function TireSection({ tire, tires }: TireSectionProps) {
                         <CircleDot className="w-5 h-5 text-green-600" />
                         <CardTitle className="text-lg">Ban Belakang</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <span className="text-muted-foreground block">Ukuran Ban</span>
@@ -96,6 +109,18 @@ export function TireSection({ tire, tires }: TireSectionProps) {
                                 <span className="font-medium">{tire.rear_pressure || "-"}</span>
                             </div>
                         </div>
+                        {tire.recommended_brands && tire.recommended_brands.length > 0 && (
+                            <div className="pt-2 border-t mt-2">
+                                <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
+                                <div className="flex flex-wrap gap-2">
+                                    {tire.recommended_brands.map((brand, idx) => (
+                                        <span key={idx} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-100">
+                                            {brand}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             )}

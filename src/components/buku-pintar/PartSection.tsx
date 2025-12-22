@@ -1,39 +1,32 @@
+import { RecommendedPart } from "@/types/buku-pintar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wrench } from "lucide-react";
 
 interface PartSectionProps {
-    wiper?: {
-        driver?: string;
-        passenger?: string;
-        rear?: string;
-    };
-    filters?: {
-        spark_plug?: string;
-        air_filter?: string;
-        cabin_filter?: string;
-        fuel_filter?: string;
-        oil_filter?: string;
-    };
+    parts?: RecommendedPart[];
+    // Legacy support (optional, can be removed if strictly migrating)
+    wiper?: any;
+    filters?: any;
 }
 
-export function PartSection({ wiper, filters }: PartSectionProps) {
-    if (!wiper && !filters) return null;
+export function PartSection({ parts, wiper, filters }: PartSectionProps) {
+    // Merge legacy props into parts array if parts is missing/empty but legacy exists
+    let displayParts: (RecommendedPart & { value?: string })[] = parts || [];
 
-    const partItems = [
-        // Wiper
-        ...(wiper?.driver ? [{ category: "Wiper", name: "Wiper Depan (Driver)", value: wiper.driver }] : []),
-        ...(wiper?.passenger ? [{ category: "Wiper", name: "Wiper Depan (Penumpang)", value: wiper.passenger }] : []),
-        ...(wiper?.rear ? [{ category: "Wiper", name: "Wiper Belakang", value: wiper.rear }] : []),
+    if (displayParts.length === 0 && (wiper || filters)) {
+        displayParts = [
+            ...(wiper?.driver ? [{ category: "Wiper" as const, name: "Wiper Depan (Driver)", part_number: wiper.driver }] : []),
+            ...(wiper?.passenger ? [{ category: "Wiper" as const, name: "Wiper Depan (Penumpang)", part_number: wiper.passenger }] : []),
+            ...(wiper?.rear ? [{ category: "Wiper" as const, name: "Wiper Belakang", part_number: wiper.rear }] : []),
+            ...(filters?.oil_filter ? [{ category: "Filter Oli" as const, name: "Filter Oli", part_number: filters.oil_filter }] : []),
+            ...(filters?.air_filter ? [{ category: "Filter Udara" as const, name: "Filter Udara", part_number: filters.air_filter }] : []),
+            ...(filters?.cabin_filter ? [{ category: "Filter Kabin" as const, name: "Filter Kabin (AC)", part_number: filters.cabin_filter }] : []),
+            ...(filters?.fuel_filter ? [{ category: "Filter Bensin" as const, name: "Filter Bensin/Solar", part_number: filters.fuel_filter }] : []),
+            ...(filters?.spark_plug ? [{ category: "Busi" as const, name: "Busi", part_number: filters.spark_plug }] : []),
+        ];
+    }
 
-        // Filters
-        ...(filters?.oil_filter ? [{ category: "Filter", name: "Filter Oli", value: filters.oil_filter }] : []),
-        ...(filters?.air_filter ? [{ category: "Filter", name: "Filter Udara", value: filters.air_filter }] : []),
-        ...(filters?.cabin_filter ? [{ category: "Filter", name: "Filter Kabin (AC)", value: filters.cabin_filter }] : []),
-        ...(filters?.fuel_filter ? [{ category: "Filter", name: "Filter Bensin/Solar", value: filters.fuel_filter }] : []),
-        ...(filters?.spark_plug ? [{ category: "Busi", name: "Busi", value: filters.spark_plug }] : []),
-    ];
-
-    if (partItems.length === 0) {
+    if (displayParts.length === 0) {
         return (
             <Card>
                 <CardHeader className="flex flex-row items-center gap-2 pb-2">
@@ -58,17 +51,38 @@ export function PartSection({ wiper, filters }: PartSectionProps) {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b">
-                                <th className="text-left font-medium py-3 text-muted-foreground">Kategori</th>
-                                <th className="text-left font-medium py-3 text-muted-foreground">Nama Part</th>
-                                <th className="text-right font-medium py-3 text-muted-foreground">Spesifikasi / Kode</th>
+                                <th className="text-left font-medium py-3 text-muted-foreground w-1/4">Kategori</th>
+                                <th className="text-left font-medium py-3 text-muted-foreground w-1/4">Nama Part</th>
+                                <th className="text-right font-medium py-3 text-muted-foreground w-1/4">Kode / Spesifikasi</th>
+                                <th className="text-right font-medium py-3 text-muted-foreground w-1/4">Rekomendasi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y">
-                            {partItems.map((part, idx) => (
+                            {displayParts.map((part, idx) => (
                                 <tr key={idx} className="hover:bg-muted/50">
                                     <td className="py-3 font-medium">{part.category}</td>
-                                    <td className="py-3">{part.name}</td>
-                                    <td className="py-3 text-right font-mono text-primary">{part.value}</td>
+                                    <td className="py-3">
+                                        {part.name}
+                                        {part.replacement_interval_km && (
+                                            <span className="block text-xs text-muted-foreground">
+                                                Ganti tiap {part.replacement_interval_km.toLocaleString()} KM
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="py-3 text-right font-mono text-primary">{part.part_number || part.value || "-"}</td>
+                                    <td className="py-3 text-right">
+                                        {part.compatible_brands && part.compatible_brands.length > 0 ? (
+                                            <div className="flex flex-wrap justify-end gap-1">
+                                                {part.compatible_brands.map((brand, bIdx) => (
+                                                    <span key={bIdx} className="text-xs bg-secondary px-1.5 py-0.5 rounded">
+                                                        {brand}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted-foreground">-</span>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -78,3 +92,6 @@ export function PartSection({ wiper, filters }: PartSectionProps) {
         </Card>
     );
 }
+
+// Helper for Legacy support where 'value' property was used instead of 'part_number'
+// We handle it by checking part.part_number || part.value

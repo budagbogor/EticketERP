@@ -67,6 +67,7 @@ export interface VehicleVariant {
             rear_size?: string;
             front_pressure?: string;
             rear_pressure?: string;
+            recommended_brands?: string[];
         };
         tires?: TireSpec[]; // Legacy array format
 
