@@ -329,7 +329,7 @@ export function useBukuPintar() {
         }
     });
 
-    // Import vehicle data mutation
+    // Import vehicle data mutation with batching
     const importDataMutation = useMutation({
         mutationFn: async (data: { brand: string; model: string; variant: VehicleVariant }[]) => {
             const insertData = [];
@@ -343,16 +343,26 @@ export function useBukuPintar() {
                 }
             }
 
-            const { data: result, error } = await supabase
-                .from("vehicle_specifications")
-                .upsert(insertData, {
-                    onConflict: "brand_id,model_id,variant_name,year_start",
-                    ignoreDuplicates: false
-                })
-                .select();
+            // Batch processing
+            const BATCH_SIZE = 50;
+            const results = [];
 
-            if (error) throw error;
-            return result;
+            for (let i = 0; i < insertData.length; i += BATCH_SIZE) {
+                const batch = insertData.slice(i, i + BATCH_SIZE);
+
+                const { data: result, error } = await supabase
+                    .from("vehicle_specifications")
+                    .upsert(batch, {
+                        onConflict: "brand_id,model_id,variant_name,year_start",
+                        ignoreDuplicates: false
+                    })
+                    .select();
+
+                if (error) throw error;
+                if (result) results.push(...result);
+            }
+
+            return results;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["vehicle-specifications"] });
