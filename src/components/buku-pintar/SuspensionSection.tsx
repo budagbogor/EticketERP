@@ -37,23 +37,37 @@ export function SuspensionSection({ suspension }: SuspensionSectionProps) {
                         { label: "Upper Support", value: suspension.upper_support, brands: suspension.upper_support_brands },
                         { label: "Shock Absorber Depan", value: suspension.shock_absorber_front, brands: suspension.shock_absorber_front_brands },
                         { label: "Shock Absorber Belakang", value: suspension.shock_absorber_rear, brands: suspension.shock_absorber_rear_brands },
-                    ].map((part, idx) => (
+                    ].map((part, idx) => {
+                        // Helper to parse legacy format "PartNo | Brand" from brands array
+                        // If brands contains something like "Part-001 | KYB", we move Part-001 to value
+                        let displayValue = part.value;
+                        let displayBrands = part.brands || [];
 
-                        (part.value || (part.brands && part.brands.length > 0)) ? (
+                        if ((!displayValue || displayValue === "-") && displayBrands.length > 0) {
+                            const firstBrand = displayBrands[0];
+                            if (firstBrand.includes("|")) {
+                                const [partNo, brandName] = firstBrand.split("|").map(s => s.trim());
+                                displayValue = partNo;
+                                // Replace the combined string with just the brand name
+                                displayBrands = [brandName, ...displayBrands.slice(1)];
+                            }
+                        }
+
+                        return (displayValue || (displayBrands && displayBrands.length > 0)) ? (
                             <div key={idx} className="flex flex-col gap-1 p-3 bg-muted/50 rounded-lg">
                                 <div className="flex justify-between items-center">
                                     <span className="text-muted-foreground text-sm">{part.label}</span>
-                                    <span className="font-medium text-right">{part.value || "-"}</span>
+                                    <span className="font-medium text-right font-mono">{displayValue || "-"}</span>
                                 </div>
-                                {part.brands && part.brands.length > 0 && (
+                                {displayBrands && displayBrands.length > 0 && (
                                     <div className="flex justify-between items-center text-xs pt-1 border-t border-muted-foreground/20 mt-1">
                                         <span className="text-muted-foreground">Rekomendasi</span>
-                                        <span className="text-primary font-medium text-right">{part.brands.join(", ")}</span>
+                                        <span className="text-primary font-medium text-right">{displayBrands.join(", ")}</span>
                                     </div>
                                 )}
                             </div>
-                        ) : null
-                    ))}
+                        ) : null;
+                    })}
                     {Object.values(suspension).every(v => !v || (Array.isArray(v) && v.length === 0)) && (
                         <div className="col-span-2 text-center text-muted-foreground py-4">Data belum tersedia</div>
                     )}
