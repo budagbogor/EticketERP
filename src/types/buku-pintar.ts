@@ -26,18 +26,21 @@ export interface VehicleVariant {
             capacity_with_filter_liter?: number; // Legacy
             quality_standard?: string; // Legacy
             recommended_brands?: string[]; // Legacy
+            replacement_interval_km?: number;
         };
         transmission_oil?: {
             capacity?: string;
             type?: string;
             capacity_liter?: number; // Legacy
             recommended_brands?: string[]; // Legacy
+            replacement_interval_km?: number;
         };
         power_steering_oil?: {
             capacity?: string;
             type?: string;
             capacity_liter?: number; // Legacy
             recommended_brands?: string[]; // Legacy
+            replacement_interval_km?: number;
         };
         diff_oil?: { // Legacy naming
             type?: string;
@@ -46,8 +49,10 @@ export interface VehicleVariant {
         };
         differential_oil?: { // New naming to match dialog
             type?: string;
+            capacity?: string;
             capacity_liter?: number;
             recommended_brands?: string[];
+            replacement_interval_km?: number;
         };
         brake_oil?: {
             type?: string;
@@ -115,14 +120,17 @@ export interface VehicleVariant {
 export interface EngineOilSpec {
     viscosity_options?: string[];
     capacity_liter?: number;
+    capacity?: string;
     capacity_with_filter_liter?: number;
     quality_standard?: string;
     recommended_brands?: string[];
+    replacement_interval_km?: number;
 }
 
 export interface FluidSpec {
     type?: string;
     capacity_liter?: number;
+    capacity?: string;
     replacement_interval_km?: number;
     recommended_brands?: string[];
 }
