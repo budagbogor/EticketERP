@@ -332,12 +332,17 @@ export function useBukuPintar() {
     // Import vehicle data mutation with batching and robust auto-create brand/model
     const importDataMutation = useMutation({
         mutationFn: async (data: { brand: string; model: string; variant: VehicleVariant }[]) => {
+            console.log("Starting Import. Total rows:", data.length);
+            console.log("Current User ID for RLS:", user?.id);
+
             const insertData = [];
             // Create a local cache of brands/models to avoid refetching constantly
             // We start with the currently loaded brands, but deep copy to modify local state
             let localBrands = JSON.parse(JSON.stringify(supabaseBrands));
+            let newBrandsCount = 0;
+            let newModelsCount = 0;
 
-            for (const item of data) {
+            for (const [index, item] of data.entries()) {
                 let brandId = "";
                 let modelId = "";
 
@@ -347,6 +352,7 @@ export function useBukuPintar() {
                 if (brandIndex === -1) {
                     // Try to Create Brand
                     try {
+                        console.log(`Creating new brand: ${item.brand}`);
                         const { data: newBrand, error: brandError } = await supabase
                             .from("car_brands")
                             .insert({ name: item.brand })
@@ -355,6 +361,7 @@ export function useBukuPintar() {
 
                         if (brandError) {
                             if (brandError.code === '23505') { // Unique violation
+                                console.log(`Brand exists (race condition): ${item.brand}`);
                                 const { data: existingBrand } = await supabase
                                     .from("car_brands")
                                     .select("id, name")
@@ -366,12 +373,15 @@ export function useBukuPintar() {
                                     brandIndex = localBrands.length - 1;
                                     brandId = existingBrand.id;
                                 } else {
+                                    console.error("Failed to recover existing brand:", item.brand);
                                     throw brandError;
                                 }
                             } else {
+                                console.error("Error creating brand:", brandError);
                                 throw brandError;
                             }
                         } else {
+                            newBrandsCount++;
                             const newBrandObj = { ...newBrand, models: [] };
                             localBrands.push(newBrandObj);
                             brandIndex = localBrands.length - 1;
@@ -407,6 +417,7 @@ export function useBukuPintar() {
 
                 if (!model) {
                     try {
+                        console.log(`Creating new model: ${item.model} for brand ${currentBrand.name}`);
                         const { data: newModel, error: modelError } = await supabase
                             .from("car_models")
                             .insert({ name: item.model, brand_id: brandId })
@@ -415,6 +426,7 @@ export function useBukuPintar() {
 
                         if (modelError) {
                             if (modelError.code === '23505') {
+                                console.log(`Model exists (race condition): ${item.model}`);
                                 const { data: existingModel } = await supabase
                                     .from("car_models")
                                     .select("id, name, brand_id")
@@ -426,12 +438,17 @@ export function useBukuPintar() {
                                     currentBrand.models.push(existingModel);
                                     modelId = existingModel.id;
                                 } else {
+                                    // Sometimes race condition creates duplicates if we are not careful?
+                                    // But we read it. If it fails, we really can't proceed.
+                                    console.error("Failed to recover existing model:", item.model);
                                     throw modelError;
                                 }
                             } else {
+                                console.error("Error creating model:", modelError);
                                 throw modelError;
                             }
                         } else {
+                            newModelsCount++;
                             currentBrand.models.push(newModel);
                             modelId = newModel.id;
                         }
@@ -459,12 +476,16 @@ export function useBukuPintar() {
                 }
             }
 
+            console.log(`Prepared ${insertData.length} records for upsert.`);
+            console.log(`Created ${newBrandsCount} new brands and ${newModelsCount} new models locally.`);
+
             // Batch processing
             const BATCH_SIZE = 50;
             const results = [];
 
             for (let i = 0; i < insertData.length; i += BATCH_SIZE) {
                 const batch = insertData.slice(i, i + BATCH_SIZE);
+                console.log(`Upserting batch ${i / BATCH_SIZE + 1} size: ${batch.length}`);
 
                 const { data: result, error } = await supabase
                     .from("vehicle_specifications")
@@ -474,23 +495,31 @@ export function useBukuPintar() {
                     })
                     .select();
 
-                if (error) throw error;
-                if (result) results.push(...result);
+                if (error) {
+                    console.error("Upsert error:", error);
+                    throw error;
+                }
+                if (result) {
+                    console.log(`Batch ${i / BATCH_SIZE + 1} success. Upserted/Returned: ${result.length}`);
+                    results.push(...result);
+                }
             }
 
+            console.log("Import completed. Total results:", results.length);
             return results;
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ["vehicle-specifications"] });
             // Also invalidate brands because we might have added new ones
             queryClient.invalidateQueries({ queryKey: ["brands"] });
             refreshVehicles();
             toast({
                 title: "Berhasil",
-                description: "Data berhasil diimport",
+                description: `Import selesai. ${data.length} data diproses.`, // Verbose success message
             });
         },
         onError: (error: any) => {
+            console.error("Mutation Error:", error);
             toast({
                 title: "Gagal",
                 description: error.message,
