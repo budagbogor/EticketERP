@@ -168,6 +168,7 @@ export default function BukuPintar() {
                                     <PartSection
                                         wiper={selectedVariant.specifications.wiper}
                                         filters={selectedVariant.specifications.filters}
+                                        parts={selectedVariant.specifications.parts}
                                     />
                                 </TabsContent>
 
@@ -176,7 +177,7 @@ export default function BukuPintar() {
                                 </TabsContent>
 
                                 <TabsContent value="brakes" className="mt-6">
-                                    <BrakeSection brakes={selectedVariant.specifications.brake_parts} />
+                                    <BrakeSection brakes={selectedVariant.specifications.brakes || selectedVariant.specifications.brake_parts} />
                                 </TabsContent>
 
                                 <TabsContent value="battery" className="mt-6">
@@ -184,7 +185,10 @@ export default function BukuPintar() {
                                 </TabsContent>
 
                                 <TabsContent value="tires" className="mt-6">
-                                    <TireSection tire={selectedVariant.specifications.tire} />
+                                    <TireSection
+                                        tire={selectedVariant.specifications.tire}
+                                        tires={selectedVariant.specifications.tires}
+                                    />
                                 </TabsContent>
                             </Tabs>
                         </div>

@@ -36,6 +36,9 @@ export function useBukuPintar() {
                     cabin_filter_recommended_brands,
                     fuel_filter_recommended_brands,
                     spark_plug_recommended_brands,
+                    battery_ampere,
+                    battery_voltage,
+                    battery_dimensions,
                     car_brands!vehicle_specifications_brand_id_fkey(id, name),
                     car_models!vehicle_specifications_model_id_fkey(id, name)
                 `)
@@ -189,10 +192,11 @@ export function useBukuPintar() {
                                 upper_support_brands: spec.upper_support_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                             },
                             battery: spec.battery_type ? {
-                                type: spec.battery_type,
-                                model: "",
-                                ampere: 0,
-                                voltage: 12
+                                type: "Aki Mobil", // Generic label as user wants code in 'model'
+                                model: spec.battery_type,
+                                ampere: spec.battery_ampere || 0,
+                                voltage: spec.battery_voltage || 12,
+                                dimensions: spec.battery_dimensions || ""
                             } : undefined,
                             brakes: {
                                 front_type: spec.brake_disc_front_type || "",
@@ -322,7 +326,10 @@ export function useBukuPintar() {
             tire_pressure_rear: tireSpec.rear_pressure?.toString() || tireSpec.pressure_psi_rear?.toString() || null,
             tire_recommended_brands: tireBrands,
 
-            battery_type: variant.specifications.battery?.type || null,
+            battery_type: variant.specifications.battery?.model || variant.specifications.battery?.type || null,
+            battery_ampere: variant.specifications.battery?.ampere || null,
+            battery_voltage: variant.specifications.battery?.voltage || null,
+            battery_dimensions: variant.specifications.battery?.dimensions || null,
 
             wiper_size_driver: variant.specifications.wiper?.driver || null,
             wiper_size_passenger: variant.specifications.wiper?.passenger || null,

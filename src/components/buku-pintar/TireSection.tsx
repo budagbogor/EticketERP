@@ -45,6 +45,18 @@ export function TireSection({ tire, tires }: TireSectionProps) {
                                     </div>
                                 )}
                             </div>
+                            {t.recommended_brands && t.recommended_brands.length > 0 && (
+                                <div className="pt-2 border-t mt-2">
+                                    <span className="text-xs text-muted-foreground block mb-2">Rekomendasi Merek:</span>
+                                    <div className="flex flex-wrap gap-2">
+                                        {t.recommended_brands.map((brand, bIdx) => (
+                                            <span key={bIdx} className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-900 dark:text-green-100">
+                                                {brand}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 ))}
