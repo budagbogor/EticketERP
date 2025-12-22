@@ -22,6 +22,12 @@ export function useBukuPintar() {
                 .from("vehicle_specifications")
                 .select(`
                     *,
+                    engine_oil_recommended_brands,
+                    transmission_oil_recommended_brands,
+                    power_steering_oil_recommended_brands,
+                    brake_oil_recommended_brands,
+                    radiator_coolant_recommended_brands,
+                    ac_freon_recommended_brands,
                     car_brands!vehicle_specifications_brand_id_fkey(id, name),
                     car_models!vehicle_specifications_model_id_fkey(id, name)
                 `)
@@ -68,17 +74,17 @@ export function useBukuPintar() {
                             capacity_liter: parseFloat(spec.engine_oil_capacity) || 0,
                             capacity_with_filter_liter: parseFloat(spec.engine_oil_capacity) || 0,
                             quality_standard: spec.engine_oil_type || "",
-                            recommended_brands: []
+                            recommended_brands: spec.engine_oil_recommended_brands ? spec.engine_oil_recommended_brands.split(',').map((s: string) => s.trim()) : []
                         },
                         transmission_oil: {
                             type: spec.transmission_oil_type || "",
                             capacity_liter: parseFloat(spec.transmission_oil_capacity) || 0,
-                            recommended_brands: []
+                            recommended_brands: spec.transmission_oil_recommended_brands ? spec.transmission_oil_recommended_brands.split(',').map((s: string) => s.trim()) : []
                         },
                         differential_oil: spec.power_steering_oil_type ? {
                             type: spec.power_steering_oil_type,
                             capacity_liter: parseFloat(spec.power_steering_oil_capacity) || 0,
-                            recommended_brands: []
+                            recommended_brands: spec.power_steering_oil_recommended_brands ? spec.power_steering_oil_recommended_brands.split(',').map((s: string) => s.trim()) : []
                         } : undefined,
                         parts: [
                             ...(spec.oil_filter_type ? [{
@@ -186,6 +192,10 @@ export function useBukuPintar() {
         const engineOilType = variant.specifications.engine_oil?.type ||
             variant.specifications.engine_oil?.viscosity_options?.[0] || null;
 
+        // Map recommended brands
+        const engineOilBrands = variant.specifications.engine_oil?.recommended_brands?.join(", ") || null;
+        const transmissionOilBrands = variant.specifications.transmission_oil?.recommended_brands?.join(", ") || null;
+
         // Map brake oil from brake_oil.type OR brakes.fluid_type
         const brakeOilType = variant.specifications.brake_oil?.type ||
             variant.specifications.brakes?.fluid_type || null;
@@ -197,6 +207,8 @@ export function useBukuPintar() {
             variant.specifications.power_steering_oil?.capacity_liter?.toString() || null;
         const psOilType = diffOil?.type ||
             variant.specifications.power_steering_oil?.type || null;
+        const psOilBrands = diffOil?.recommended_brands?.join(", ") ||
+            variant.specifications.power_steering_oil?.recommended_brands?.join(", ") || null;
 
         // Map tires from legacy object OR array (ImportDialog uses tires array)
         const tireSpec = variant.specifications.tire || variant.specifications.tires?.[0];
@@ -211,13 +223,16 @@ export function useBukuPintar() {
 
             engine_oil_capacity: variant.specifications.engine_oil?.capacity_liter?.toString() || null,
             engine_oil_type: engineOilType,
+            engine_oil_recommended_brands: engineOilBrands,
 
             transmission_oil_capacity: variant.specifications.transmission_oil?.capacity_liter?.toString() || null,
             transmission_oil_type: variant.specifications.transmission_oil?.type || null,
+            transmission_oil_recommended_brands: transmissionOilBrands,
 
             // Mapping Differential Oil input to Power Steering columns as per existing schema reuse
             power_steering_oil_capacity: psOilCapacity,
             power_steering_oil_type: psOilType,
+            power_steering_oil_recommended_brands: psOilBrands,
 
             brake_oil_type: brakeOilType,
 
