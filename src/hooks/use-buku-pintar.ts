@@ -102,6 +102,36 @@ export function useBukuPintar() {
                     const transBrands = Array.from(new Set([...dbTransBrands, ...legacyTransBrands]));
                     const psBrands = Array.from(new Set([...dbPsBrands, ...legacyDiffBrands]));
 
+                    // Helper to parse battery string (Legacy: "MF (34B19L) 35Ah 12V")
+                    const parseBatteryData = (rawType: string | null) => {
+                        if (!rawType) return { model: "", ampere: 0, voltage: 12 };
+
+                        let model = rawType;
+                        let ampere = 0;
+                        let voltage = 12;
+
+                        // Extract Ampere (e.g., 35Ah or 35 Ah or 35ah)
+                        const ahMatch = model.match(/(\d+)\s*Ah/i);
+                        if (ahMatch) {
+                            ampere = parseInt(ahMatch[1]);
+                            model = model.replace(ahMatch[0], "");
+                        }
+
+                        // Extract Voltage (e.g., 12V or 12 V)
+                        const vMatch = model.match(/(\d+)\s*V\b/i);
+                        if (vMatch) {
+                            voltage = parseInt(vMatch[1]);
+                            model = model.replace(vMatch[0], "");
+                        }
+
+                        // Clean up 
+                        model = model.trim().replace(/\s+/g, " ");
+
+                        return { model, ampere, voltage };
+                    };
+
+                    const batteryParsed = spec.battery_type ? parseBatteryData(spec.battery_type) : { model: "", ampere: 0, voltage: 12 };
+
                     return {
                         id: spec.id,
                         name: spec.variant_name,
@@ -191,11 +221,14 @@ export function useBukuPintar() {
                                 upper_support: "",
                                 upper_support_brands: spec.upper_support_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                             },
+
+
+
                             battery: spec.battery_type ? {
-                                type: "Aki Mobil", // Generic label as user wants code in 'model'
-                                model: spec.battery_type,
-                                ampere: spec.battery_ampere || 0,
-                                voltage: spec.battery_voltage || 12,
+                                type: "Aki Mobil",
+                                model: batteryParsed.model, // Cleaned model code
+                                ampere: spec.battery_ampere || batteryParsed.ampere,
+                                voltage: spec.battery_voltage || batteryParsed.voltage,
                                 dimensions: spec.battery_dimensions || ""
                             } : undefined,
                             brakes: {
