@@ -346,26 +346,34 @@ export function useBukuPintar() {
                 let brandId = "";
                 let modelId = "";
 
+                const brandName = String(item.brand || "").trim();
+                const modelName = String(item.model || "").trim();
+
+                if (!brandName || !modelName) {
+                    console.warn(`Skipping row ${index + 1}: Missing Brand or Model`, item);
+                    continue;
+                }
+
                 // 1. Find or Create Brand
-                let brandIndex = localBrands.findIndex((b: any) => b.name.toLowerCase() === item.brand.toLowerCase());
+                let brandIndex = localBrands.findIndex((b: any) => b.name.toLowerCase() === brandName.toLowerCase());
 
                 if (brandIndex === -1) {
                     // Try to Create Brand
                     try {
-                        console.log(`Creating new brand: ${item.brand}`);
+                        console.log(`Creating new brand: ${brandName}`);
                         const { data: newBrand, error: brandError } = await supabase
                             .from("car_brands")
-                            .insert({ name: item.brand })
+                            .insert({ name: brandName })
                             .select("id, name")
                             .single();
 
                         if (brandError) {
                             if (brandError.code === '23505') { // Unique violation
-                                console.log(`Brand exists (race condition): ${item.brand}`);
+                                console.log(`Brand exists (race condition): ${brandName}`);
                                 const { data: existingBrand } = await supabase
                                     .from("car_brands")
                                     .select("id, name")
-                                    .ilike("name", item.brand)
+                                    .ilike("name", brandName)
                                     .single();
                                 if (existingBrand) {
                                     const newBrandObj = { ...existingBrand, models: [] };
@@ -373,7 +381,7 @@ export function useBukuPintar() {
                                     brandIndex = localBrands.length - 1;
                                     brandId = existingBrand.id;
                                 } else {
-                                    console.error("Failed to recover existing brand:", item.brand);
+                                    console.error("Failed to recover existing brand:", brandName);
                                     throw brandError;
                                 }
                             } else {
@@ -392,7 +400,7 @@ export function useBukuPintar() {
                         const { data: existingBrand } = await supabase
                             .from("car_brands")
                             .select("id, name")
-                            .ilike("name", item.brand)
+                            .ilike("name", brandName)
                             .single();
                         if (existingBrand) {
                             const newBrandObj = { ...existingBrand, models: [] };
@@ -413,25 +421,25 @@ export function useBukuPintar() {
                 // Actually if we just fetched the brand from DB, it has no models loaded.
                 // But we can check if model exists in DB if not found in local array.
 
-                let model = currentBrand.models.find((m: any) => m.name.toLowerCase() === item.model.toLowerCase());
+                let model = currentBrand.models.find((m: any) => m.name.toLowerCase() === modelName.toLowerCase());
 
                 if (!model) {
                     try {
-                        console.log(`Creating new model: ${item.model} for brand ${currentBrand.name}`);
+                        console.log(`Creating new model: ${modelName} for brand ${currentBrand.name}`);
                         const { data: newModel, error: modelError } = await supabase
                             .from("car_models")
-                            .insert({ name: item.model, brand_id: brandId })
+                            .insert({ name: modelName, brand_id: brandId })
                             .select("id, name, brand_id")
                             .single();
 
                         if (modelError) {
                             if (modelError.code === '23505') {
-                                console.log(`Model exists (race condition): ${item.model}`);
+                                console.log(`Model exists (race condition): ${modelName}`);
                                 const { data: existingModel } = await supabase
                                     .from("car_models")
                                     .select("id, name, brand_id")
                                     .eq("brand_id", brandId)
-                                    .ilike("name", item.model)
+                                    .ilike("name", modelName)
                                     .single();
 
                                 if (existingModel) {
@@ -440,7 +448,7 @@ export function useBukuPintar() {
                                 } else {
                                     // Sometimes race condition creates duplicates if we are not careful?
                                     // But we read it. If it fails, we really can't proceed.
-                                    console.error("Failed to recover existing model:", item.model);
+                                    console.error("Failed to recover existing model:", modelName);
                                     throw modelError;
                                 }
                             } else {
@@ -457,7 +465,7 @@ export function useBukuPintar() {
                             .from("car_models")
                             .select("id, name, brand_id")
                             .eq("brand_id", brandId)
-                            .ilike("name", item.model)
+                            .ilike("name", modelName)
                             .single();
 
                         if (existingModel) {
