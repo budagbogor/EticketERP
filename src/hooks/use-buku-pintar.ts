@@ -59,113 +59,145 @@ export function useBukuPintar() {
                         spec.car_models?.name.toLowerCase() === model.name.toLowerCase()
                 );
 
+                // Helper to clean spec string (remove text in parentheses)
+                const cleanSpecString = (str: string | null) => {
+                    if (!str) return "";
+                    // Remove content in parentheses, e.g., "0W-20 (Nissan Genuine)" -> "0W-20"
+                    return str.replace(/\s*\(.*?\)\s*/g, "").trim();
+                };
+
+                // Helper to extract brand from spec string (text in parentheses)
+                const extractBrandFromSpec = (str: string | null): string[] => {
+                    if (!str) return [];
+                    const matches = str.match(/\((.*?)\)/g);
+                    if (!matches) return [];
+                    return matches.map(m => m.replace(/[()]/g, "").trim());
+                };
+
                 // Convert Supabase specs to VehicleVariant format with nested specifications
-                const supabaseVariants: VehicleVariant[] = supabaseSpecs.map((spec: any) => ({
-                    id: spec.id,
-                    name: spec.variant_name,
-                    year_start: spec.year_start,
-                    year_end: spec.year_end,
-                    engine_type: spec.engine_type,
-                    transmission: "AT" as any, // Default, will be updated if needed
-                    engine_code: "", // Not stored in Supabase yet
-                    specifications: {
-                        engine_oil: {
-                            viscosity_options: spec.engine_oil_type ? [spec.engine_oil_type] : [],
-                            capacity_liter: parseFloat(spec.engine_oil_capacity) || 0,
-                            capacity_with_filter_liter: parseFloat(spec.engine_oil_capacity) || 0,
-                            quality_standard: spec.engine_oil_type || "",
-                            recommended_brands: spec.engine_oil_recommended_brands ? spec.engine_oil_recommended_brands.split(',').map((s: string) => s.trim()) : []
-                        },
-                        transmission_oil: {
-                            type: spec.transmission_oil_type || "",
-                            capacity_liter: parseFloat(spec.transmission_oil_capacity) || 0,
-                            recommended_brands: spec.transmission_oil_recommended_brands ? spec.transmission_oil_recommended_brands.split(',').map((s: string) => s.trim()) : []
-                        },
-                        differential_oil: spec.power_steering_oil_type ? {
-                            type: spec.power_steering_oil_type,
-                            capacity_liter: parseFloat(spec.power_steering_oil_capacity) || 0,
-                            recommended_brands: spec.power_steering_oil_recommended_brands ? spec.power_steering_oil_recommended_brands.split(',').map((s: string) => s.trim()) : []
-                        } : undefined,
-                        parts: [
-                            ...(spec.oil_filter_type ? [{
-                                category: "Filter Oli" as any,
-                                name: spec.oil_filter_type,
-                                part_number: "",
-                                compatible_brands: []
-                            }] : []),
-                            ...(spec.air_filter_type ? [{
-                                category: "Filter Udara" as any,
-                                name: spec.air_filter_type,
-                                part_number: "",
-                                compatible_brands: []
-                            }] : []),
-                            ...(spec.cabin_filter_type ? [{
-                                category: "Filter Kabin" as any,
-                                name: spec.cabin_filter_type,
-                                part_number: "",
-                                compatible_brands: []
-                            }] : []),
-                            ...(spec.spark_plug_type ? [{
-                                category: "Busi" as any,
-                                name: spec.spark_plug_type,
-                                part_number: "",
-                                compatible_brands: []
-                            }] : []),
-                            ...(spec.fuel_filter_type ? [{
-                                category: "Filter Bensin" as any,
-                                name: spec.fuel_filter_type,
-                                part_number: "",
-                                compatible_brands: []
-                            }] : []),
-                            ...(spec.wiper_size_driver ? [{
-                                category: "Wiper" as any,
-                                name: `Driver: ${spec.wiper_size_driver}, Passenger: ${spec.wiper_size_passenger || '-'}, Rear: ${spec.wiper_size_rear || '-'}`,
-                                part_number: "",
-                                compatible_brands: []
-                            }] : [])
-                        ],
-                        tires: spec.tire_size_front ? [{
-                            location: "Depan & Belakang" as any,
-                            size: spec.tire_size_front,
-                            pressure_psi_front: parseFloat(spec.tire_pressure_front) || 0,
-                            pressure_psi_rear: parseFloat(spec.tire_pressure_rear) || 0,
-                            recommended_brands: []
-                        }] : [],
-                        suspension: {
-                            shock_absorber_front: "",
-                            shock_absorber_front_brands: spec.shock_depan_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
-                            shock_absorber_rear: "",
-                            shock_absorber_rear_brands: spec.shock_belakang_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
-                            rack_end: "",
-                            rack_end_brands: spec.rack_end_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
-                            tie_rod_end: "",
-                            tie_rod_end_brands: spec.tie_rod_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
-                            link_stabilizer: "",
-                            link_stabilizer_brands: spec.link_stabilizer_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
-                            lower_arm: "",
-                            lower_arm_brands: spec.lower_arm_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
-                            upper_arm: "",
-                            upper_arm_brands: spec.upper_arm_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
-                            upper_support: "",
-                            upper_support_brands: spec.upper_support_recommended_brands?.split(',').map((s: string) => s.trim()) || []
-                        },
-                        battery: spec.battery_type ? {
-                            type: spec.battery_type,
-                            model: "",
-                            ampere: 0,
-                            voltage: 12
-                        } : undefined,
-                        brakes: {
-                            front_type: spec.brake_disc_front_type || "",
-                            rear_type: spec.brake_disc_rear_type || "",
-                            fluid_type: spec.brake_oil_type || "",
-                            pad_part_number_front: spec.brake_pad_front_type || "",
-                            shoe_part_number_rear: spec.brake_pad_rear_type || "",
-                            recommended_brands_front: [],
-                            recommended_brands_rear: []
+                const supabaseVariants: VehicleVariant[] = supabaseSpecs.map((spec: any) => {
+                    // Pre-calculate extracted brands from legacy fields
+                    const legacyEngineBrands = extractBrandFromSpec(spec.engine_oil_type);
+                    const legacyTransBrands = extractBrandFromSpec(spec.transmission_oil_type);
+                    const legacyDiffBrands = extractBrandFromSpec(spec.power_steering_oil_type);
+                    const legacyPowerSteeringBrands = extractBrandFromSpec(spec.power_steering_oil_type);
+
+                    const dbEngineBrands = spec.engine_oil_recommended_brands ? spec.engine_oil_recommended_brands.split(',').map((s: string) => s.trim()) : [];
+                    const dbTransBrands = spec.transmission_oil_recommended_brands ? spec.transmission_oil_recommended_brands.split(',').map((s: string) => s.trim()) : [];
+                    const dbPsBrands = spec.power_steering_oil_recommended_brands ? spec.power_steering_oil_recommended_brands.split(',').map((s: string) => s.trim()) : [];
+
+                    // Merge and deduplicate
+                    const engineBrands = Array.from(new Set([...dbEngineBrands, ...legacyEngineBrands]));
+                    const transBrands = Array.from(new Set([...dbTransBrands, ...legacyTransBrands]));
+                    const psBrands = Array.from(new Set([...dbPsBrands, ...legacyDiffBrands]));
+
+                    return {
+                        id: spec.id,
+                        name: spec.variant_name,
+                        year_start: spec.year_start,
+                        year_end: spec.year_end,
+                        engine_type: spec.engine_type,
+                        transmission: "AT" as any,
+                        engine_code: "",
+                        specifications: {
+                            engine_oil: {
+                                viscosity_options: spec.engine_oil_type ? [cleanSpecString(spec.engine_oil_type)] : [],
+                                capacity_liter: parseFloat(spec.engine_oil_capacity) || 0,
+                                capacity_with_filter_liter: parseFloat(spec.engine_oil_capacity) || 0,
+                                quality_standard: cleanSpecString(spec.engine_oil_type) || "",
+                                recommended_brands: engineBrands
+                            },
+                            transmission_oil: {
+                                type: cleanSpecString(spec.transmission_oil_type) || "",
+                                capacity_liter: parseFloat(spec.transmission_oil_capacity) || 0,
+                                recommended_brands: transBrands
+                            },
+                            differential_oil: spec.power_steering_oil_type ? {
+                                type: cleanSpecString(spec.power_steering_oil_type),
+                                capacity_liter: parseFloat(spec.power_steering_oil_capacity) || 0,
+                                recommended_brands: psBrands
+                            } : undefined,
+                            parts: [
+                                ...(spec.oil_filter_type ? [{
+                                    category: "Filter Oli" as any,
+                                    name: spec.oil_filter_type,
+                                    part_number: "",
+                                    compatible_brands: []
+                                }] : []),
+                                ...(spec.air_filter_type ? [{
+                                    category: "Filter Udara" as any,
+                                    name: spec.air_filter_type,
+                                    part_number: "",
+                                    compatible_brands: []
+                                }] : []),
+                                ...(spec.cabin_filter_type ? [{
+                                    category: "Filter Kabin" as any,
+                                    name: spec.cabin_filter_type,
+                                    part_number: "",
+                                    compatible_brands: []
+                                }] : []),
+                                ...(spec.spark_plug_type ? [{
+                                    category: "Busi" as any,
+                                    name: spec.spark_plug_type,
+                                    part_number: "",
+                                    compatible_brands: []
+                                }] : []),
+                                ...(spec.fuel_filter_type ? [{
+                                    category: "Filter Bensin" as any,
+                                    name: spec.fuel_filter_type,
+                                    part_number: "",
+                                    compatible_brands: []
+                                }] : []),
+                                ...(spec.wiper_size_driver ? [{
+                                    category: "Wiper" as any,
+                                    name: `Driver: ${spec.wiper_size_driver}, Passenger: ${spec.wiper_size_passenger || '-'}, Rear: ${spec.wiper_size_rear || '-'}`,
+                                    part_number: "",
+                                    compatible_brands: []
+                                }] : [])
+                            ],
+                            tires: spec.tire_size_front ? [{
+                                location: "Depan & Belakang" as any,
+                                size: spec.tire_size_front,
+                                pressure_psi_front: parseFloat(spec.tire_pressure_front) || 0,
+                                pressure_psi_rear: parseFloat(spec.tire_pressure_rear) || 0,
+                                recommended_brands: []
+                            }] : [],
+                            suspension: {
+                                shock_absorber_front: "",
+                                shock_absorber_front_brands: spec.shock_depan_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                shock_absorber_rear: "",
+                                shock_absorber_rear_brands: spec.shock_belakang_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                rack_end: "",
+                                rack_end_brands: spec.rack_end_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                tie_rod_end: "",
+                                tie_rod_end_brands: spec.tie_rod_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                link_stabilizer: "",
+                                link_stabilizer_brands: spec.link_stabilizer_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                lower_arm: "",
+                                lower_arm_brands: spec.lower_arm_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                upper_arm: "",
+                                upper_arm_brands: spec.upper_arm_recommended_brands?.split(',').map((s: string) => s.trim()) || [],
+                                upper_support: "",
+                                upper_support_brands: spec.upper_support_recommended_brands?.split(',').map((s: string) => s.trim()) || []
+                            },
+                            battery: spec.battery_type ? {
+                                type: spec.battery_type,
+                                model: "",
+                                ampere: 0,
+                                voltage: 12
+                            } : undefined,
+                            brakes: {
+                                front_type: spec.brake_disc_front_type || "",
+                                rear_type: spec.brake_disc_rear_type || "",
+                                fluid_type: cleanSpecString(spec.brake_oil_type) || "",
+                                pad_part_number_front: spec.brake_pad_front_type || "",
+                                shoe_part_number_rear: spec.brake_pad_rear_type || "",
+                                recommended_brands_front: [],
+                                recommended_brands_rear: []
+                            }
                         }
-                    }
-                }));
+                    };
+                });
 
                 // Merge variants
                 let variants: VehicleVariant[] = [];
