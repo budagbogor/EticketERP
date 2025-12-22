@@ -51,19 +51,15 @@ export function PartSection({ parts, wiper, filters }: PartSectionProps) {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b">
-                                <th className="text-left font-medium py-3 text-muted-foreground w-1/4">Kategori</th>
-                                <th className="text-left font-medium py-3 text-muted-foreground w-1/4">Nama Part</th>
-                                <th className="text-right font-medium py-3 text-muted-foreground w-1/4">Kode / Spesifikasi</th>
-                                <th className="text-right font-medium py-3 text-muted-foreground w-1/4">Rekomendasi</th>
+                                <th className="text-left font-medium py-3 text-muted-foreground w-1/3">Nama Part</th>
+                                <th className="text-right font-medium py-3 text-muted-foreground w-1/3">Kode / Spesifikasi</th>
+                                <th className="text-right font-medium py-3 text-muted-foreground w-1/3">Rekomendasi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y">
                             {displayParts.map((part, idx) => (
                                 <tr key={idx} className="hover:bg-muted/50">
                                     <td className="py-3 font-medium">{part.category}</td>
-                                    <td className="py-3">
-                                        {part.name}
-                                    </td>
                                     <td className="py-3 text-right font-mono text-primary">{part.part_number || part.value || "-"}</td>
                                     <td className="py-3 text-right">
                                         <div className="flex flex-col items-end gap-1">
