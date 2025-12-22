@@ -329,17 +329,61 @@ export function useBukuPintar() {
         }
     });
 
-    // Import vehicle data mutation with batching
+    // Import vehicle data mutation with batching and auto-create brand/model
     const importDataMutation = useMutation({
         mutationFn: async (data: { brand: string; model: string; variant: VehicleVariant }[]) => {
             const insertData = [];
+            // Create a local cache of brands/models to avoid refetching constantly
+            // We start with the currently loaded brands, but deep copy to modify local state
+            let localBrands = JSON.parse(JSON.stringify(supabaseBrands));
 
             for (const item of data) {
-                const brand = supabaseBrands.find(b => b.name.toLowerCase() === item.brand.toLowerCase());
-                const model = brand?.models.find(m => m.name.toLowerCase() === item.model.toLowerCase());
+                let brandId = "";
+                let modelId = "";
 
-                if (brand && model) {
-                    insertData.push(variantToDbFormat(item.variant, brand.id, model.id));
+                // 1. Find or Create Brand
+                let brandIndex = localBrands.findIndex((b: any) => b.name.toLowerCase() === item.brand.toLowerCase());
+
+                if (brandIndex === -1) {
+                    // Create Brand
+                    const { data: newBrand, error: brandError } = await supabase
+                        .from("car_brands")
+                        .insert({ name: item.brand })
+                        .select("id, name")
+                        .single();
+
+                    if (brandError) throw brandError;
+
+                    const newBrandObj = { ...newBrand, models: [] };
+                    localBrands.push(newBrandObj);
+                    brandIndex = localBrands.length - 1;
+                    brandId = newBrand.id;
+                } else {
+                    brandId = localBrands[brandIndex].id;
+                }
+
+                // 2. Find or Create Model
+                const currentBrand = localBrands[brandIndex];
+                let model = currentBrand.models.find((m: any) => m.name.toLowerCase() === item.model.toLowerCase());
+
+                if (!model) {
+                    // Create Model
+                    const { data: newModel, error: modelError } = await supabase
+                        .from("car_models")
+                        .insert({ name: item.model, brand_id: brandId })
+                        .select("id, name, brand_id")
+                        .single();
+
+                    if (modelError) throw modelError;
+
+                    currentBrand.models.push(newModel);
+                    modelId = newModel.id;
+                } else {
+                    modelId = model.id;
+                }
+
+                if (brandId && modelId) {
+                    insertData.push(variantToDbFormat(item.variant, brandId, modelId));
                 }
             }
 
@@ -366,6 +410,8 @@ export function useBukuPintar() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["vehicle-specifications"] });
+            // Also invalidate brands because we might have added new ones
+            queryClient.invalidateQueries({ queryKey: ["brands"] });
             refreshVehicles();
             toast({
                 title: "Berhasil",
