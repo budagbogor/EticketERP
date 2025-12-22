@@ -124,13 +124,21 @@ export function useBukuPintar() {
                             model = model.replace(vMatch[0], "");
                         }
 
+                        // Extract Dimensions (e.g., [238x175x190])
+                        let dimensions = "";
+                        const dimMatch = model.match(/\[([\dxX]+)\]/);
+                        if (dimMatch) {
+                            dimensions = dimMatch[1];
+                            model = model.replace(dimMatch[0], "");
+                        }
+
                         // Clean up 
                         model = model.trim().replace(/\s+/g, " ");
 
-                        return { model, ampere, voltage };
+                        return { model, ampere, voltage, dimensions };
                     };
 
-                    const batteryParsed = spec.battery_type ? parseBatteryData(spec.battery_type) : { model: "", ampere: 0, voltage: 12 };
+                    const batteryParsed = spec.battery_type ? parseBatteryData(spec.battery_type) : { model: "", ampere: 0, voltage: 12, dimensions: "" };
 
                     // Helper to parse part string (e.g., "123-456 (Denso) [10000 KM]")
                     const parsePartData = (rawString: string | null) => {
@@ -246,7 +254,7 @@ export function useBukuPintar() {
                                 model: batteryParsed.model, // Cleaned model code
                                 ampere: spec.battery_ampere || batteryParsed.ampere,
                                 voltage: spec.battery_voltage || batteryParsed.voltage,
-                                dimensions: spec.battery_dimensions || ""
+                                dimensions: spec.battery_dimensions || batteryParsed.dimensions
                             } : undefined,
                             brakes: {
                                 front_type: spec.brake_disc_front_type || "",
