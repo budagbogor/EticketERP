@@ -70,9 +70,6 @@ export function SuspensionSection({ suspension }: SuspensionSectionProps) {
                             </div>
                         ) : null;
                     })}
-                    {Object.values(suspension).every(v => !v || (Array.isArray(v) && v.length === 0)) && (
-                        <div className="col-span-2 text-center text-muted-foreground py-4">Data belum tersedia</div>
-                    )}
                 </div>
             </CardContent>
         </Card>
