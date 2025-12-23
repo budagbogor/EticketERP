@@ -81,6 +81,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
+
         <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/50 text-xs uppercase tracking-wider">
             Menu Utama

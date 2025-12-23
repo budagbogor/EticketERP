@@ -38,63 +38,127 @@ ALTER TABLE public.wiper_sizes ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for wiper_specifications
 -- Allow all authenticated users to read
-CREATE POLICY "Allow authenticated users to read wiper specifications"
-    ON public.wiper_specifications
-    FOR SELECT
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_specifications' 
+    AND policyname = 'Allow authenticated users to read wiper specifications'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to read wiper specifications"
+        ON public.wiper_specifications
+        FOR SELECT
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
 -- Allow authenticated users to insert
-CREATE POLICY "Allow authenticated users to insert wiper specifications"
-    ON public.wiper_specifications
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_specifications' 
+    AND policyname = 'Allow authenticated users to insert wiper specifications'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to insert wiper specifications"
+        ON public.wiper_specifications
+        FOR INSERT
+        TO authenticated
+        WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Allow authenticated users to update
-CREATE POLICY "Allow authenticated users to update wiper specifications"
-    ON public.wiper_specifications
-    FOR UPDATE
-    TO authenticated
-    USING (true)
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_specifications' 
+    AND policyname = 'Allow authenticated users to update wiper specifications'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to update wiper specifications"
+        ON public.wiper_specifications
+        FOR UPDATE
+        TO authenticated
+        USING (true)
+        WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Allow authenticated users to delete
-CREATE POLICY "Allow authenticated users to delete wiper specifications"
-    ON public.wiper_specifications
-    FOR DELETE
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_specifications' 
+    AND policyname = 'Allow authenticated users to delete wiper specifications'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to delete wiper specifications"
+        ON public.wiper_specifications
+        FOR DELETE
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
 -- Create policies for wiper_sizes
 -- Allow all authenticated users to read
-CREATE POLICY "Allow authenticated users to read wiper sizes"
-    ON public.wiper_sizes
-    FOR SELECT
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_sizes' 
+    AND policyname = 'Allow authenticated users to read wiper sizes'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to read wiper sizes"
+        ON public.wiper_sizes
+        FOR SELECT
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
 -- Allow authenticated users to insert
-CREATE POLICY "Allow authenticated users to insert wiper sizes"
-    ON public.wiper_sizes
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_sizes' 
+    AND policyname = 'Allow authenticated users to insert wiper sizes'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to insert wiper sizes"
+        ON public.wiper_sizes
+        FOR INSERT
+        TO authenticated
+        WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Allow authenticated users to update
-CREATE POLICY "Allow authenticated users to update wiper sizes"
-    ON public.wiper_sizes
-    FOR UPDATE
-    TO authenticated
-    USING (true)
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_sizes' 
+    AND policyname = 'Allow authenticated users to update wiper sizes'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to update wiper sizes"
+        ON public.wiper_sizes
+        FOR UPDATE
+        TO authenticated
+        USING (true)
+        WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Allow authenticated users to delete
-CREATE POLICY "Allow authenticated users to delete wiper sizes"
-    ON public.wiper_sizes
-    FOR DELETE
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'wiper_sizes' 
+    AND policyname = 'Allow authenticated users to delete wiper sizes'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to delete wiper sizes"
+        ON public.wiper_sizes
+        FOR DELETE
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
 -- Insert seed data
 INSERT INTO public.wiper_specifications (id, brand, model, year_start, year_end, notes) VALUES
@@ -107,47 +171,56 @@ INSERT INTO public.wiper_specifications (id, brand, model, year_start, year_end,
 ('550e8400-e29b-41d4-a716-446655440007', 'Daihatsu', 'Terios', 2018, NULL, NULL),
 ('550e8400-e29b-41d4-a716-446655440008', 'Suzuki', 'Ertiga', 2012, 2018, NULL),
 ('550e8400-e29b-41d4-a716-446655440009', 'Suzuki', 'Ignis', 2017, NULL, NULL),
-('550e8400-e29b-41d4-a716-446655440010', 'Nissan', 'Grand Livina', 2007, 2018, NULL);
+('550e8400-e29b-41d4-a716-446655440010', 'Nissan', 'Grand Livina', 2007, 2018, NULL)
+ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public.wiper_sizes (specification_id, position, size_inch, blade_brand, part_code, stock, price) VALUES
+INSERT INTO public.wiper_sizes (specification_id, position, size_inch, blade_brand, part_code, stock, price)
+SELECT v.specification_id, v.position, v.size_inch, v.blade_brand, v.part_code, v.stock, v.price
+FROM (VALUES
 -- Toyota Avanza Gen 1
-('550e8400-e29b-41d4-a716-446655440001', 'kiri', 20, 'Universal', NULL, 6, 65000),
-('550e8400-e29b-41d4-a716-446655440001', 'kanan', 16, 'Universal', NULL, 8, 60000),
-('550e8400-e29b-41d4-a716-446655440001', 'belakang', 12, 'Universal', NULL, 4, 55000),
+('550e8400-e29b-41d4-a716-446655440001'::uuid, 'kiri', 20, 'Universal', NULL, 6, 65000),
+('550e8400-e29b-41d4-a716-446655440001'::uuid, 'kanan', 16, 'Universal', NULL, 8, 60000),
+('550e8400-e29b-41d4-a716-446655440001'::uuid, 'belakang', 12, 'Universal', NULL, 4, 55000),
 -- Toyota Avanza Gen 2
-('550e8400-e29b-41d4-a716-446655440002', 'kiri', 24, 'Premium', NULL, 5, 85000),
-('550e8400-e29b-41d4-a716-446655440002', 'kanan', 14, 'Premium', NULL, 5, 80000),
-('550e8400-e29b-41d4-a716-446655440002', 'belakang', 12, 'Universal', NULL, 3, 60000),
+('550e8400-e29b-41d4-a716-446655440002'::uuid, 'kiri', 24, 'Premium', NULL, 5, 85000),
+('550e8400-e29b-41d4-a716-446655440002'::uuid, 'kanan', 14, 'Premium', NULL, 5, 80000),
+('550e8400-e29b-41d4-a716-446655440002'::uuid, 'belakang', 12, 'Universal', NULL, 3, 60000),
 -- Toyota Innova Reborn
-('550e8400-e29b-41d4-a716-446655440003', 'kiri', 26, 'Premium', NULL, 2, 95000),
-('550e8400-e29b-41d4-a716-446655440003', 'kanan', 16, 'Premium', NULL, 2, 90000),
+('550e8400-e29b-41d4-a716-446655440003'::uuid, 'kiri', 26, 'Premium', NULL, 2, 95000),
+('550e8400-e29b-41d4-a716-446655440003'::uuid, 'kanan', 16, 'Premium', NULL, 2, 90000),
 -- Mitsubishi Xpander
-('550e8400-e29b-41d4-a716-446655440004', 'kiri', 24, 'OEM', NULL, 5, 90000),
-('550e8400-e29b-41d4-a716-446655440004', 'kanan', 16, 'OEM', NULL, 5, 88000),
-('550e8400-e29b-41d4-a716-446655440004', 'belakang', 12, 'Universal', NULL, 4, 65000),
+('550e8400-e29b-41d4-a716-446655440004'::uuid, 'kiri', 24, 'OEM', NULL, 5, 90000),
+('550e8400-e29b-41d4-a716-446655440004'::uuid, 'kanan', 16, 'OEM', NULL, 5, 88000),
+('550e8400-e29b-41d4-a716-446655440004'::uuid, 'belakang', 12, 'Universal', NULL, 4, 65000),
 -- Honda Brio
-('550e8400-e29b-41d4-a716-446655440005', 'kiri', 22, 'Universal', NULL, 7, 75000),
-('550e8400-e29b-41d4-a716-446655440005', 'kanan', 14, 'Universal', NULL, 7, 70000),
+('550e8400-e29b-41d4-a716-446655440005'::uuid, 'kiri', 22, 'Universal', NULL, 7, 75000),
+('550e8400-e29b-41d4-a716-446655440005'::uuid, 'kanan', 14, 'Universal', NULL, 7, 70000),
 -- Honda Jazz GE8
-('550e8400-e29b-41d4-a716-446655440006', 'kiri', 24, 'Premium', NULL, 3, 90000),
-('550e8400-e29b-41d4-a716-446655440006', 'kanan', 14, 'Premium', NULL, 3, 85000),
-('550e8400-e29b-41d4-a716-446655440006', 'belakang', 14, 'Universal', NULL, 3, 70000),
+('550e8400-e29b-41d4-a716-446655440006'::uuid, 'kiri', 24, 'Premium', NULL, 3, 90000),
+('550e8400-e29b-41d4-a716-446655440006'::uuid, 'kanan', 14, 'Premium', NULL, 3, 85000),
+('550e8400-e29b-41d4-a716-446655440006'::uuid, 'belakang', 14, 'Universal', NULL, 3, 70000),
 -- Daihatsu Terios
-('550e8400-e29b-41d4-a716-446655440007', 'kiri', 24, 'OEM', NULL, 4, 88000),
-('550e8400-e29b-41d4-a716-446655440007', 'kanan', 14, 'OEM', NULL, 4, 84000),
-('550e8400-e29b-41d4-a716-446655440007', 'belakang', 12, 'Universal', NULL, 3, 65000),
+('550e8400-e29b-41d4-a716-446655440007'::uuid, 'kiri', 24, 'OEM', NULL, 4, 88000),
+('550e8400-e29b-41d4-a716-446655440007'::uuid, 'kanan', 14, 'OEM', NULL, 4, 84000),
+('550e8400-e29b-41d4-a716-446655440007'::uuid, 'belakang', 12, 'Universal', NULL, 3, 65000),
 -- Suzuki Ertiga
-('550e8400-e29b-41d4-a716-446655440008', 'kiri', 22, 'Universal', NULL, 6, 80000),
-('550e8400-e29b-41d4-a716-446655440008', 'kanan', 16, 'Universal', NULL, 6, 78000),
-('550e8400-e29b-41d4-a716-446655440008', 'belakang', 10, 'Universal', NULL, 4, 60000),
+('550e8400-e29b-41d4-a716-446655440008'::uuid, 'kiri', 22, 'Universal', NULL, 6, 80000),
+('550e8400-e29b-41d4-a716-446655440008'::uuid, 'kanan', 16, 'Universal', NULL, 6, 78000),
+('550e8400-e29b-41d4-a716-446655440008'::uuid, 'belakang', 10, 'Universal', NULL, 4, 60000),
 -- Suzuki Ignis
-('550e8400-e29b-41d4-a716-446655440009', 'kiri', 21, 'OEM', NULL, 4, 88000),
-('550e8400-e29b-41d4-a716-446655440009', 'kanan', 16, 'OEM', NULL, 4, 85000),
-('550e8400-e29b-41d4-a716-446655440009', 'belakang', 12, 'Universal', NULL, 3, 65000),
+('550e8400-e29b-41d4-a716-446655440009'::uuid, 'kiri', 21, 'OEM', NULL, 4, 88000),
+('550e8400-e29b-41d4-a716-446655440009'::uuid, 'kanan', 16, 'OEM', NULL, 4, 85000),
+('550e8400-e29b-41d4-a716-446655440009'::uuid, 'belakang', 12, 'Universal', NULL, 3, 65000),
 -- Nissan Grand Livina
-('550e8400-e29b-41d4-a716-446655440010', 'kiri', 24, 'Universal', NULL, 5, 85000),
-('550e8400-e29b-41d4-a716-446655440010', 'kanan', 16, 'Universal', NULL, 5, 80000),
-('550e8400-e29b-41d4-a716-446655440010', 'belakang', 12, 'Universal', NULL, 3, 65000);
+('550e8400-e29b-41d4-a716-446655440010'::uuid, 'kiri', 24, 'Universal', NULL, 5, 85000),
+('550e8400-e29b-41d4-a716-446655440010'::uuid, 'kanan', 16, 'Universal', NULL, 5, 80000),
+('550e8400-e29b-41d4-a716-446655440010'::uuid, 'belakang', 12, 'Universal', NULL, 3, 65000)
+) AS v(specification_id, position, size_inch, blade_brand, part_code, stock, price)
+WHERE NOT EXISTS (
+    SELECT 1 FROM public.wiper_sizes ws 
+    WHERE ws.specification_id = v.specification_id 
+    AND ws.position = v.position
+);
 
 -- Add comment to tables
 COMMENT ON TABLE public.wiper_specifications IS 'Stores wiper blade specifications for different vehicle models';

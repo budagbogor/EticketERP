@@ -38,56 +38,120 @@ ALTER TABLE public.tire_brands ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tire_products ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for tire_brands
-CREATE POLICY "Allow authenticated users to read tire brands"
-    ON public.tire_brands
-    FOR SELECT
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_brands' 
+    AND policyname = 'Allow authenticated users to read tire brands'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to read tire brands"
+        ON public.tire_brands
+        FOR SELECT
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
-CREATE POLICY "Allow authenticated users to insert tire brands"
-    ON public.tire_brands
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_brands' 
+    AND policyname = 'Allow authenticated users to insert tire brands'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to insert tire brands"
+        ON public.tire_brands
+        FOR INSERT
+        TO authenticated
+        WITH CHECK (true);
+  END IF;
+END $$;
 
-CREATE POLICY "Allow authenticated users to update tire brands"
-    ON public.tire_brands
-    FOR UPDATE
-    TO authenticated
-    USING (true)
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_brands' 
+    AND policyname = 'Allow authenticated users to update tire brands'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to update tire brands"
+        ON public.tire_brands
+        FOR UPDATE
+        TO authenticated
+        USING (true)
+        WITH CHECK (true);
+  END IF;
+END $$;
 
-CREATE POLICY "Allow authenticated users to delete tire brands"
-    ON public.tire_brands
-    FOR DELETE
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_brands' 
+    AND policyname = 'Allow authenticated users to delete tire brands'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to delete tire brands"
+        ON public.tire_brands
+        FOR DELETE
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
 -- Create policies for tire_products
-CREATE POLICY "Allow authenticated users to read tire products"
-    ON public.tire_products
-    FOR SELECT
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_products' 
+    AND policyname = 'Allow authenticated users to read tire products'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to read tire products"
+        ON public.tire_products
+        FOR SELECT
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
-CREATE POLICY "Allow authenticated users to insert tire products"
-    ON public.tire_products
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_products' 
+    AND policyname = 'Allow authenticated users to insert tire products'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to insert tire products"
+        ON public.tire_products
+        FOR INSERT
+        TO authenticated
+        WITH CHECK (true);
+  END IF;
+END $$;
 
-CREATE POLICY "Allow authenticated users to update tire products"
-    ON public.tire_products
-    FOR UPDATE
-    TO authenticated
-    USING (true)
-    WITH CHECK (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_products' 
+    AND policyname = 'Allow authenticated users to update tire products'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to update tire products"
+        ON public.tire_products
+        FOR UPDATE
+        TO authenticated
+        USING (true)
+        WITH CHECK (true);
+  END IF;
+END $$;
 
-CREATE POLICY "Allow authenticated users to delete tire products"
-    ON public.tire_products
-    FOR DELETE
-    TO authenticated
-    USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'tire_products' 
+    AND policyname = 'Allow authenticated users to delete tire products'
+  ) THEN
+    CREATE POLICY "Allow authenticated users to delete tire products"
+        ON public.tire_products
+        FOR DELETE
+        TO authenticated
+        USING (true);
+  END IF;
+END $$;
 
 -- Insert seed data for tire brands
 -- Insert seed data for tire brands

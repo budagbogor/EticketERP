@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { AdminRoute, ProtectedRoute, WriterRoute } from "@/components/auth/ProtectedRoute";
+import { ChatAssistant } from "@/components/ChatAssistant";
 
 // Pages
 import Login from "./pages/Login";
@@ -40,7 +41,8 @@ const App = () => (
       <AuthProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <ChatAssistant />
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

@@ -133,6 +133,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create trigger to automatically update updated_at
+DROP TRIGGER IF EXISTS update_vehicle_specifications_updated_at ON vehicle_specifications;
 CREATE TRIGGER update_vehicle_specifications_updated_at
     BEFORE UPDATE ON vehicle_specifications
     FOR EACH ROW
