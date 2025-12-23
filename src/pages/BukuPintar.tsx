@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Droplet, Wrench, CircleDot, Info, Activity, Zap, Disc, Download, Table as TableIcon, Search as SearchIcon, Wind } from "lucide-react";
+import { BookOpen, Droplet, Wrench, CircleDot, Info, Activity, Zap, Disc, Download, Table as TableIcon, Search as SearchIcon } from "lucide-react";
 import { exportToCSV } from "@/lib/export-utils";
 import { VehicleSelector } from "@/components/buku-pintar/VehicleSelector";
 import { VehicleDatabaseTable } from "@/components/buku-pintar/VehicleDatabaseTable";
@@ -12,7 +12,6 @@ import { TireSection } from "@/components/buku-pintar/TireSection";
 import { SuspensionSection } from "@/components/buku-pintar/SuspensionSection";
 import { BatterySection } from "@/components/buku-pintar/BatterySection";
 import { BrakeSection } from "@/components/buku-pintar/BrakeSection";
-import { WiperSection } from "@/components/buku-pintar/WiperSection";
 import { Vehicle, VehicleVariant } from "@/types/buku-pintar";
 import { AddDataDialog } from "@/components/buku-pintar/AddDataDialog";
 import { EditDataDialog } from "@/components/buku-pintar/EditDataDialog";
@@ -152,9 +151,6 @@ export default function BukuPintar() {
                                     <TabsTrigger value="tires" className="flex gap-2">
                                         <CircleDot className="w-4 h-4" /> Ban
                                     </TabsTrigger>
-                                    <TabsTrigger value="wiper" className="flex gap-2">
-                                        <Wind className="w-4 h-4" /> Wiper
-                                    </TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="oil" className="mt-6">
@@ -193,10 +189,6 @@ export default function BukuPintar() {
                                         tire={selectedVariant.specifications.tire}
                                         tires={selectedVariant.specifications.tires}
                                     />
-                                </TabsContent>
-
-                                <TabsContent value="wiper" className="mt-6">
-                                    <WiperSection wiper={selectedVariant.specifications.wiper} />
                                 </TabsContent>
                             </Tabs>
                         </div>
