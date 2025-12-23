@@ -226,6 +226,7 @@ export function useBukuPintar() {
                                 size: spec.tire_size_front,
                                 pressure_psi_front: parseFloat(spec.tire_pressure_front) || 0,
                                 pressure_psi_rear: parseFloat(spec.tire_pressure_rear) || 0,
+                                load_speed_index: spec.tire_load_speed_index || undefined,
                                 recommended_brands: spec.tire_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                             }] : [],
                             suspension: {
@@ -382,6 +383,7 @@ export function useBukuPintar() {
             tire_size_rear: tireSpec.rear_size || tireSpec.size || null,
             tire_pressure_front: tireSpec.front_pressure?.toString() || tireSpec.pressure_psi_front?.toString() || null,
             tire_pressure_rear: tireSpec.rear_pressure?.toString() || tireSpec.pressure_psi_rear?.toString() || null,
+            tire_load_speed_index: tireSpec.load_speed_index || null,
             tire_recommended_brands: tireBrands,
 
             battery_type: variant.specifications.battery?.model || variant.specifications.battery?.type || null,
