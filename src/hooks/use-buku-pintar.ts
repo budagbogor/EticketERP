@@ -350,7 +350,14 @@ export function useBukuPintar() {
         };
         const getPartNumber = (category: string, namePart: string) => {
             const part = getPart(category, namePart);
-            return part?.part_number || null;
+            if (!part) return null;
+
+            // Reconstruct part_number string with interval if it exists
+            let partString = part.part_number || "";
+            if (part.replacement_interval_km) {
+                partString += ` [${part.replacement_interval_km} KM]`;
+            }
+            return partString || null;
         };
 
         // Extract Filter values (try legacy object first, then parts array)
