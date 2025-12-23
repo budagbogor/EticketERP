@@ -274,7 +274,7 @@ export function useBukuPintar() {
 
                             battery: spec.battery_type ? {
                                 type: batteryParsed.type || spec.battery_type || "Aki Mobil", // Use extracted type, or raw string, or fallback
-                                model: batteryParsed.model, // Cleaned model code
+                                model: spec.battery_model || batteryParsed.model || "", // Use database model, or parsed model, or empty
                                 ampere: spec.battery_ampere || batteryParsed.ampere,
                                 voltage: spec.battery_voltage || batteryParsed.voltage,
                                 dimensions: spec.battery_dimensions || batteryParsed.dimensions
@@ -417,8 +417,6 @@ export function useBukuPintar() {
             tire_recommended_brands: tireBrands,
 
             // Reconstruct battery_type string to include type, model, ampere, voltage, dimensions
-            // Format: "Type Model AmpereAh VoltageV [Dimensions]"
-            // Example: "MF 55D23L 55Ah 12V [238x175x190]"
             battery_type: variant.specifications.battery ? (() => {
                 const b = variant.specifications.battery;
                 let batteryString = "";
@@ -450,6 +448,7 @@ export function useBukuPintar() {
 
                 return batteryString.trim() || null;
             })() : null,
+            battery_model: variant.specifications.battery?.model || null,
             battery_ampere: variant.specifications.battery?.ampere || null,
             battery_voltage: variant.specifications.battery?.voltage || null,
             battery_dimensions: variant.specifications.battery?.dimensions || null,
