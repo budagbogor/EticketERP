@@ -102,43 +102,65 @@ export function useBukuPintar() {
                     const transBrands = Array.from(new Set([...dbTransBrands, ...legacyTransBrands]));
                     const psBrands = Array.from(new Set([...dbPsBrands, ...legacyDiffBrands]));
 
-                    // Helper to parse battery string (Legacy: "MF (34B19L) 35Ah 12V")
+                    // Helper to parse battery string (Legacy: "MF (34B19L) 35Ah 12V" or "Kering 55D23L 55Ah 12V")
                     const parseBatteryData = (rawType: string | null) => {
-                        if (!rawType) return { model: "", ampere: 0, voltage: 12 };
+                        if (!rawType) return { type: "", model: "", ampere: 0, voltage: 12, dimensions: "" };
 
-                        let model = rawType;
+                        let remainingString = rawType;
+                        let type = "";
+                        let model = "";
                         let ampere = 0;
                         let voltage = 12;
+                        let dimensions = "";
+
+                        // Extract Type (MF, Kering, Basah, etc.) - usually at the beginning
+                        const typeMatch = remainingString.match(/^(MF|Kering|Basah|Maintenance Free|Wet|Dry)\s*/i);
+                        if (typeMatch) {
+                            type = typeMatch[1];
+                            remainingString = remainingString.replace(typeMatch[0], "");
+                        }
+
+                        // Extract Model Code in parentheses (e.g., (34B19L) or (55D23L))
+                        const modelInParenMatch = remainingString.match(/\(([A-Z0-9]+)\)/);
+                        if (modelInParenMatch) {
+                            model = modelInParenMatch[1];
+                            remainingString = remainingString.replace(modelInParenMatch[0], "");
+                        }
+
+                        // If no model in parentheses, try to extract alphanumeric model code
+                        if (!model) {
+                            const modelMatch = remainingString.match(/([A-Z0-9]{5,})/);
+                            if (modelMatch) {
+                                model = modelMatch[1];
+                                remainingString = remainingString.replace(modelMatch[0], "");
+                            }
+                        }
 
                         // Extract Ampere (e.g., 35Ah or 35 Ah or 35ah)
-                        const ahMatch = model.match(/(\d+)\s*Ah/i);
+                        const ahMatch = remainingString.match(/(\d+)\s*Ah/i);
                         if (ahMatch) {
                             ampere = parseInt(ahMatch[1]);
-                            model = model.replace(ahMatch[0], "");
+                            remainingString = remainingString.replace(ahMatch[0], "");
                         }
 
                         // Extract Voltage (e.g., 12V or 12 V)
-                        const vMatch = model.match(/(\d+)\s*V\b/i);
+                        const vMatch = remainingString.match(/(\d+)\s*V\b/i);
                         if (vMatch) {
                             voltage = parseInt(vMatch[1]);
-                            model = model.replace(vMatch[0], "");
+                            remainingString = remainingString.replace(vMatch[0], "");
                         }
 
                         // Extract Dimensions (e.g., [238x175x190])
-                        let dimensions = "";
-                        const dimMatch = model.match(/\[([\dxX]+)\]/);
+                        const dimMatch = remainingString.match(/\[([\dxX]+)\]/);
                         if (dimMatch) {
                             dimensions = dimMatch[1];
-                            model = model.replace(dimMatch[0], "");
+                            remainingString = remainingString.replace(dimMatch[0], "");
                         }
 
-                        // Clean up 
-                        model = model.trim().replace(/\s+/g, " ");
-
-                        return { model, ampere, voltage, dimensions };
+                        return { type, model: model.trim(), ampere, voltage, dimensions };
                     };
 
-                    const batteryParsed = spec.battery_type ? parseBatteryData(spec.battery_type) : { model: "", ampere: 0, voltage: 12, dimensions: "" };
+                    const batteryParsed = spec.battery_type ? parseBatteryData(spec.battery_type) : { type: "", model: "", ampere: 0, voltage: 12, dimensions: "" };
 
                     // Helper to parse part string (e.g., "123-456 (Denso) [10000 KM]")
                     const parsePartData = (rawString: string | null) => {
@@ -251,7 +273,7 @@ export function useBukuPintar() {
 
 
                             battery: spec.battery_type ? {
-                                type: "Aki Mobil",
+                                type: batteryParsed.type || "Aki Mobil", // Use extracted type or fallback to "Aki Mobil"
                                 model: batteryParsed.model, // Cleaned model code
                                 ampere: spec.battery_ampere || batteryParsed.ampere,
                                 voltage: spec.battery_voltage || batteryParsed.voltage,
@@ -386,7 +408,40 @@ export function useBukuPintar() {
             tire_load_speed_index: tireSpec.load_speed_index || null,
             tire_recommended_brands: tireBrands,
 
-            battery_type: variant.specifications.battery?.model || variant.specifications.battery?.type || null,
+            // Reconstruct battery_type string to include type, model, ampere, voltage, dimensions
+            // Format: "Type Model AmpereAh VoltageV [Dimensions]"
+            // Example: "MF 55D23L 55Ah 12V [238x175x190]"
+            battery_type: variant.specifications.battery ? (() => {
+                const b = variant.specifications.battery;
+                let batteryString = "";
+
+                // Add type if available (e.g., "MF", "Kering", "Basah")
+                if (b.type && b.type !== "Aki Mobil") {
+                    batteryString += b.type + " ";
+                }
+
+                // Add model code (e.g., "55D23L")
+                if (b.model) {
+                    batteryString += b.model + " ";
+                }
+
+                // Add ampere (e.g., "55Ah")
+                if (b.ampere) {
+                    batteryString += b.ampere + "Ah ";
+                }
+
+                // Add voltage (e.g., "12V")
+                if (b.voltage) {
+                    batteryString += b.voltage + "V ";
+                }
+
+                // Add dimensions (e.g., "[238x175x190]")
+                if (b.dimensions) {
+                    batteryString += "[" + b.dimensions + "]";
+                }
+
+                return batteryString.trim() || null;
+            })() : null,
             battery_ampere: variant.specifications.battery?.ampere || null,
             battery_voltage: variant.specifications.battery?.voltage || null,
             battery_dimensions: variant.specifications.battery?.dimensions || null,

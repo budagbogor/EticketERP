@@ -53,11 +53,13 @@ export function SuspensionSection({ suspension }: SuspensionSectionProps) {
                             }
                         }
 
-                        return (displayValue || (displayBrands && displayBrands.length > 0)) ? (
+                        return ((displayValue && displayValue !== "" && displayValue !== "-") || (displayBrands && displayBrands.length > 0)) ? (
                             <div key={idx} className="flex flex-col gap-1 p-3 bg-muted/50 rounded-lg">
                                 <div className="flex justify-between items-center">
                                     <span className="text-muted-foreground text-sm">{part.label}</span>
-                                    <span className="font-medium text-right font-mono">{displayValue || "-"}</span>
+                                    {displayValue && displayValue !== "" && displayValue !== "-" && (
+                                        <span className="font-medium text-right font-mono">{displayValue}</span>
+                                    )}
                                 </div>
                                 {displayBrands && displayBrands.length > 0 && (
                                     <div className="flex justify-between items-center text-xs pt-1 border-t border-muted-foreground/20 mt-1">
