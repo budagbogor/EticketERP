@@ -273,7 +273,7 @@ export function useBukuPintar() {
 
 
                             battery: spec.battery_type ? {
-                                type: batteryParsed.type || "Aki Mobil", // Use extracted type or fallback to "Aki Mobil"
+                                type: batteryParsed.type || spec.battery_type || "Aki Mobil", // Use extracted type, or raw string, or fallback
                                 model: batteryParsed.model, // Cleaned model code
                                 ampere: spec.battery_ampere || batteryParsed.ampere,
                                 voltage: spec.battery_voltage || batteryParsed.voltage,
