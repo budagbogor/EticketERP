@@ -217,7 +217,7 @@ export function useBukuPintar() {
                                 viscosity_options: spec.engine_oil_type ? [cleanSpecString(spec.engine_oil_type)] : [],
                                 capacity_liter: parseFloat(spec.engine_oil_capacity) || 0,
                                 capacity_with_filter_liter: parseFloat(spec.engine_oil_capacity) || 0,
-                                quality_standard: cleanSpecString(spec.engine_oil_type) || "",
+                                quality_standard: cleanSpecString(spec.engine_oil_quality_standard) || "",
                                 recommended_brands: engineBrands
                             },
                             transmission_oil: {
@@ -389,6 +389,7 @@ export function useBukuPintar() {
 
             engine_oil_capacity: variant.specifications.engine_oil?.capacity_liter?.toString() || null,
             engine_oil_type: engineOilType,
+            engine_oil_quality_standard: variant.specifications.engine_oil?.quality_standard || null,
             engine_oil_recommended_brands: engineOilBrands,
 
             transmission_oil_capacity: variant.specifications.transmission_oil?.capacity_liter?.toString() || null,
