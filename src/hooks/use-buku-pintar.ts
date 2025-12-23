@@ -113,8 +113,8 @@ export function useBukuPintar() {
                         let voltage = 12;
                         let dimensions = "";
 
-                        // Extract Type (MF, Kering, Basah, etc.) - usually at the beginning
-                        const typeMatch = remainingString.match(/^(MF|Kering|Basah|Maintenance Free|Wet|Dry)\s*/i);
+                        // Extract Type (MF, Kering, Basah, AGM, EFB, etc.) - usually at the beginning
+                        const typeMatch = remainingString.match(/^(MF|Kering|Basah|AGM|EFB|Lithium|Li-Ion|Gel|Maintenance Free|Wet|Dry|Calcium|Silver)\s*/i);
                         if (typeMatch) {
                             type = typeMatch[1];
                             remainingString = remainingString.replace(typeMatch[0], "");
