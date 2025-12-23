@@ -475,13 +475,21 @@ export function useBukuPintar() {
             brake_disc_front_type: variant.specifications.brake_parts?.front_disc || variant.specifications.brakes?.front_type || null,
             brake_disc_rear_type: variant.specifications.brake_parts?.rear_disc || variant.specifications.brakes?.rear_type || null,
 
+            shock_absorber_front: variant.specifications.suspension?.shock_absorber_front || null,
             shock_depan_recommended_brands: variant.specifications.suspension?.shock_absorber_front_brands?.join(", ") || null,
+            shock_absorber_rear: variant.specifications.suspension?.shock_absorber_rear || null,
             shock_belakang_recommended_brands: variant.specifications.suspension?.shock_absorber_rear_brands?.join(", ") || null,
+            rack_end: variant.specifications.suspension?.rack_end || null,
             rack_end_recommended_brands: variant.specifications.suspension?.rack_end_brands?.join(", ") || null,
+            tie_rod_end: variant.specifications.suspension?.tie_rod_end || null,
             tie_rod_recommended_brands: variant.specifications.suspension?.tie_rod_end_brands?.join(", ") || null,
+            link_stabilizer: variant.specifications.suspension?.link_stabilizer || null,
             link_stabilizer_recommended_brands: variant.specifications.suspension?.link_stabilizer_brands?.join(", ") || null,
+            lower_arm: variant.specifications.suspension?.lower_arm || null,
             lower_arm_recommended_brands: variant.specifications.suspension?.lower_arm_brands?.join(", ") || null,
+            upper_arm: variant.specifications.suspension?.upper_arm || null,
             upper_arm_recommended_brands: variant.specifications.suspension?.upper_arm_brands?.join(", ") || null,
+            upper_support: variant.specifications.suspension?.upper_support || null,
             upper_support_recommended_brands: variant.specifications.suspension?.upper_support_brands?.join(", ") || null,
 
             created_by: user?.id || null
