@@ -270,6 +270,11 @@ export function useBukuPintar() {
                                 upper_support_brands: spec.upper_support_recommended_brands?.split(',').map((s: string) => s.trim()) || []
                             },
 
+                            wiper: (spec.wiper_size_driver || spec.wiper_size_passenger || spec.wiper_size_rear) ? {
+                                driver: spec.wiper_size_driver || undefined,
+                                passenger: spec.wiper_size_passenger || undefined,
+                                rear: spec.wiper_size_rear || undefined
+                            } : undefined,
 
 
                             battery: spec.battery_type ? {
