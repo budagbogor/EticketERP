@@ -110,7 +110,7 @@ The database has the following key tables:
 1. complaints: Customer complaints.
    - Columns: id, ticket_number, customer_name, customer_phone, branch, vehicle_brand, vehicle_model, description, status, created_at, category.
 2. vehicle_specifications: Technical specs of vehicles.
-   - Columns: brand_id, model_id, variant_name, engine_oil_type, tire_size_front, tire_size_rear, battery_type, wiper_size_driver, wiper_size_passenger, created_at.
+   - Columns: brand_id, model_id, variant_name, year_start, year_end, engine_type, engine_oil_capacity, engine_oil_type, transmission_oil_capacity, transmission_oil_type, power_steering_oil_capacity, power_steering_oil_type, brake_oil_type, radiator_coolant_capacity, radiator_coolant_type, ac_freon_capacity, ac_freon_type, tire_size_front, tire_size_rear, tire_pressure_front, tire_pressure_rear, battery_type, wiper_size_driver, wiper_size_passenger, wiper_size_rear, spark_plug_type, air_filter_type, cabin_filter_type, fuel_filter_type, oil_filter_type, brake_pad_front_type, brake_pad_rear_type, brake_disc_front_type, brake_disc_rear_type, shock_depan_recommended_brands, shock_belakang_recommended_brands, rack_end_recommended_brands, tie_rod_recommended_brands, link_stabilizer_recommended_brands, lower_arm_recommended_brands, upper_arm_recommended_brands, upper_support_recommended_brands, created_at.
 3. technical_reports: Technical analysis of complaints.
    - Columns: complaint_id, damage_analysis, repair_method, conclusion, estimated_cost.
 4. car_brands: Brand names (e.g., Toyota, Honda).
@@ -134,6 +134,33 @@ Relationships:
 - wiper_specifications.id -> wiper_sizes.specification_id
 `;
 
+const APP_DOCUMENTATION = `
+SYSTEM KNOWLEDGE BASE (WORKFLOWS):
+
+1. **COMPLAIN COMPASS (Pendataan Medsos)**
+   - **Tujuan**: Mencatat komplain dari media sosial (IG/FB/TikTok/WA) dengan data minim.
+   - **User**: Admin CS.
+   - **Input**: Username, Link, Channel, Kategori, Risiko Viral (Normal/Potensi).
+   - **Flow**:
+     1. Terima komplain di medsos.
+     2. Input ke "Complain Compass" (Status: Open).
+     3. Coba hubungi customer (Status: Monitoring).
+     4. Jika selesai atau jadi tiket formal -> Status: Closed.
+
+2. **SISTEM TIKET (Resmi)**
+   - **Tujuan**: Penanganan servis/komplain resmi di bengkel.
+   - **Input**: Nama, Telp, Merek, Model, Nopol, VIN, KM, Attachment (Foto).
+   - **Flow**:
+     1. Buat Tiket (Status: New).
+     2. Teknisi periksa -> Buat "Laporan Teknik" (Analisa kerusakan, estimasi biaya).
+     3. Persetujuan & Pengerjaan (Status: In Progress).
+     4. Selesai (Status: Closed).
+
+3. **BUKU PINTAR**
+   - **Tujuan**: Database spesifikasi teknis (Oli, Ban, Part).
+   - **Cara Pakai**: Cukup tanya "Oli Avanza" atau "Ban Xpander".
+`;
+
 Deno.serve(async (req) => {
     if (req.method === "OPTIONS") {
         return new Response(null, { headers: corsHeaders });
@@ -149,7 +176,7 @@ Deno.serve(async (req) => {
         }
 
         const supabase = createClient(supabaseUrl, serviceRoleKey);
-        const { messages } = await req.json();
+        const { messages, userName } = await req.json();
 
         if (!messages || !Array.isArray(messages)) {
             throw new Error("Invalid messages format");
@@ -162,19 +189,57 @@ Deno.serve(async (req) => {
     Database Schema:
     ${DATABASE_SCHEMA}
 
+    ${APP_DOCUMENTATION}
+
     Rules:
     1. You have READ-ONLY access.
     2. Convert natural language questions into valid PostgreSQL queries.
     3. Output Format (JSON ONLY):
        - Database Question: { "sql": "SELECT ..." }
-       - Tire Upgrade Request (e.g. "upgrade ban 195/65R15"): { "action": "upgrade_tire", "size": "195/65R15" }
-       - Navigation Request (e.g. "buka kalkulator", "menu ban"): { "action": "navigate", "target": "/tire-upgrade" }
+       - App/Workflow Question (e.g. "cara buat tiket", "apa itu complain compass"): { "action": "explain_app", "topic": "ticket_creation" } -> *Handle this in summarizer, or just answer directly via 'sql' with empty query if needed, but better to let the summarizer handle it. Actually, for this model, we can just let it answer in the summarization phase if no SQL is generated. But wait, the first step is SQL generation. If the user asks "How to create ticket", we don't need SQL.
+       
+       *REVISED STRATEGY*:
+       If the user asks about APP WORKFLOWS (not database data), return: { "action": "explain_app", "reply": "Your explanation here based on SYSTEM KNOWLEDGE BASE." }
+       
+       - Database Question: { "sql": "SELECT ..." }
+       - Tire Upgrade Request: { "action": "upgrade_tire", "size": "..." }
+       - Navigation Request: { "action": "navigate", "target": "..." }
+       - App Knowledge/Workflow Question: { "action": "explain_app", "reply": "Short explanation based on System Knowledge Base." }
        - Error/Unknown: { "error": "Cannot answer" }
+
     4. Do not include markdown code blocks.
     5. Be case-insensitive (use ILIKE).
     6. Limit results to 10 unless specified.
     7. CRITICAL: The column for brand name is 'name' (in car_brands) and model name is 'name' (in car_models). Do NOT use 'brand_name' or 'model_name'.
+    8. WIPER QUERIES:
+       - If the user asks for wiper sizes and does NOT provide a year, SELECT all matching rows for that model from 'wiper_specifications'.
+       - Do NOT ask for the year.
+       - Join with 'wiper_sizes' to get the size_inch and position.
+       - Order by year_start DESC.
+    9. GENERAL SPECIFICATION QUERIES (fluids, parts, tires, legs, etc.):
+       - If user asks for any vehicle spec (oil, tires, battery, suspension, filters, etc) and does NOT provide a year:
+       - SELECT all matching rows for that 'model' from 'vehicle_specifications'.
+       - Include 'year_start', 'year_end', and 'variant_name' in the SELECT column list along with the requested spec.
+       - Order by 'year_start' DESC.
+       - Do NOT ask for the year.
+    10. APP KNOWLEDGE (INFERENCE):
+       - If user input is short (e.g. "tiket macet", "beda compass"), INFER the intent based on the WORKFLOWS.
+       - example: "tiket macet" -> Explain the ticket flow (New -> Report -> In Progress) and suggest checking status.
+       - example: "complain viral" -> Explain "Complain Compass" viral risk flow.
+    11. CONTEXT RETENTION (CRITICAL):
+       - If the user asks a follow-up question (e.g. "Harganya berapa?", "Kalau olinya?", "Ukuran wipernya?") without mentioning a vehicle:
+       - LOOK BACK at the conversation history to find the active Vehicle Brand, Model, and Year.
+       - USE that retained vehicle context to construct the SQL query.
+       - Example: User "Ban Avanza 2021" -> SQL covers Avanza. Next User msg "Harganya?" -> You MUST infer they mean "Harga Ban Avanza 2021".
+       - RESET context ONLY if the user explicitly mentions a NEW vehicle brand/model.
     `;
+
+        // Add user context if available
+        let currentSystemPrompt = systemPrompt;
+        if (userName) {
+            const firstName = userName.split(' ')[0];
+            currentSystemPrompt += `\n\nUser Context: You are chatting with ${firstName}. Greet them by name naturally in your FIRST response if appropriate, and occasionally during the conversation, but do not overuse it.`;
+        }
 
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
@@ -185,7 +250,7 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
                 model: "tngtech/deepseek-r1t2-chimera:free",
                 messages: [
-                    { role: "system", content: systemPrompt },
+                    { role: "system", content: currentSystemPrompt },
                     ...messages
                 ]
             }),
@@ -229,6 +294,13 @@ Deno.serve(async (req) => {
             } else if (parsed.action === 'navigate' && parsed.target) {
                 return new Response(JSON.stringify({ reply: `Silakan akses menu di sini: [Buka Halaman](${parsed.target})` }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+            } else if (parsed.action === 'explain_app' && parsed.reply) {
+                return new Response(JSON.stringify({
+                    reply: parsed.reply
+                }), {
+                    headers: { ...corsHeaders, "Content-Type": "application/json" },
+                });
+
             } else if (parsed.error) {
                 return new Response(JSON.stringify({ reply: parsed.error }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
@@ -259,7 +331,7 @@ Deno.serve(async (req) => {
         if (dbError) {
             console.error("SQL Execution Error:", dbError);
             return new Response(JSON.stringify({
-                reply: `I tried to query the database but encountered an error: ${dbError.message || JSON.stringify(dbError)}`,
+                reply: `Maaf, saya kurang mengerti pertanyaan Anda atau ada kesalahan format. Bisa tolong ulangi pertanyaan dengan lebih jelas atau spesifik? Terima kasih!`,
                 debug: dbError.message
             }), {
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -276,7 +348,7 @@ Deno.serve(async (req) => {
             body: JSON.stringify({
                 model: "tngtech/deepseek-r1t2-chimera:free",
                 messages: [
-                    { role: "system", content: "You are a helpful assistant. If the Database Results contain data, summarize it concisely. If the Database Results are empty or contain '[]', IGNORE the database and answer the User Question using your own general knowledge/training data. If you answer from general knowledge, start with '⚠️ Data tidak ditemukan di database internal, namun berdasarkan informasi umum:'." },
+                    { role: "system", content: "You are a helpful assistant. If the Database Results contain data, summarize it concisely and directly. Avoid conversational filler. For lists (like years), use a clean format. If the Database Results are empty or contain '[]', IGNORE the database and answer the User Question using your own general knowledge/training data. If you answer from general knowledge, start with '⚠️ Data tidak ditemukan di database internal, namun berdasarkan informasi umum:'." },
                     { role: "user", content: `User Question: ${messages[messages.length - 1].content}\n\nDatabase Results: ${JSON.stringify(result)}` }
                 ]
             }),

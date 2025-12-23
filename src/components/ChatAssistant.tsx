@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { MessageCircle, X, Send, Loader2, Bot, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ type Message = {
 };
 
 export function ChatAssistant() {
+    const { profile } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         { role: "assistant", content: "Halo! Saya asisten AI Mobeng. Ada yang bisa saya bantu terkait data complaint atau kendaraan?" }
@@ -21,6 +23,26 @@ export function ChatAssistant() {
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
     const scrollRef = useRef<HTMLDivElement>(null);
+    const hasInitialized = useRef(false);
+
+    useEffect(() => {
+        if (profile?.name && !hasInitialized.current) {
+            setMessages(prev => {
+                const newMsgs = [...prev];
+                if (newMsgs.length > 0 && newMsgs[0].role === 'assistant') {
+                    const firstName = profile.name.split(' ')[0];
+                    newMsgs[0] = {
+                        ...newMsgs[0],
+                        content: `Halo ${firstName}! Saya asisten AI Mobeng. Ada yang bisa saya bantu terkait data complaint atau kendaraan?`
+                    };
+                }
+                return newMsgs;
+            });
+            hasInitialized.current = true;
+        }
+    }, [profile]);
+
+
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -38,7 +60,10 @@ export function ChatAssistant() {
 
         try {
             const { data, error } = await supabase.functions.invoke('chat-assistant', {
-                body: { messages: [...messages, userMessage] }
+                body: {
+                    messages: [...messages, userMessage],
+                    userName: profile?.name
+                }
             });
 
             if (error) throw error;
