@@ -319,16 +319,16 @@ export function EditDataDialog({ vehicle, variant, onUpdate }: EditDataDialogPro
                 tires: tireSize ? [{
                     location: tireLocation as any,
                     size: tireSize,
-                    pressure_psi_front: Number(tirePressureFront) || 32,
-                    pressure_psi_rear: Number(tirePressureRear) || 32,
+                    pressure_psi_front: Number(tirePressureFront) || undefined,
+                    pressure_psi_rear: Number(tirePressureRear) || undefined,
                     load_speed_index: tireLoadSpeed || undefined,
                     recommended_brands: tireBrands ? tireBrands.split(",").map(b => b.trim()) : undefined
                 }] : [],
                 battery: batteryType ? {
                     type: batteryType,
                     model: batteryModel,
-                    ampere: Number(batteryAmpere) || 45,
-                    voltage: Number(batteryVoltage) || 12,
+                    ampere: Number(batteryAmpere) || undefined,
+                    voltage: Number(batteryVoltage) || undefined,
                     dimensions: batteryDimensions
                 } : undefined,
                 brakes: brakeFront ? {

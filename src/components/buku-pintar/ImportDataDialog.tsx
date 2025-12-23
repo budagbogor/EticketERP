@@ -127,15 +127,15 @@ export function ImportDataDialog({ onImport }: ImportDataDialogProps) {
                             tires: row["Ban - Ukuran"] ? [{
                                 location: "Depan & Belakang",
                                 size: row["Ban - Ukuran"],
-                                pressure_psi_front: Number(row["Ban - Tekanan Depan (PSI)"]) || 32,
-                                pressure_psi_rear: Number(row["Ban - Tekanan Belakang (PSI)"]) || 32,
+                                pressure_psi_front: Number(row["Ban - Tekanan Depan (PSI)"]) || undefined,
+                                pressure_psi_rear: Number(row["Ban - Tekanan Belakang (PSI)"]) || undefined,
                                 recommended_brands: row["Ban - Merek"] ? String(row["Ban - Merek"]).split(",").map(b => b.trim()) : []
                             }] : [],
                             battery: row["Aki - Tipe"] ? {
                                 type: row["Aki - Tipe"],
                                 model: row["Aki - Model"] || "",
-                                ampere: Number(row["Aki - Ampere"]) || 45,
-                                voltage: Number(row["Aki - Voltage"]) || 12,
+                                ampere: Number(row["Aki - Ampere"]) || undefined,
+                                voltage: Number(row["Aki - Voltage"]) || undefined,
                                 dimensions: row["Aki - Dimensi"] || ""
                             } : undefined,
                             brakes: row["Rem - Tipe Depan"] ? {
