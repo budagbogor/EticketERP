@@ -9,6 +9,9 @@ Panduan lengkap penggunaan aplikasi MBTracker untuk semua role pengguna.
 - [Manajemen Tiket](#manajemen-tiket)
 - [Laporan Teknik](#laporan-teknik)
 - [Buku Pintar](#buku-pintar)
+- [Tire Data Management](#tire-data-management)
+- [Tire Upgrade Calculator](#tire-upgrade-calculator)
+- [Wiper Fit Finder](#wiper-fit-finder)
 - [Laporan & Export](#laporan--export)
 - [Manajemen Pengguna](#manajemen-pengguna-admin)
 - [Pengaturan](#pengaturan-admin)
@@ -27,7 +30,7 @@ Panduan lengkap penggunaan aplikasi MBTracker untuk semua role pengguna.
    - **Role**: Pilih role yang sesuai
      - **Admin**: Akses penuh ke semua fitur
      - **Mekanik**: Akses ke tiket dan laporan teknik
-     - **Customer Service**: Akses ke tiket dan dashboard
+     - **Customer Service**: Akses ke menu utama saja (tanpa akses admin)
 4. Klik **"Daftar"**
 5. Anda akan diarahkan ke halaman login
 
@@ -236,43 +239,69 @@ Buku Pintar adalah database spesifikasi kendaraan.
 #### Oli Mesin
 - Viskositas (0W-20, 5W-30, dll)
 - Kapasitas (liter)
-- Standar kualitas (API SP, ILSAC GF-6A)
+- Standar kualitas (API SP, ILSAC GF-6A, dll)
 - Merek rekomendasi
 
 #### Oli Transmisi
 - Tipe (CVT Fluid, ATF WS, dll)
 - Kapasitas (liter)
+- Merek rekomendasi
+
+#### Oli Gardan (Differential)
+- Tipe oli differential
+- Kapasitas (liter)
+
+#### Oli Power Steering
+- Tipe oli power steering
+- Merek rekomendasi
+
+#### Minyak Rem
+- Tipe (DOT 3/4)
+- Merek rekomendasi
+
+#### Coolant (Radiator)
+- Tipe coolant
+- Merek rekomendasi
+
+#### Freon AC
+- Tipe freon
+- Merek rekomendasi
 
 #### Suku Cadang
-- Filter oli (part number)
-- Filter udara (part number)
-- Filter kabin (part number)
-- Busi (part number)
+- Filter oli (part number + merek rekomendasi)
+- Filter udara (part number + merek rekomendasi)
+- Filter kabin (part number + merek rekomendasi)
+- Busi (part number + merek rekomendasi)
 
 #### Aki (Battery)
 - Tipe (Kering/Basah)
-- Model (NS40ZL, dll)
+- Model code (NS40ZL, dll)
 - Ampere (Ah)
 - Voltage (V)
-- Dimensi
+- Dimensi (P x L x T cm)
 
 #### Rem (Brakes)
 - Tipe rem depan
 - Tipe rem belakang
 - Part number kampas rem depan
 - Part number kampas rem belakang
-- Minyak rem (DOT 3/4)
+- Merek rekomendasi kampas rem
 
 #### Kaki-kaki (Suspension)
-- Shock absorber depan/belakang
-- Rack end
-- Tie rod end
-- Link stabilizer
-- Lower arm
-- Upper arm
+- Shock absorber depan (part number + merek rekomendasi)
+- Shock absorber belakang (part number + merek rekomendasi)
+- Rack end (part number + merek rekomendasi)
+- Tie rod end (part number + merek rekomendasi)
+- Link stabilizer (part number + merek rekomendasi)
+- Lower arm (part number + merek rekomendasi)
+- Upper arm (part number + merek rekomendasi)
+- Upper support (part number + merek rekomendasi)
 
 #### Ban (Tires)
 - Ukuran ban
+- Load index (indeks beban)
+- Speed index (indeks kecepatan)
+- Merek rekomendasi
 - Tekanan angin
 
 ### Menambah Data Buku Pintar
@@ -311,6 +340,156 @@ Buku Pintar adalah database spesifikasi kendaraan.
    - "Part number filter oli untuk Honda Civic 2020?"
    - "Ukuran ban untuk Toyota Fortuner?"
 4. AI akan menjawab berdasarkan data di Buku Pintar
+
+## Tire Data Management
+
+Fitur untuk mengelola database ban (tire brands dan tire products).
+
+### Melihat Data Ban
+
+1. Klik **"Tire Data"** di sidebar
+2. Pilih tab **"Brands"** untuk melihat merek ban
+3. Pilih tab **"Products"** untuk melihat produk ban
+4. Gunakan **Search** untuk mencari berdasarkan nama
+5. Gunakan **Filter** untuk menyaring data
+
+### Menambah Merek Ban
+
+1. Di tab **"Brands"**, klik **"Add Brand"**
+2. Isi form:
+   - **Brand Name**: Nama merek (contoh: Bridgestone, Michelin)
+   - **Logo URL**: URL logo merek (opsional)
+   - **Description**: Deskripsi merek (opsional)
+3. Klik **"Save"**
+
+### Menambah Produk Ban
+
+1. Di tab **"Products"**, klik **"Add Product"**
+2. Isi form:
+   - **Brand**: Pilih merek ban
+   - **Product Name**: Nama produk (contoh: Turanza T005)
+   - **Size**: Ukuran ban (contoh: 195/65R15)
+   - **Type**: Tipe ban (Radial, Bias, Run-flat)
+   - **Load Index**: Indeks beban (contoh: 91)
+   - **Speed Index**: Indeks kecepatan (contoh: V)
+   - **Price**: Harga (Rp)
+   - **Rating**: Rating produk (1-5)
+   - **Warranty**: Garansi (bulan)
+   - **Features**: Fitur produk (comma-separated)
+3. Klik **"Save"**
+
+### Import Data Ban dari Excel
+
+1. Klik tombol **"Import Excel"**
+2. Download template Excel jika belum punya
+3. Isi data ban di Excel sesuai format template
+4. Klik **"Choose File"** dan pilih file Excel
+5. Klik **"Import"**
+6. Sistem akan memproses dan menampilkan hasil import
+
+### Export Data Ban
+
+1. Klik tombol **"Export CSV"**
+2. File CSV akan terdownload otomatis
+3. File berisi semua data ban (brands dan products)
+
+### Edit/Hapus Data Ban
+
+1. Di daftar brands/products, klik icon **Edit** (pensil)
+2. Update informasi yang diperlukan
+3. Klik **"Save Changes"**
+4. Untuk hapus, klik icon **Delete** (trash) dan konfirmasi
+
+## Tire Upgrade Calculator
+
+Fitur untuk menghitung rekomendasi upgrade ukuran ban.
+
+### Mencari Rekomendasi Ban
+
+1. Klik **"Tire Upgrade"** di sidebar
+2. Isi **Current Tire Size**:
+   - **Width**: Lebar ban (mm) - contoh: 195
+   - **Aspect Ratio**: Rasio tinggi (%) - contoh: 65
+   - **Rim Diameter**: Diameter velg (inch) - contoh: 15
+3. Klik **"Calculate Upgrades"**
+
+### Melihat Hasil Rekomendasi
+
+Sistem akan menampilkan:
+- **Upgrade Options**: Daftar ukuran ban yang direkomendasikan
+- **Same Rim Diameter**: Hanya ukuran dengan diameter velg yang sama
+- **Diameter Difference**: Perbedaan diameter total (maksimal ±3%)
+- **Visual Comparison**: Perbandingan ukuran secara visual
+
+### Melihat Brand Recommendations
+
+1. Klik salah satu ukuran rekomendasi
+2. Sistem akan menampilkan produk ban dari berbagai merek
+3. Informasi yang ditampilkan:
+   - Brand dan nama produk
+   - Harga
+   - Rating
+   - Warranty
+   - Features
+   - Load index dan speed index
+
+### Tips Penggunaan
+
+- Pilih ukuran dengan diameter difference ≤ 3%
+- Perhatikan load index harus sama atau lebih tinggi
+- Sesuaikan dengan kecepatan maksimal kendaraan (speed index)
+
+## Wiper Fit Finder
+
+Fitur untuk mencari ukuran wiper yang sesuai dengan kendaraan.
+
+### Mencari Ukuran Wiper
+
+1. Klik **"Wiper Finder"** di sidebar
+2. Pilih **Make** (Merek kendaraan)
+3. Pilih **Model** (Model kendaraan)
+4. Pilih **Year** (Tahun)
+5. Klik **"Search"**
+
+### Melihat Hasil Pencarian
+
+Sistem akan menampilkan:
+- **Driver Side**: Ukuran wiper sisi pengemudi (inch)
+- **Passenger Side**: Ukuran wiper sisi penumpang (inch)
+- **Rear**: Ukuran wiper belakang (inch) - jika ada
+
+### Menambah Data Wiper
+
+1. Klik tombol **"Add Wiper Data"**
+2. Isi form:
+   - **Make**: Merek kendaraan
+   - **Model**: Model kendaraan
+   - **Year**: Tahun
+   - **Driver Size**: Ukuran wiper pengemudi (inch)
+   - **Passenger Size**: Ukuran wiper penumpang (inch)
+   - **Rear Size**: Ukuran wiper belakang (inch) - opsional
+3. Klik **"Save"**
+
+### Import Data Wiper dari Excel
+
+1. Klik tombol **"Import Excel"**
+2. Download template Excel
+3. Isi data wiper sesuai format
+4. Upload file Excel
+5. Klik **"Import"**
+
+### Export Data Wiper
+
+1. Klik tombol **"Export CSV"**
+2. File CSV akan terdownload
+3. Gunakan untuk backup atau analisis
+
+### Edit/Hapus Data Wiper
+
+1. Di hasil pencarian, klik icon **Edit**
+2. Update ukuran wiper
+3. Klik **"Save Changes"**
+4. Untuk hapus, klik icon **Delete** dan konfirmasi
 
 ## Laporan & Export
 

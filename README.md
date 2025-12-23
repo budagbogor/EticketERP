@@ -1,6 +1,6 @@
 # MBTracker - Mobeng E-Ticket System
 
-![MBTracker](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![MBTracker](https://img.shields.io/badge/version-1.3.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?logo=typescript)
@@ -46,23 +46,52 @@
 
 ### 📚 Buku Pintar (Vehicle Database)
 - **Database Kendaraan**: Informasi lengkap spesifikasi kendaraan
-- **Oli Mesin**: Viskositas, kapasitas, standar kualitas, merek rekomendasi
-- **Oli Transmisi**: Tipe dan kapasitas oli transmisi
-- **Suku Cadang**: Part number untuk filter oli, filter udara, filter kabin, busi
-- **Aki**: Tipe, model, ampere, voltage, dimensi
-- **Rem**: Tipe rem depan/belakang, part number kampas rem, minyak rem
-- **Kaki-kaki**: Shock absorber, rack end, tie rod, link stabilizer, lower/upper arm
-- **Ban**: Ukuran dan spesifikasi ban
+- **Oli Mesin**: Viskositas, kapasitas, standar kualitas (API SP, ILSAC GF-6A), merek rekomendasi
+- **Oli Transmisi**: Tipe, kapasitas, merek rekomendasi (ATF, CVT Fluid, dll)
+- **Oli Gardan**: Tipe dan kapasitas oli differential
+- **Oli Power Steering**: Tipe dan merek rekomendasi
+- **Minyak Rem**: Tipe (DOT 3/4) dan merek rekomendasi
+- **Coolant**: Tipe radiator coolant dan merek rekomendasi
+- **Freon AC**: Tipe dan merek rekomendasi
+- **Suku Cadang**: Part number untuk filter oli, filter udara, filter kabin, busi dengan merek rekomendasi
+- **Aki**: Tipe, model code, ampere (Ah), voltage (V), dimensi (P x L x T)
+- **Rem**: Tipe rem depan/belakang, part number kampas rem, merek rekomendasi
+- **Kaki-kaki**: Part number untuk 8 komponen (shock depan/belakang, rack end, tie rod, link stabilizer, lower/upper arm, upper support) dengan merek rekomendasi
+- **Ban**: Ukuran, load index, speed index, merek rekomendasi
+- **Import/Export**: Upload data via Excel, export template, edit data massal
 - **AI Chatbot**: Tanya jawab tentang spesifikasi kendaraan dengan Google Gemini
 
+### 🔧 Tire Data Management (NEW)
+- **Manage Tire Brands**: CRUD untuk merek ban dengan logo
+- **Manage Tire Products**: Database produk ban dengan spesifikasi lengkap
+- **Import Excel**: Upload data ban massal dari Excel
+- **Export CSV**: Download data ban untuk backup/analisis
+- **Product Details**: Harga, rating, warranty, features, load/speed index
+- **Search & Filter**: Cari berdasarkan merek, ukuran, tipe
+
+### 🚗 Tire Upgrade Calculator (NEW)
+- **Upgrade Recommendations**: Hitung rekomendasi upgrade ban berdasarkan ukuran asli
+- **Same Rim Diameter**: Hanya tampilkan ukuran dengan diameter velg yang sama
+- **Brand Recommendations**: Tampilkan produk ban dari berbagai merek
+- **Detailed Specs**: Load index, speed index, harga, rating
+- **Visual Comparison**: Bandingkan ukuran ban secara visual
+
+### 🧹 Wiper Fit Finder (NEW)
+- **Wiper Size Database**: Database ukuran wiper untuk berbagai kendaraan
+- **Search by Vehicle**: Cari berdasarkan merek, model, tahun
+- **Import/Export**: Upload data via Excel, export template
+- **CRUD Operations**: Tambah, edit, hapus data wiper
+- **Multiple Positions**: Driver, passenger, rear wiper sizes
+
 ### 👥 Manajemen Pengguna (User Management)
-- **Role-Based Access**: Admin, Staff, Tech Support, PSD, Viewer
+- **Role-Based Access**: Admin, Staff, Tech Support, PSD, Customer Service, Viewer
 - **CRUD Users**: Tambah, edit, hapus pengguna
 - **Generate Password**: Admin dapat generate password baru untuk user
 - **Reset Password**: Kirim email reset password
 - **NIK Optional**: NIK tidak wajib untuk fleksibilitas
 - **Search & Filter**: Cari pengguna berdasarkan nama, email, NIK, role
-- **Access Control**: Viewer role hanya dapat melihat, tidak dapat create/edit
+- **Access Control**: Customer Service hanya akses menu utama, Viewer hanya dapat melihat
+
 
 ### 📊 Dashboard & Laporan
 - **Dashboard**: Statistik real-time tiket, grafik, quick actions
