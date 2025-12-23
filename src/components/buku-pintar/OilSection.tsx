@@ -27,20 +27,6 @@ export function OilSection({ engineOil, transmissionOil, differentialOil, powerS
                                 </>
                             )}
 
-                            {engineOil.capacity_liter && (
-                                <>
-                                    <span className="text-muted-foreground">Kapasitas (Tanpa Filter):</span>
-                                    <span className="font-medium">{engineOil.capacity_liter} Liter</span>
-                                </>
-                            )}
-
-                            {engineOil.capacity && (
-                                <>
-                                    <span className="text-muted-foreground">Kapasitas:</span>
-                                    <span className="font-medium">{engineOil.capacity}</span>
-                                </>
-                            )}
-
                             {engineOil.capacity_with_filter_liter && (
                                 <>
                                     <span className="text-muted-foreground">Kapasitas (Ganti Filter):</span>
