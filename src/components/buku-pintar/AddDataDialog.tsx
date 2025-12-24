@@ -33,11 +33,13 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
     const [oilCapacity, setOilCapacity] = useState("");
     const [oilQuality, setOilQuality] = useState("");
     const [oilBrands, setOilBrands] = useState("");
+    const [oilInterval, setOilInterval] = useState("");
 
     // Transmission Oil
     const [transOilType, setTransOilType] = useState("");
     const [transOilCapacity, setTransOilCapacity] = useState("");
     const [transOilBrands, setTransOilBrands] = useState("");
+    const [transOilInterval, setTransOilInterval] = useState("");
 
     // Differential Oil
     const [diffOilType, setDiffOilType] = useState("");
@@ -136,13 +138,15 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                     capacity_liter: parseFloat(oilCapacity.replace(",", ".")) || 0,
                     capacity_with_filter_liter: (parseFloat(oilCapacity.replace(",", ".")) || 4) + 0.2,
                     quality_standard: oilQuality || "API SP",
-                    recommended_brands: oilBrands ? oilBrands.split(",").map(b => b.trim()) : undefined
+                    recommended_brands: oilBrands ? oilBrands.split(",").map(b => b.trim()) : undefined,
+                    replacement_interval_km: Number(oilInterval) || undefined
                 },
                 transmission_oil: {
                     type: transOilType || "Standard",
                     capacity: transOilCapacity,
                     capacity_liter: parseFloat(transOilCapacity.replace(",", ".")) || 0,
-                    recommended_brands: transOilBrands ? transOilBrands.split(",").map(b => b.trim()) : undefined
+                    recommended_brands: transOilBrands ? transOilBrands.split(",").map(b => b.trim()) : undefined,
+                    replacement_interval_km: Number(transOilInterval) || undefined
                 },
                 differential_oil: diffOilType ? {
                     type: diffOilType,
@@ -232,10 +236,11 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
         setOilCapacity("");
         setOilQuality("");
         setOilBrands("");
-        setOilBrands("");
+        setOilInterval("");
         setTransOilType("");
         setTransOilCapacity("");
         setTransOilBrands("");
+        setTransOilInterval("");
         setDiffOilType("");
         setDiffOilCapacity("");
         setDiffOilBrands("");
@@ -477,8 +482,11 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                     <Input placeholder="API SP / ILSAC GF-6A" value={oilQuality} onChange={e => setOilQuality(e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Merek Rekomendasi</Label>
                                     <Input placeholder="Pisahkan dengan koma (TMO, Shell)" value={oilBrands} onChange={e => setOilBrands(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Interval Ganti (KM)</Label>
+                                    <Input type="number" placeholder="10000" value={oilInterval} onChange={e => setOilInterval(e.target.value)} />
                                 </div>
                             </div>
 
@@ -495,6 +503,10 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                                 <div className="space-y-2 col-span-2">
                                     <Label>Merek Rekomendasi (Opsional)</Label>
                                     <Input placeholder="Pisahkan dengan koma" value={transOilBrands} onChange={e => setTransOilBrands(e.target.value)} />
+                                </div>
+                                <div className="space-y-2 col-span-2">
+                                    <Label>Interval Ganti (KM)</Label>
+                                    <Input type="number" placeholder="40000" value={transOilInterval} onChange={e => setTransOilInterval(e.target.value)} />
                                 </div>
                             </div>
 
@@ -729,6 +741,6 @@ export function AddDataDialog({ brands, onAdd }: AddDataDialogProps) {
                     <Button onClick={handleAdd}>Simpan Data</Button>
                 </DialogFooter>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     );
 }

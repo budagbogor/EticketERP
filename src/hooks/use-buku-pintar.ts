@@ -210,20 +210,22 @@ export function useBukuPintar() {
                         year_start: spec.year_start,
                         year_end: spec.year_end,
                         engine_type: spec.engine_type,
-                        transmission: "AT" as any,
-                        engine_code: "",
+                        transmission: (spec.transmission as any) || "AT",
+                        engine_code: spec.engine_code || "",
                         specifications: {
                             engine_oil: {
                                 viscosity_options: spec.engine_oil_type ? [cleanSpecString(spec.engine_oil_type)] : [],
                                 capacity_liter: parseFloat(spec.engine_oil_capacity) || 0,
                                 capacity_with_filter_liter: parseFloat(spec.engine_oil_capacity) || 0,
                                 quality_standard: cleanSpecString(spec.engine_oil_quality_standard || spec.engine_oil_type) || "",
-                                recommended_brands: engineBrands
+                                recommended_brands: engineBrands,
+                                replacement_interval_km: parseInt(spec.engine_oil_replacement_interval_km) || undefined
                             },
                             transmission_oil: {
                                 type: cleanSpecString(spec.transmission_oil_type) || "",
                                 capacity_liter: parseFloat(spec.transmission_oil_capacity) || 0,
-                                recommended_brands: transBrands
+                                recommended_brands: transBrands,
+                                replacement_interval_km: parseInt(spec.transmission_oil_replacement_interval_km) || undefined
                             },
                             differential_oil: spec.power_steering_oil_type ? {
                                 type: cleanSpecString(spec.power_steering_oil_type),
@@ -386,15 +388,19 @@ export function useBukuPintar() {
             year_start: variant.year_start || new Date().getFullYear(),
             year_end: variant.year_end || null,
             engine_type: variant.engine_type || null,
+            transmission: variant.transmission || null,
+            engine_code: variant.engine_code || null,
 
             engine_oil_capacity: variant.specifications.engine_oil?.capacity_liter?.toString() || null,
             engine_oil_type: engineOilType,
             engine_oil_quality_standard: variant.specifications.engine_oil?.quality_standard || null,
             engine_oil_recommended_brands: engineOilBrands,
+            engine_oil_replacement_interval_km: variant.specifications.engine_oil?.replacement_interval_km?.toString() || null,
 
             transmission_oil_capacity: variant.specifications.transmission_oil?.capacity_liter?.toString() || null,
             transmission_oil_type: variant.specifications.transmission_oil?.type || null,
             transmission_oil_recommended_brands: transmissionOilBrands,
+            transmission_oil_replacement_interval_km: variant.specifications.transmission_oil?.replacement_interval_km?.toString() || null,
 
             // Mapping Differential Oil input to Power Steering columns as per existing schema reuse
             power_steering_oil_capacity: psOilCapacity,
