@@ -232,12 +232,20 @@ export function useBukuPintar() {
                                 capacity_liter: parseFloat(spec.power_steering_oil_capacity) || 0,
                                 recommended_brands: psBrands
                             } : undefined,
+                            radiator_coolant: spec.radiator_coolant_type || spec.radiator_coolant_capacity ? {
+                                type: cleanSpecString(spec.radiator_coolant_type),
+                                capacity: spec.radiator_coolant_capacity || ""
+                            } : undefined,
+                            ac_freon: spec.ac_freon_type || spec.ac_freon_capacity ? {
+                                type: cleanSpecString(spec.ac_freon_type),
+                                capacity: spec.ac_freon_capacity || ""
+                            } : undefined,
                             parts: [
                                 ...(spec.oil_filter_type ? [createPart("Filter Oli", "Oil Filter", spec.oil_filter_type, spec.oil_filter_recommended_brands)!] : []),
                                 ...(spec.air_filter_type ? [createPart("Filter Udara", "Air Filter", spec.air_filter_type, spec.air_filter_recommended_brands)!] : []),
                                 ...(spec.cabin_filter_type ? [createPart("Filter Kabin", "Cabin Filter", spec.cabin_filter_type, spec.cabin_filter_recommended_brands)!] : []),
                                 ...(spec.spark_plug_type ? [createPart("Busi", "Spark Plug", spec.spark_plug_type, spec.spark_plug_recommended_brands)!] : []),
-                                ...(spec.fuel_filter_type ? [createPart("Filter Bensin", "Fuel Filter", spec.fuel_filter_type, spec.fuel_filter_recommended_brands)!] : []),
+                                ...(spec.fuel_filter_type ? [createPart("Filter Bensin", spec.engine_type === "Diesel" ? "Fuel Filter (Solar)" : "Fuel Filter (Bensin)", spec.fuel_filter_type, spec.fuel_filter_recommended_brands)!] : []),
                                 ...(spec.wiper_size_driver ? [{
                                     category: "Wiper" as const,
                                     name: `Driver: ${spec.wiper_size_driver}, Passenger: ${spec.wiper_size_passenger || '-'}, Rear: ${spec.wiper_size_rear || '-'}`,
@@ -375,8 +383,17 @@ export function useBukuPintar() {
         const cabinFilterBrands = getPartBrands("Filter Kabin", "Cabin Filter");
 
         // Fuel Filter might be "Filter Bensin" or "Filter Solar"
-        const fuelFilter = variant.specifications.filters?.fuel_filter || getPartNumber("Filter Bensin", "Fuel Filter") || getPartNumber("Filter Solar", "Fuel Filter");
-        const fuelFilterBrands = getPartBrands("Filter Bensin", "Fuel Filter") || getPartBrands("Filter Solar", "Fuel Filter");
+        // Note: EditDataDialog uses specific names "Fuel Filter (Bensin)" and "Fuel Filter (Solar)"
+        const fuelFilter = variant.specifications.filters?.fuel_filter ||
+            getPartNumber("Filter Bensin", "Fuel Filter (Bensin)") ||
+            getPartNumber("Filter Solar", "Fuel Filter (Solar)") ||
+            getPartNumber("Filter Bensin", "Fuel Filter") || // Fallback
+            getPartNumber("Filter Solar", "Fuel Filter"); // Fallback
+
+        const fuelFilterBrands = getPartBrands("Filter Bensin", "Fuel Filter (Bensin)") ||
+            getPartBrands("Filter Solar", "Fuel Filter (Solar)") ||
+            getPartBrands("Filter Bensin", "Fuel Filter") ||
+            getPartBrands("Filter Solar", "Fuel Filter");
 
         const oilFilter = variant.specifications.filters?.oil_filter || getPartNumber("Filter Oli", "Oil Filter");
         const oilFilterBrands = getPartBrands("Filter Oli", "Oil Filter");
