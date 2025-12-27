@@ -11,6 +11,7 @@ import {
   Lock,
   BookOpen,
   MessageSquareWarning,
+  MessageSquare,
   CircleDashed,
   Briefcase,
   Wrench,
@@ -40,6 +41,7 @@ const mainMenuItems = [
   { title: "Laporan Teknik", url: "/reports", icon: FileText, end: true },
   { title: "Buku Pintar", url: "/buku-pintar", icon: BookOpen, end: true },
   { title: "Complain Compass", url: "/complain-compass", icon: MessageSquareWarning, end: true },
+  { title: "Forum Diskusi", url: "/forum", icon: MessageSquare, end: false },
   { title: "Upgrade Ban", url: "/tire-upgrade", icon: CircleDashed, end: true },
   { title: "Pencari Ukuran Wiper", url: "/wiper-fit-finder", icon: Wrench, end: true },
 ];

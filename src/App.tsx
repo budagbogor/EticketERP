@@ -32,6 +32,9 @@ import TireUpgrade from "./pages/TireUpgrade";
 import ManageTires from "./pages/admin/ManageTires";
 import WiperFitFinder from "./pages/WiperFitFinder";
 import TireDataManagement from "./pages/TireDataManagement";
+import ForumPage from "./pages/forum/ForumPage";
+import ThreadDetail from "./pages/forum/ThreadDetail";
+import { ForumLayout } from "./components/layout/ForumLayout";
 
 const queryClient = new QueryClient();
 
@@ -156,6 +159,19 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/forum"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ForumLayout />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<ForumPage />} />
+              <Route path=":threadId" element={<ThreadDetail />} />
+            </Route>
             <Route
               path="/tire-upgrade"
               element={
